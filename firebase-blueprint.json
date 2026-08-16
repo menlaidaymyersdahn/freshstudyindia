@@ -1,0 +1,75 @@
+{
+  "entities": {
+    "users": {
+      "title": "Users",
+      "description": "Student and admin profiles",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "phone": { "type": "string" },
+        "county": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "email", "role"]
+    },
+    "applications": {
+      "title": "Applications",
+      "description": "University application entries saved to Firestore",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "studentId": { "type": "string" },
+        "studentName": { "type": "string" },
+        "studentEmail": { "type": "string" },
+        "universityName": { "type": "string" },
+        "courseName": { "type": "string" },
+        "degree": { "type": "string" },
+        "country": { "type": "string" },
+        "trackingId": { "type": "string" },
+        "status": { "type": "string" },
+        "progressPercentage": { "type": "number" },
+        "submittedDate": { "type": "string" },
+        "intake": { "type": "string" },
+        "notes": { "type": "string" },
+        "county": { "type": "string" }
+      },
+      "required": ["studentId", "universityName", "courseName", "status"]
+    },
+    "documents": {
+      "title": "Documents",
+      "description": "Student uploaded documents",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "studentId": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "uploadDate": { "type": "string" },
+        "status": { "type": "string" },
+        "size": { "type": "string" }
+      },
+      "required": ["studentId", "name", "category"]
+    },
+    "inquiries": {
+      "title": "Inquiries",
+      "description": "Contact admin inquiries",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "studentId": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "county": { "type": "string" },
+        "courseLevel": { "type": "string" },
+        "desiredCourse": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "email", "phone"]
+    }
+  }
+}
