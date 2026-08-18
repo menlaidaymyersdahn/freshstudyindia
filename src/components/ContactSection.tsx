@@ -25,17 +25,65 @@ export const ContactSection: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.fullName || !formData.phone) return;
 
     setIsSubmitting(true);
-    
-    // Simulate swift local persistence / dispatch
+
+    const countryCode = formData.country === 'Liberia' ? 'LR' : formData.country === 'Ghana' ? 'GH' : formData.country === 'Nigeria' ? 'NG' : 'INT';
+    const trackingRef = `IND-2026-${countryCode}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newId = `enquiry_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+
+    const enquiryApplication = {
+      id: newId,
+      trackingId: trackingRef,
+      fullName: formData.fullName.trim(),
+      phone: formData.phone.trim(),
+      email: '',
+      country: formData.country,
+      studyField: formData.studyField,
+      qualification: 'Pending Verification (Web Direct Enquiry)',
+      status: 'NEW',
+      documents: [],
+      notes: [
+        {
+          id: `note_${Date.now()}`,
+          text: formData.message ? `Student Inquiry Message: "${formData.message}"` : `Direct inquiry submitted from website homepage for ${formData.studyField}.`,
+          author: 'Website Contact Intake',
+          createdAt: new Date().toISOString()
+        }
+      ],
+      submittedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    // 1. Try server POST
+    try {
+      await fetch('/api/applications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(enquiryApplication)
+      });
+    } catch {
+      // static host fallback
+    }
+
+    // 2. Save into persistent local storage for Admissions Portal
+    try {
+      const existing = JSON.parse(localStorage.getItem('fresh_study_submitted_applications') || '[]');
+      const filtered = existing.filter((item: any) => item.id !== enquiryApplication.id);
+      filtered.unshift(enquiryApplication);
+      localStorage.setItem('fresh_study_submitted_applications', JSON.stringify(filtered));
+      window.dispatchEvent(new CustomEvent('fresh_application_submitted'));
+    } catch {
+      // storage
+    }
+
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
-    }, 600);
+    }, 400);
   };
 
   const countries = [

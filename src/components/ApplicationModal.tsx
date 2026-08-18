@@ -15,7 +15,7 @@ import {
   FileCheck
 } from 'lucide-react';
 import { BRAND, getWhatsAppLink } from '../lib/constants';
-import { ApplicationDocument } from '../types';
+import { ApplicationDocument, StudentApplicationProfile } from '../types';
 
 interface ApplicationModalProps {
   isOpen: boolean;
@@ -187,56 +187,70 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
       dataUrl: doc.dataUrl
     }));
 
-    const applicationData = {
+    const countryCode = country === 'Liberia' ? 'LR' : country === 'Ghana' ? 'GH' : country === 'Nigeria' ? 'NG' : 'INT';
+    const trackingRef = `IND-2026-${countryCode}-${Math.floor(1000 + Math.random() * 9000)}`;
+    let generatedId = `app_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+
+    const applicationPayload: StudentApplicationProfile = {
+      id: generatedId,
+      trackingId: trackingRef,
       fullName,
       phone,
       email,
       country,
       studyField,
       qualification,
+      status: 'NEW',
       documents: documentsPayload,
-      submittedAt: new Date().toISOString()
+      notes: [
+        {
+          id: `note_${Date.now()}`,
+          text: `Application submitted online by student from ${country}.`,
+          author: 'System Intake Engine',
+          createdAt: new Date().toISOString()
+        }
+      ],
+      submittedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
 
     try {
-      // 1. Submit to backend API endpoint
+      // 1. Submit to backend API endpoint if online
       const response = await fetch('/api/applications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(applicationData)
+        body: JSON.stringify(applicationPayload)
       });
 
-      let returnedId = `FSI-${Date.now()}`;
       if (response.ok) {
         const result = await response.json();
         if (result.applicationId) {
-          returnedId = result.applicationId;
+          generatedId = result.applicationId;
+          applicationPayload.id = generatedId;
+        }
+        if (result.trackingId) {
+          applicationPayload.trackingId = result.trackingId;
         }
       }
-
-      setSubmittedAppId(returnedId);
-
-      // 2. Persist to localStorage client record
-      try {
-        const existing = JSON.parse(localStorage.getItem('fresh_study_submitted_applications') || '[]');
-        existing.unshift({
-          ...applicationData,
-          id: returnedId,
-          documentsCount: documentsPayload.length
-        });
-        localStorage.setItem('fresh_study_submitted_applications', JSON.stringify(existing));
-      } catch {
-        // ignore localStorage full
-      }
-
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-    } catch (err) {
-      console.error('Submission error:', err);
-      // Fallback local submission
-      setIsSubmitting(false);
-      setIsSubmitted(true);
+    } catch {
+      // static host fallback
     }
+
+    setSubmittedAppId(applicationPayload.trackingId || generatedId);
+
+    // 2. Persist to localStorage client records for Admissions Portal
+    try {
+      const existing = JSON.parse(localStorage.getItem('fresh_study_submitted_applications') || '[]');
+      const filtered = existing.filter((item: any) => item.id !== applicationPayload.id);
+      filtered.unshift(applicationPayload);
+      localStorage.setItem('fresh_study_submitted_applications', JSON.stringify(filtered));
+      window.dispatchEvent(new CustomEvent('fresh_application_submitted'));
+    } catch {
+      // ignore localStorage full
+    }
+
+    setIsSubmitting(false);
+    setIsSubmitted(true);
   };
 
   const countries = [

@@ -78,6 +78,19 @@ export const AdmissionsPortal: React.FC<AdmissionsPortalProps> = ({ isOpen, onCl
     }
   }, [isOpen, isAuthenticated, statusFilter, countryFilter]);
 
+  // Real-time listener for new registrations across modals or tabs
+  useEffect(() => {
+    const handleNewSubmission = () => {
+      fetchApplications();
+    };
+    window.addEventListener('fresh_application_submitted', handleNewSubmission);
+    window.addEventListener('storage', handleNewSubmission);
+    return () => {
+      window.removeEventListener('fresh_application_submitted', handleNewSubmission);
+      window.removeEventListener('storage', handleNewSubmission);
+    };
+  }, [statusFilter, countryFilter]);
+
   // Fetch single dossier when selectedAppId changes
   useEffect(() => {
     if (selectedAppId) {
@@ -267,30 +280,30 @@ export const AdmissionsPortal: React.FC<AdmissionsPortalProps> = ({ isOpen, onCl
       // server offline / static host
     }
 
-    if (serverApps.length > 0) {
-      setApplications(serverApps);
-    } else {
-      // Load from local storage & apply search/filter
-      let localApps = getStoredApplications();
+    // Always retrieve local storage records
+    const localApps = getStoredApplications();
+    const combinedMap = new Map<string, any>();
 
-      if (statusFilter !== 'ALL') {
-        localApps = localApps.filter(a => a.status === statusFilter);
-      }
-      if (countryFilter !== 'ALL') {
-        localApps = localApps.filter(a => a.country.toLowerCase() === countryFilter.toLowerCase());
-      }
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        localApps = localApps.filter(a => 
-          a.fullName.toLowerCase().includes(q) ||
-          (a.trackingId && a.trackingId.toLowerCase().includes(q)) ||
-          a.phone.toLowerCase().includes(q) ||
-          (a.email && a.email.toLowerCase().includes(q)) ||
-          a.studyField.toLowerCase().includes(q)
-        );
-      }
+    // 1. Put server apps first
+    for (const app of serverApps) {
+      combinedMap.set(app.id, {
+        id: app.id,
+        trackingId: app.trackingId || `IND-2026-${app.id.slice(-4).toUpperCase()}`,
+        fullName: app.fullName,
+        phone: app.phone,
+        email: app.email,
+        country: app.country,
+        studyField: app.studyField,
+        qualification: app.qualification,
+        status: app.status || 'NEW',
+        documentsCount: app.documentsCount ?? (app.documents?.length || 0),
+        submittedAt: app.submittedAt || new Date().toISOString()
+      });
+    }
 
-      setApplications(localApps.map(a => ({
+    // 2. Put local apps (any new student registration from browser storage will be included/updated)
+    for (const a of localApps) {
+      combinedMap.set(a.id, {
         id: a.id,
         trackingId: a.trackingId || `IND-2026-${a.id.slice(-4).toUpperCase()}`,
         fullName: a.fullName,
@@ -300,11 +313,37 @@ export const AdmissionsPortal: React.FC<AdmissionsPortalProps> = ({ isOpen, onCl
         studyField: a.studyField,
         qualification: a.qualification,
         status: a.status || 'NEW',
-        documentsCount: a.documents?.length || 0,
+        documentsCount: (a as any).documentsCount ?? (a.documents?.length || 0),
         submittedAt: a.submittedAt || new Date().toISOString()
-      })));
+      });
     }
 
+    let combinedList = Array.from(combinedMap.values());
+
+    // Apply Filter by status
+    if (statusFilter !== 'ALL') {
+      combinedList = combinedList.filter(a => a.status === statusFilter);
+    }
+    // Apply Filter by country
+    if (countryFilter !== 'ALL') {
+      combinedList = combinedList.filter(a => a.country && a.country.toLowerCase() === countryFilter.toLowerCase());
+    }
+    // Apply Search query
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      combinedList = combinedList.filter(a => 
+        (a.fullName && a.fullName.toLowerCase().includes(q)) ||
+        (a.trackingId && a.trackingId.toLowerCase().includes(q)) ||
+        (a.phone && a.phone.toLowerCase().includes(q)) ||
+        (a.email && a.email.toLowerCase().includes(q)) ||
+        (a.studyField && a.studyField.toLowerCase().includes(q))
+      );
+    }
+
+    // Sort newest submissions first
+    combinedList.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+
+    setApplications(combinedList);
     setIsLoading(false);
   };
 
@@ -625,12 +664,22 @@ export const AdmissionsPortal: React.FC<AdmissionsPortalProps> = ({ isOpen, onCl
 
           <div className="flex items-center gap-3">
             {isAuthenticated && (
-              <button
-                onClick={handleLogout}
-                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition"
-              >
-                Log Out
-              </button>
+              <>
+                <button
+                  onClick={fetchApplications}
+                  title="Refresh student applications list"
+                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-sky-400 hover:text-white transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+                  <span>Refresh</span>
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition"
+                >
+                  Log Out
+                </button>
+              </>
             )}
             <button
               onClick={onClose}
