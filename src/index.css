@@ -1,20 +1,94 @@
 @import "tailwindcss";
 
+@layer base {
+  :root {
+    --primary: #1677FF;
+    --secondary: #38BDF8;
+    --accent: #06B6D4;
+    --bg-main: #F5FAFF;
+    --card-bg: #FFFFFF;
+    --text-main: #102A43;
+    --text-muted: #52667A;
+    --border-light: #D9EAF7;
+  }
+
+  body {
+    background-color: #F5FAFF;
+    color: #102A43;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Floating animation keyframes for educational visual elements */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(3deg);
+  }
+}
+
+@keyframes floatReverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(10px) rotate(-3deg);
+  }
+}
+
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.08);
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 7s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: floatReverse 8.5s ease-in-out infinite;
+}
+
+.animate-float-gentle {
+  animation: floatGentle 5s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 6s ease-in-out infinite;
+}
+
 /* Ensure all input, select, textarea fields have high-contrast, dark readable text on light backgrounds */
 input,
 textarea,
 select {
-  color: #0f172a !important; /* text-slate-900 */
-  -webkit-text-fill-color: #0f172a !important;
-  caret-color: #059669; /* emerald-600 */
+  color: #102A43 !important; /* deep navy text */
+  -webkit-text-fill-color: #102A43 !important;
+  caret-color: #1677FF; /* primary education blue */
 }
 
 /* Explicit high-contrast placeholder styling */
 input::placeholder,
 textarea::placeholder {
-  color: #64748b !important; /* text-slate-500 */
+  color: #52667A !important; /* secondary text */
   opacity: 1 !important;
-  -webkit-text-fill-color: #64748b !important;
+  -webkit-text-fill-color: #52667A !important;
 }
 
 /* Fix browser autofill so background stays clean and text NEVER turns white */
@@ -28,17 +102,20 @@ textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
-  -webkit-text-fill-color: #0f172a !important;
+  -webkit-text-fill-color: #102A43 !important;
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
   box-shadow: 0 0 0px 1000px #ffffff inset !important;
   transition: background-color 5000s ease-in-out 0s;
-  color: #0f172a !important;
+  color: #102A43 !important;
 }
 
-/* Dark mode inputs if inside dark container */
-.dark input,
-.dark textarea,
-.dark select {
-  color: #0f172a !important;
-  -webkit-text-fill-color: #0f172a !important;
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-slow,
+  .animate-float-reverse,
+  .animate-float-gentle,
+  .animate-pulse-glow {
+    animation: none !important;
+  }
 }
+

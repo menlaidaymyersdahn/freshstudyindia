@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ActiveTab } from '../types';
+import { motion } from 'motion/react';
 import { 
   GraduationCap, 
   Plane, 
@@ -23,17 +24,49 @@ import {
   Clock, 
   Globe, 
   Building2, 
-  Briefcase, 
-  MessageCircle,
   ChevronDown,
   Star,
-  Download
+  Check
 } from 'lucide-react';
 
 interface BentoHeroProps {
   setActiveTab: (tab: ActiveTab) => void;
   openApplyModal?: () => void;
 }
+
+// Interactive Count-Up Component for Hero Stats
+const StatCounter: React.FC<{ end: number; suffix?: string; prefix?: string; duration?: number }> = ({
+  end,
+  suffix = '',
+  prefix = '',
+  duration = 1800
+}) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const increment = end / (duration / 30);
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= end) {
+        setCount(end);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 30);
+
+    return () => clearInterval(timer);
+  }, [end, duration]);
+
+  return (
+    <span>
+      {prefix}
+      {count.toLocaleString()}
+      {suffix}
+    </span>
+  );
+};
 
 export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyModal }) => {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
@@ -49,10 +82,11 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
       badge: 'Core Service',
       description: 'Direct seat allocation and application processing for B.Tech, MBBS, BBA, MBA, Nursing, BCA, and Master degrees across India.',
       features: ['Direct Program Allotment', 'Course & Major Selection', 'Fast-Track Offer Letters', 'WAEC / NECO Grade Conversion'],
-      color: 'from-emerald-500/10 to-emerald-500/5',
-      borderColor: 'border-emerald-500/20',
-      iconColor: 'text-emerald-600 dark:text-emerald-400',
-      btnColor: 'bg-emerald-600 hover:bg-emerald-700 text-white'
+      color: 'from-[#1677FF]/10 to-[#38BDF8]/5',
+      borderColor: 'border-[#1677FF]/30',
+      iconBg: 'bg-[#EBF5FE]',
+      iconColor: 'text-[#1677FF]',
+      btnColor: 'bg-gradient-to-r from-[#1677FF] to-[#38BDF8] hover:from-[#005cd6] hover:to-[#0284c7] text-white shadow-sm shadow-blue-500/20'
     },
     {
       id: 'visa',
@@ -62,10 +96,11 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
       badge: '100% Approval Rate',
       description: 'End-to-end Student Visa (S-1/S-2) processing, document verification, embassy interview preparation, and official invitation letters.',
       features: ['Indian Embassy Filing Prep', 'VFS Appointment Scheduling', 'Visa Cover Letter Drafting', 'Document Attestation Guidance'],
-      color: 'from-indigo-500/10 to-indigo-500/5',
-      borderColor: 'border-indigo-500/20',
-      iconColor: 'text-indigo-600 dark:text-indigo-400',
-      btnColor: 'bg-indigo-600 hover:bg-indigo-700 text-white'
+      color: 'from-[#0284C7]/10 to-[#06B6D4]/5',
+      borderColor: 'border-[#0284C7]/30',
+      iconBg: 'bg-[#F0F9FF]',
+      iconColor: 'text-[#0284C7]',
+      btnColor: 'bg-gradient-to-r from-[#0284C7] to-[#06B6D4] hover:from-[#0369a1] hover:to-[#0891b2] text-white shadow-sm shadow-cyan-500/20'
     },
     {
       id: 'scholarship',
@@ -75,10 +110,11 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
       badge: 'Affordable Options',
       description: 'Transparent tuition cost structures, fee installment planning, and direct financial clearance guidance for international students.',
       features: ['Transparent Fee Breakdown', 'Installment Payment Schedules', 'Cost of Living Estimation', 'Direct Payment Clearance'],
-      color: 'from-amber-500/10 to-amber-500/5',
-      borderColor: 'border-amber-500/20',
-      iconColor: 'text-amber-600 dark:text-amber-400',
-      btnColor: 'bg-amber-600 hover:bg-amber-700 text-white'
+      color: 'from-[#0EA5E9]/10 to-[#38BDF8]/5',
+      borderColor: 'border-[#0EA5E9]/30',
+      iconBg: 'bg-[#E0F2FE]',
+      iconColor: 'text-[#0284C7]',
+      btnColor: 'bg-gradient-to-r from-[#0284C7] to-[#38BDF8] text-white shadow-sm'
     },
     {
       id: 'pickup',
@@ -88,10 +124,11 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
       badge: '24/7 On-Arrival',
       description: 'Warm, dedicated reception at major Indian international airports (Delhi, Mumbai, Bengaluru, Chennai, Hyderabad) with private transport to campus.',
       features: ['Airport Meet & Greet', 'Luggage Assistance', 'Direct Campus Escort', 'Emergency Family Call Line'],
-      color: 'from-cyan-500/10 to-cyan-500/5',
-      borderColor: 'border-cyan-500/20',
-      iconColor: 'text-cyan-600 dark:text-cyan-400',
-      btnColor: 'bg-cyan-600 hover:bg-cyan-700 text-white'
+      color: 'from-[#06B6D4]/10 to-[#38BDF8]/5',
+      borderColor: 'border-[#06B6D4]/30',
+      iconBg: 'bg-[#ECFEFF]',
+      iconColor: 'text-[#0891B2]',
+      btnColor: 'bg-[#0891B2] hover:bg-[#0e7490] text-white shadow-sm'
     },
     {
       id: 'accommodation',
@@ -101,10 +138,11 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
       badge: 'Safe & Verified',
       description: 'Guaranteed placement in safe, secure on-campus international student hostels or premium off-campus apartment rentals with meal plans.',
       features: ['AC & Non-AC Room Options', 'International Student Mess', '24/7 Security & High-Speed WiFi', 'Furnished Living Suites'],
-      color: 'from-teal-500/10 to-teal-500/5',
-      borderColor: 'border-teal-500/20',
-      iconColor: 'text-teal-600 dark:text-teal-400',
-      btnColor: 'bg-teal-600 hover:bg-teal-700 text-white'
+      color: 'from-[#38BDF8]/10 to-[#1677FF]/5',
+      borderColor: 'border-[#38BDF8]/30',
+      iconBg: 'bg-[#F0F7FF]',
+      iconColor: 'text-[#1677FF]',
+      btnColor: 'bg-gradient-to-r from-[#1677FF] to-[#38BDF8] text-white shadow-sm'
     },
     {
       id: 'frro',
@@ -114,10 +152,11 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
       badge: 'Legal Requirement',
       description: 'Complete Foreign Regional Registration Office (FRRO) assistance within 14 days of arrival in India, residential permit, and visa extensions.',
       features: ['Mandatory 14-Day FRRO Filing', 'Residential Permit (RP) Issuance', 'S-1 Visa Extension Support', 'Police Verification Escort'],
-      color: 'from-slate-500/10 to-slate-500/5',
-      borderColor: 'border-slate-500/20',
-      iconColor: 'text-slate-700 dark:text-slate-300',
-      btnColor: 'bg-slate-800 hover:bg-slate-900 text-white'
+      color: 'from-[#102A43]/10 to-[#1677FF]/5',
+      borderColor: 'border-[#102A43]/30',
+      iconBg: 'bg-[#EBF5FE]',
+      iconColor: 'text-[#102A43]',
+      btnColor: 'bg-[#102A43] hover:bg-[#1e3a5f] text-white shadow-sm'
     },
     {
       id: 'support',
@@ -127,10 +166,11 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
       badge: '24/7 Helpline',
       description: 'Continuous local guardianship, local SIM card activation, Indian bank account opening, medical insurance setup, and academic orientation.',
       features: ['Local Indian SIM Card Setup', 'Bank Account Opening', 'Medical Emergency Assistance', 'Cultural & City Orientation'],
-      color: 'from-rose-500/10 to-rose-500/5',
-      borderColor: 'border-rose-500/20',
-      iconColor: 'text-rose-600 dark:text-rose-400',
-      btnColor: 'bg-rose-600 hover:bg-rose-700 text-white'
+      color: 'from-[#1677FF]/10 to-[#06B6D4]/5',
+      borderColor: 'border-[#1677FF]/30',
+      iconBg: 'bg-[#EBF5FE]',
+      iconColor: 'text-[#1677FF]',
+      btnColor: 'bg-gradient-to-r from-[#1677FF] to-[#06B6D4] text-white shadow-sm'
     },
     {
       id: 'counseling',
@@ -140,10 +180,11 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
       badge: 'One-on-One',
       description: 'Personalized academic profiling, career roadmap building, industry internship guidance, and post-graduation job placement counseling.',
       features: ['Academic Skill Profiling', 'Industry Career Roadmaps', 'Internship & Campus Placements', 'Global Post-Grad Pathways'],
-      color: 'from-purple-500/10 to-purple-500/5',
-      borderColor: 'border-purple-500/20',
-      iconColor: 'text-purple-600 dark:text-purple-400',
-      btnColor: 'bg-purple-600 hover:bg-purple-700 text-white'
+      color: 'from-[#38BDF8]/10 to-[#1677FF]/5',
+      borderColor: 'border-[#38BDF8]/30',
+      iconBg: 'bg-[#F0F7FF]',
+      iconColor: 'text-[#0284C7]',
+      btnColor: 'bg-gradient-to-r from-[#1677FF] to-[#38BDF8] text-white shadow-sm'
     }
   ];
 
@@ -262,162 +303,223 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
   return (
     <div className="w-full space-y-16 py-4">
       
-      {/* 1. HERO SECTION */}
+      {/* 1. HERO SECTION (Bright, Clean, Modern Blue & White Palette) */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="bg-slate-900 dark:bg-slate-900 text-white rounded-3xl p-6 sm:p-12 relative overflow-hidden shadow-2xl border border-slate-800">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="bg-gradient-to-b from-[#FFFFFF] via-[#F5FAFF] to-[#EBF5FE] text-[#102A43] rounded-3xl p-6 sm:p-12 relative overflow-hidden shadow-xl border border-[#D9EAF7]"
+        >
           
-          {/* Subtle Background Glow Elements */}
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+          {/* Subtle Glowing Blue Ambient Circles */}
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#38BDF8]/15 rounded-full blur-3xl pointer-events-none animate-pulse-glow"></div>
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[#1677FF]/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          {/* Floating Educational Background Elements */}
+          <div className="absolute top-10 right-1/3 text-[#38BDF8]/20 animate-float-slow pointer-events-none hidden md:block">
+            <GraduationCap className="w-16 h-16" />
+          </div>
+          <div className="absolute bottom-12 right-1/4 text-[#06B6D4]/20 animate-float-reverse pointer-events-none hidden md:block">
+            <Plane className="w-14 h-14" />
+          </div>
+          <div className="absolute top-1/2 left-4 text-[#1677FF]/15 animate-float-gentle pointer-events-none hidden lg:block">
+            <Compass className="w-12 h-12" />
+          </div>
 
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             {/* Left Content Column */}
             <div className="lg:col-span-7 space-y-6">
               
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-xs font-extrabold uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1, duration: 0.5 }}
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF5FE] border border-[#BFDBFE] text-[#1677FF] text-xs font-extrabold uppercase tracking-wider shadow-xs"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#1677FF]" />
                 <span>Official Education Consultancy for India</span>
-              </div>
+              </motion.div>
 
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight text-white">
+              <motion.h1 
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="text-3xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight text-[#102A43]"
+              >
                 Study in India's Premier <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-indigo-300">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1677FF] via-[#0284C7] to-[#06B6D4]">
                   Universities & IITs
                 </span>
-              </h1>
+              </motion.h1>
 
-              <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl font-normal">
+              <motion.p 
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="text-[#52667A] text-base sm:text-lg leading-relaxed max-w-2xl font-medium"
+              >
                 Your trusted bridge to top Indian higher education. We provide end-to-end university admissions, student visa filing, Study in India (SII) scholarships, airport pickup, hostel booking, and FRRO registration.
-              </p>
+              </motion.p>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
+              <motion.div 
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                className="flex flex-wrap items-center gap-3 pt-2"
+              >
                 {openApplyModal && (
                   <button
                     onClick={openApplyModal}
-                    className="px-6 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-2xl transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2 text-sm cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                    className="px-6 py-3.5 bg-gradient-to-r from-[#1677FF] to-[#38BDF8] hover:from-[#005cd6] hover:to-[#0284c7] text-white font-black rounded-2xl transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 flex items-center gap-2 text-sm cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
                   >
-                    <Sparkles className="w-4 h-4 fill-slate-950" />
+                    <Sparkles className="w-4 h-4 fill-white" />
                     Apply for 2025/2026 Intake
                   </button>
                 )}
 
                 <button
                   onClick={() => { setActiveTab('ai-advisor'); window.history.pushState({}, '', '/ai-advisor'); }}
-                  className="px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-900/30 flex items-center gap-2 text-sm cursor-pointer hover:scale-[1.02] active:scale-[0.98] border border-emerald-400/30"
+                  className="px-6 py-3.5 bg-gradient-to-r from-[#0284C7] to-[#06B6D4] hover:from-[#0369a1] hover:to-[#0891b2] text-white font-bold rounded-2xl transition-all shadow-md shadow-cyan-500/20 hover:shadow-cyan-500/35 flex items-center gap-2 text-sm cursor-pointer hover:scale-[1.02] active:scale-[0.98] border border-white/20"
                 >
-                  <Sparkles className="w-4 h-4 text-emerald-200" />
+                  <Sparkles className="w-4 h-4 text-cyan-200" />
                   Ask AI Advisor (Gemini)
                 </button>
                 
                 <button
                   onClick={() => setActiveTab('contact')}
-                  className="px-6 py-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold rounded-2xl transition-all flex items-center gap-2 text-sm cursor-pointer"
+                  className="px-6 py-3.5 bg-white hover:bg-[#F0F7FF] border border-[#D9EAF7] text-[#102A43] font-bold rounded-2xl transition-all flex items-center gap-2 text-sm cursor-pointer shadow-xs hover:border-[#BFDBFE]"
                 >
-                  <PhoneCall className="w-4 h-4 text-emerald-400" />
+                  <PhoneCall className="w-4 h-4 text-[#1677FF]" />
                   Free Counseling
                 </button>
 
                 <button
                   onClick={() => { setActiveTab('student-login'); window.history.pushState({}, '', '/login'); }}
-                  className="px-6 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl backdrop-blur-md transition-all flex items-center gap-2 text-sm cursor-pointer border border-white/10"
+                  className="px-6 py-3.5 bg-[#EBF5FE] hover:bg-[#D9EAF7] text-[#1677FF] font-bold rounded-2xl transition-all flex items-center gap-2 text-sm cursor-pointer border border-[#BFDBFE]"
                 >
-                  <UserCheck className="w-4 h-4 text-emerald-400" />
+                  <UserCheck className="w-4 h-4 text-[#1677FF]" />
                   Track Status
                 </button>
-              </div>
+              </motion.div>
 
-              {/* Key Trust Metrics Row */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-slate-800/80">
-                <div>
-                  <div className="text-2xl font-black text-emerald-400">250+</div>
-                  <div className="text-xs text-slate-400 font-medium">Partner Campuses</div>
+              {/* Key Trust Metrics Row (with animated stats counters) */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+                className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-[#D9EAF7]"
+              >
+                <div className="bg-white/80 p-3 rounded-2xl border border-[#D9EAF7]/80 shadow-xs">
+                  <div className="text-2xl font-black text-[#1677FF]">
+                    <StatCounter end={250} suffix="+" />
+                  </div>
+                  <div className="text-xs text-[#52667A] font-semibold mt-0.5">Partner Campuses</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-black text-white">100%</div>
-                  <div className="text-xs text-slate-400 font-medium">Visa Success Rate</div>
+                <div className="bg-white/80 p-3 rounded-2xl border border-[#D9EAF7]/80 shadow-xs">
+                  <div className="text-2xl font-black text-[#102A43]">
+                    <StatCounter end={100} suffix="%" />
+                  </div>
+                  <div className="text-xs text-[#52667A] font-semibold mt-0.5">Visa Success Rate</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-black text-emerald-400">$1.5M+</div>
-                  <div className="text-xs text-slate-400 font-medium">Scholarships Secured</div>
+                <div className="bg-white/80 p-3 rounded-2xl border border-[#D9EAF7]/80 shadow-xs">
+                  <div className="text-2xl font-black text-[#0284C7]">
+                    <StatCounter end={1500} prefix="$" suffix="k+" />
+                  </div>
+                  <div className="text-xs text-[#52667A] font-semibold mt-0.5">Scholarships Secured</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-black text-white">8,500+</div>
-                  <div className="text-xs text-slate-400 font-medium">Students Enrolled</div>
+                <div className="bg-white/80 p-3 rounded-2xl border border-[#D9EAF7]/80 shadow-xs">
+                  <div className="text-2xl font-black text-[#102A43]">
+                    <StatCounter end={8500} suffix="+" />
+                  </div>
+                  <div className="text-xs text-[#52667A] font-semibold mt-0.5">Students Enrolled</div>
                 </div>
-              </div>
+              </motion.div>
 
             </div>
 
             {/* Right Card / Visual Showcase */}
-            <div className="lg:col-span-5">
-              <div className="bg-slate-800/90 border border-slate-700 rounded-3xl p-6 shadow-2xl space-y-5 backdrop-blur-xl">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.35, duration: 0.6 }}
+              className="lg:col-span-5"
+            >
+              <div className="bg-white border border-[#D9EAF7] rounded-3xl p-6 sm:p-7 shadow-xl space-y-5 backdrop-blur-xl relative">
                 
-                <div className="flex items-center justify-between border-b border-slate-700 pb-4">
+                {/* Floating badge */}
+                <div className="flex items-center justify-between border-b border-[#D9EAF7] pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-emerald-500/20 border border-emerald-500/30 rounded-2xl flex items-center justify-center">
-                      <GraduationCap className="w-5 h-5 text-emerald-400" />
+                    <div className="w-11 h-11 bg-gradient-to-tr from-[#1677FF] to-[#38BDF8] rounded-2xl flex items-center justify-center shadow-md shadow-blue-500/20">
+                      <GraduationCap className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-extrabold text-sm text-white">Fresh Study India Hub</h3>
-                      <p className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
-                        <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                      <h3 className="font-extrabold text-sm text-[#102A43]">Fresh Study India Hub</h3>
+                      <p className="text-xs text-[#1677FF] font-bold flex items-center gap-1.5">
+                        <span className="w-2 h-2 bg-[#1677FF] rounded-full animate-pulse"></span>
                         Admissions Open 2025/2026
                       </p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-full border border-emerald-400/30">
+                  <span className="text-[10px] font-black uppercase tracking-wider bg-[#EBF5FE] text-[#1677FF] px-2.5 py-1 rounded-full border border-[#BFDBFE]">
                     Official Agency
                   </span>
                 </div>
 
                 {/* Quick Highlight Features */}
-                <div className="space-y-3 text-xs">
-                  <div className="p-3 bg-slate-900/80 rounded-2xl border border-slate-700/60 flex items-center justify-between">
+                <div className="space-y-2.5 text-xs">
+                  <div className="p-3 bg-[#F5FAFF] rounded-2xl border border-[#D9EAF7] flex items-center justify-between hover:border-[#1677FF]/40 transition">
                     <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span className="text-slate-200 font-medium">Direct University Provisional Offers</span>
+                      <div className="w-6 h-6 rounded-full bg-[#EBF5FE] flex items-center justify-center text-[#1677FF]">
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      </div>
+                      <span className="text-[#102A43] font-semibold">Direct University Provisional Offers</span>
                     </div>
-                    <span className="text-[10px] font-bold text-slate-400">24–48 Hrs</span>
+                    <span className="text-[10px] font-bold text-[#1677FF] bg-white px-2 py-0.5 rounded-md border border-[#D9EAF7]">24–48 Hrs</span>
                   </div>
 
-                  <div className="p-3 bg-slate-900/80 rounded-2xl border border-slate-700/60 flex items-center justify-between">
+                  <div className="p-3 bg-[#F5FAFF] rounded-2xl border border-[#D9EAF7] flex items-center justify-between hover:border-[#1677FF]/40 transition">
                     <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span className="text-slate-200 font-medium">Study in India (SII) 100% Waivers</span>
+                      <div className="w-6 h-6 rounded-full bg-[#E0F2FE] flex items-center justify-center text-[#0284C7]">
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      </div>
+                      <span className="text-[#102A43] font-semibold">Study in India (SII) 100% Waivers</span>
                     </div>
-                    <span className="text-[10px] font-bold text-emerald-400">Up to 100%</span>
+                    <span className="text-[10px] font-bold text-[#0284C7] bg-white px-2 py-0.5 rounded-md border border-[#D9EAF7]">Up to 100%</span>
                   </div>
 
-                  <div className="p-3 bg-slate-900/80 rounded-2xl border border-slate-700/60 flex items-center justify-between">
+                  <div className="p-3 bg-[#F5FAFF] rounded-2xl border border-[#D9EAF7] flex items-center justify-between hover:border-[#1677FF]/40 transition">
                     <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span className="text-slate-200 font-medium">Airport Reception & FRRO Desk</span>
+                      <div className="w-6 h-6 rounded-full bg-[#ECFEFF] flex items-center justify-center text-[#0891B2]">
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      </div>
+                      <span className="text-[#102A43] font-semibold">Airport Reception & FRRO Desk</span>
                     </div>
-                    <span className="text-[10px] font-bold text-slate-400">Guaranteed</span>
+                    <span className="text-[10px] font-bold text-[#0891B2] bg-white px-2 py-0.5 rounded-md border border-[#D9EAF7]">Guaranteed</span>
                   </div>
                 </div>
 
                 {/* Direct Portal Quick Jump */}
-                <div className="p-4 bg-gradient-to-r from-emerald-950 to-slate-900 rounded-2xl border border-emerald-800/40 text-xs flex items-center justify-between">
+                <div className="p-4 bg-gradient-to-r from-[#EBF5FE] via-[#F0F7FF] to-[#E0F2FE] rounded-2xl border border-[#BFDBFE] text-xs flex items-center justify-between">
                   <div>
-                    <span className="text-slate-300 font-semibold block">Have an existing application?</span>
-                    <span className="text-emerald-400 font-bold">Track status & documents in Student Portal</span>
+                    <span className="text-[#102A43] font-bold block">Have an existing application?</span>
+                    <span className="text-[#52667A] text-[11px] font-medium">Track status & documents in Student Portal</span>
                   </div>
                   <button
                     onClick={() => { setActiveTab('student-login'); window.history.pushState({}, '', '/login'); }}
-                    className="px-3 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold rounded-xl shrink-0 cursor-pointer"
+                    className="px-3.5 py-2 bg-[#1677FF] hover:bg-[#005cd6] text-white font-extrabold rounded-xl shrink-0 cursor-pointer shadow-xs transition"
                   >
                     Login
                   </button>
                 </div>
 
               </div>
-            </div>
+            </motion.div>
 
           </div>
-        </div>
+        </motion.div>
       </section>
 
 
@@ -426,36 +528,36 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
         <div className="space-y-8">
           
           {/* Section Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#D9EAF7] pb-6">
             <div>
-              <span className="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
+              <span className="text-xs font-black uppercase tracking-widest text-[#1677FF] bg-[#EBF5FE] px-3 py-1 rounded-full border border-[#BFDBFE]">
                 End-to-End Student Support
               </span>
-              <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white mt-2 tracking-tight">
+              <h2 className="text-2xl sm:text-4xl font-black text-[#102A43] mt-2 tracking-tight">
                 Our Comprehensive Services
               </h2>
-              <p className="text-slate-500 dark:text-slate-400 text-sm max-w-2xl mt-1">
+              <p className="text-[#52667A] text-sm max-w-2xl mt-1">
                 From academic profiling and university admission to visa stamping, airport reception, accommodation, and FRRO registration in India.
               </p>
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs font-bold">
+            <div className="flex items-center gap-2 bg-white p-1 rounded-2xl border border-[#D9EAF7] text-xs font-bold shadow-xs">
               <button
                 onClick={() => setActiveServiceFilter('all')}
-                className={`px-4 py-2 rounded-xl transition cursor-pointer ${activeServiceFilter === 'all' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
+                className={`px-4 py-2 rounded-xl transition cursor-pointer ${activeServiceFilter === 'all' ? 'bg-[#1677FF] text-white shadow-xs' : 'text-[#52667A] hover:text-[#102A43]'}`}
               >
                 All Services (8)
               </button>
               <button
                 onClick={() => setActiveServiceFilter('admission')}
-                className={`px-4 py-2 rounded-xl transition cursor-pointer ${activeServiceFilter === 'admission' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
+                className={`px-4 py-2 rounded-xl transition cursor-pointer ${activeServiceFilter === 'admission' ? 'bg-[#1677FF] text-white shadow-xs' : 'text-[#52667A] hover:text-[#102A43]'}`}
               >
                 Admissions & Visa
               </button>
               <button
                 onClick={() => setActiveServiceFilter('relocation')}
-                className={`px-4 py-2 rounded-xl transition cursor-pointer ${activeServiceFilter === 'relocation' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
+                className={`px-4 py-2 rounded-xl transition cursor-pointer ${activeServiceFilter === 'relocation' ? 'bg-[#1677FF] text-white shadow-xs' : 'text-[#52667A] hover:text-[#102A43]'}`}
               >
                 Relocation & Support
               </button>
@@ -469,34 +571,34 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
               return (
                 <div
                   key={service.id}
-                  className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden"
+                  className="bg-white rounded-3xl border border-[#D9EAF7] p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden"
                 >
                   <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${service.color} rounded-bl-full pointer-events-none`}></div>
 
                   <div>
                     {/* Top Badge & Icon */}
                     <div className="flex items-center justify-between mb-4">
-                      <div className={`w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 border ${service.borderColor} flex items-center justify-center shrink-0`}>
+                      <div className={`w-12 h-12 rounded-2xl ${service.iconBg} border border-[#D9EAF7] flex items-center justify-center shrink-0`}>
                         <IconComp className={`w-6 h-6 ${service.iconColor}`} />
                       </div>
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider bg-[#F5FAFF] text-[#102A43] px-2.5 py-1 rounded-full border border-[#D9EAF7]">
                         {service.badge}
                       </span>
                     </div>
 
-                    <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                    <h3 className="text-lg font-black text-[#102A43] mb-2 group-hover:text-[#1677FF] transition-colors">
                       {service.title}
                     </h3>
 
-                    <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed mb-4">
+                    <p className="text-[#52667A] text-xs leading-relaxed mb-4">
                       {service.description}
                     </p>
 
                     {/* Features list */}
-                    <ul className="space-y-2 border-t border-slate-100 dark:border-slate-800 pt-4 mb-6">
+                    <ul className="space-y-2 border-t border-[#D9EAF7] pt-4 mb-6">
                       {service.features.map((feat, idx) => (
-                        <li key={idx} className="flex items-center gap-2 text-[11px] font-medium text-slate-600 dark:text-slate-300">
-                          <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                        <li key={idx} className="flex items-center gap-2 text-[11px] font-semibold text-[#52667A]">
+                          <CheckCircle className="w-3.5 h-3.5 text-[#1677FF] shrink-0" />
                           <span>{feat}</span>
                         </li>
                       ))}
@@ -509,7 +611,7 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
                       if (openApplyModal) openApplyModal();
                       else setActiveTab('contact');
                     }}
-                    className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer shadow-xs ${service.btnColor}`}
+                    className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer ${service.btnColor}`}
                   >
                     <span>Request {service.title}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -525,58 +627,58 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
 
       {/* 3. WHY CHOOSE FRESH STUDY INDIA */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 text-white rounded-3xl p-8 sm:p-12 border border-slate-800 shadow-xl space-y-8">
+        <div className="bg-gradient-to-br from-[#EBF5FE] via-[#F0F7FF] to-[#E0F2FE] text-[#102A43] rounded-3xl p-8 sm:p-12 border border-[#BFDBFE] shadow-lg space-y-8">
           
           <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="text-xs font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-400/30">
+            <span className="text-xs font-black uppercase tracking-widest text-[#1677FF] bg-white px-3 py-1 rounded-full border border-[#BFDBFE] shadow-xs">
               The Fresh Study India Advantage
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white">
+            <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-[#102A43]">
               Why 8,500+ Students Trust Fresh Study India
             </h2>
-            <p className="text-slate-300 text-sm">
+            <p className="text-[#52667A] text-sm">
               We are not just an admissions agency — we are your official education guardians and facilitators throughout your academic journey in India.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
-            <div className="p-6 bg-slate-800/80 rounded-2xl border border-slate-700/80 space-y-3">
-              <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 font-black">
+            <div className="p-6 bg-white rounded-2xl border border-[#D9EAF7] space-y-3 shadow-sm hover:border-[#1677FF]/40 transition">
+              <div className="w-10 h-10 bg-[#EBF5FE] rounded-xl flex items-center justify-center text-[#1677FF] font-black border border-[#BFDBFE]">
                 <Building2 className="w-5 h-5" />
               </div>
-              <h3 className="font-extrabold text-base text-white">Direct University Tie-ups</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <h3 className="font-extrabold text-base text-[#102A43]">Direct University Tie-ups</h3>
+              <p className="text-xs text-[#52667A] leading-relaxed font-medium">
                 Direct admission authorization with 250+ top Indian public, central, and private campuses. No middleman delays.
               </p>
             </div>
 
-            <div className="p-6 bg-slate-800/80 rounded-2xl border border-slate-700/80 space-y-3">
-              <div className="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400 font-black">
+            <div className="p-6 bg-white rounded-2xl border border-[#D9EAF7] space-y-3 shadow-sm hover:border-[#1677FF]/40 transition">
+              <div className="w-10 h-10 bg-[#E0F2FE] rounded-xl flex items-center justify-center text-[#0284C7] font-black border border-[#BFDBFE]">
                 <ShieldCheck className="w-5 h-5" />
               </div>
-              <h3 className="font-extrabold text-base text-white">100% Visa & Doc Accuracy</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <h3 className="font-extrabold text-base text-[#102A43]">100% Visa & Doc Accuracy</h3>
+              <p className="text-xs text-[#52667A] leading-relaxed font-medium">
                 Flawless Student Visa filing, invitation letters, embassy interview prep, and WAEC/NECO equivalency mapping.
               </p>
             </div>
 
-            <div className="p-6 bg-slate-800/80 rounded-2xl border border-slate-700/80 space-y-3">
-              <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center text-amber-400 font-black">
+            <div className="p-6 bg-white rounded-2xl border border-[#D9EAF7] space-y-3 shadow-sm hover:border-[#1677FF]/40 transition">
+              <div className="w-10 h-10 bg-[#ECFEFF] rounded-xl flex items-center justify-center text-[#0891B2] font-black border border-[#BFDBFE]">
                 <Globe className="w-5 h-5" />
               </div>
-              <h3 className="font-extrabold text-base text-white">On-Ground Indian Desk</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <h3 className="font-extrabold text-base text-[#102A43]">On-Ground Indian Desk</h3>
+              <p className="text-xs text-[#52667A] leading-relaxed font-medium">
                 Our local Indian representatives welcome you at the airport, manage your FRRO registration, and settle you into campus.
               </p>
             </div>
 
-            <div className="p-6 bg-slate-800/80 rounded-2xl border border-slate-700/80 space-y-3">
-              <div className="w-10 h-10 bg-rose-500/20 rounded-xl flex items-center justify-center text-rose-400 font-black">
+            <div className="p-6 bg-white rounded-2xl border border-[#D9EAF7] space-y-3 shadow-sm hover:border-[#1677FF]/40 transition">
+              <div className="w-10 h-10 bg-[#EBF5FE] rounded-xl flex items-center justify-center text-[#1677FF] font-black border border-[#BFDBFE]">
                 <Award className="w-5 h-5" />
               </div>
-              <h3 className="font-extrabold text-base text-white">Transparent & Fee-Free</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <h3 className="font-extrabold text-base text-[#102A43]">Transparent & Fee-Free</h3>
+              <p className="text-xs text-[#52667A] leading-relaxed font-medium">
                 No hidden charges or unexpected fees. Clear fee breakdowns and maximum scholarship discount application.
               </p>
             </div>
@@ -592,13 +694,13 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
         <div className="space-y-8">
           
           <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
+            <span className="text-xs font-black uppercase tracking-widest text-[#1677FF] bg-[#EBF5FE] px-3 py-1 rounded-full border border-[#BFDBFE]">
               Clear & Transparent Flow
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-black text-[#102A43] tracking-tight">
               Our 8-Step Admission Journey
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">
+            <p className="text-[#52667A] text-sm">
               How we take you from your initial inquiry to sitting in your university classroom in India.
             </p>
           </div>
@@ -607,26 +709,26 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
             {processSteps.map((s, idx) => (
               <div 
                 key={idx}
-                className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-emerald-500/40 transition flex flex-col justify-between space-y-3 group"
+                className="bg-white rounded-3xl p-6 border border-[#D9EAF7] shadow-sm hover:border-[#1677FF] transition flex flex-col justify-between space-y-3 group hover:shadow-md"
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform inline-block">
+                    <span className="text-2xl font-black text-[#1677FF] group-hover:scale-110 transition-transform inline-block">
                       {s.step}
                     </span>
-                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span className="w-2 h-2 rounded-full bg-[#1677FF]"></span>
                   </div>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  <h3 className="text-base font-extrabold text-[#102A43] group-hover:text-[#1677FF] transition-colors">
                     {s.title}
                   </h3>
-                  <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed mt-2">
+                  <p className="text-[#52667A] text-xs leading-relaxed mt-2 font-medium">
                     {s.desc}
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                <div className="pt-2 border-t border-[#D9EAF7] text-[10px] font-bold text-[#52667A] uppercase tracking-wider flex items-center justify-between">
                   <span>Step {idx + 1} of 8</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-emerald-500" />
+                  <ArrowRight className="w-3.5 h-3.5 text-[#1677FF]" />
                 </div>
               </div>
             ))}
@@ -640,24 +742,24 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6">
         <div className="space-y-8">
           
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#D9EAF7] pb-6">
             <div>
-              <span className="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
+              <span className="text-xs font-black uppercase tracking-widest text-[#1677FF] bg-[#EBF5FE] px-3 py-1 rounded-full border border-[#BFDBFE]">
                 Academic Programs
               </span>
-              <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white mt-2 tracking-tight">
+              <h2 className="text-2xl sm:text-4xl font-black text-[#102A43] mt-2 tracking-tight">
                 Popular Degree Pathways
               </h2>
-              <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xl mt-1">
+              <p className="text-[#52667A] text-sm max-w-xl mt-1">
                 Explore accredited undergraduate, postgraduate, and professional study pathways in India.
               </p>
             </div>
 
             <button
               onClick={() => setActiveTab('courses')}
-              className="px-5 py-2.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white font-bold text-xs rounded-2xl transition flex items-center gap-2 shrink-0 cursor-pointer"
+              className="px-5 py-2.5 bg-[#1677FF] hover:bg-[#005cd6] text-white font-bold text-xs rounded-2xl transition flex items-center gap-2 shrink-0 cursor-pointer shadow-md shadow-blue-500/20"
             >
-              <BookOpen className="w-4 h-4 text-emerald-400" />
+              <BookOpen className="w-4 h-4 text-white" />
               <span>Explore All Courses</span>
             </button>
           </div>
@@ -666,28 +768,28 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
             {popularPrograms.map((prog, idx) => (
               <div 
                 key={idx}
-                className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-lg transition-all duration-300 hover:border-emerald-500/30 flex flex-col justify-between space-y-4"
+                className="bg-white rounded-3xl p-6 border border-[#D9EAF7] shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#1677FF]/40 flex flex-col justify-between space-y-4"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <div className="w-10 h-10 bg-slate-900 text-white font-black text-xs rounded-2xl flex items-center justify-center border border-slate-700">
+                    <div className="w-10 h-10 bg-[#EBF5FE] text-[#1677FF] font-black text-xs rounded-2xl flex items-center justify-center border border-[#BFDBFE]">
                       {prog.code}
                     </div>
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider bg-[#F5FAFF] text-[#1677FF] px-2 py-0.5 rounded-md border border-[#D9EAF7]">
                       {prog.tag}
                     </span>
                   </div>
 
-                  <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
+                  <h3 className="font-extrabold text-base text-[#102A43]">
                     {prog.title}
                   </h3>
 
-                  <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-1">
-                    <Clock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <p className="text-xs text-[#52667A] flex items-center gap-1.5 mt-1 font-medium">
+                    <Clock className="w-3.5 h-3.5 text-[#1677FF] shrink-0" />
                     <span>{prog.duration}</span>
                   </p>
 
-                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-2 bg-emerald-50 dark:bg-emerald-950/40 p-2 rounded-xl">
+                  <p className="text-xs font-semibold text-[#1677FF] mt-2 bg-[#EBF5FE] p-2 rounded-xl border border-[#BFDBFE]">
                     {prog.level}
                   </p>
                 </div>
@@ -697,7 +799,7 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
                     if (openApplyModal) openApplyModal();
                     else setActiveTab('courses');
                   }}
-                  className="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5"
+                  className="w-full py-2 bg-[#F5FAFF] hover:bg-[#1677FF] hover:text-white text-[#102A43] text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 border border-[#D9EAF7]"
                 >
                   <span>Apply Now</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -712,16 +814,16 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
 
       {/* 6. STUDENT TESTIMONIALS */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="bg-slate-100 dark:bg-slate-900/60 rounded-3xl p-8 sm:p-12 border border-slate-200 dark:border-slate-800 space-y-8">
+        <div className="bg-[#EBF5FE] rounded-3xl p-8 sm:p-12 border border-[#BFDBFE] space-y-8">
           
           <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
+            <span className="text-xs font-black uppercase tracking-widest text-[#1677FF] bg-white px-3 py-1 rounded-full border border-[#BFDBFE]">
               International Success Stories
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-black text-[#102A43] tracking-tight">
               What Our Students Say
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">
+            <p className="text-[#52667A] text-sm">
               Hear directly from international students who successfully journeyed from their home country to India with Fresh Study India.
             </p>
           </div>
@@ -730,7 +832,7 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
             {testimonials.map((t, idx) => (
               <div 
                 key={idx}
-                className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between space-y-4"
+                className="bg-white rounded-3xl p-6 border border-[#D9EAF7] shadow-sm flex flex-col justify-between space-y-4"
               >
                 <div className="space-y-3">
                   <div className="flex items-center gap-1 text-amber-400">
@@ -738,23 +840,23 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
                       <Star key={i} className="w-4 h-4 fill-amber-400" />
                     ))}
                   </div>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 italic leading-relaxed">
+                  <p className="text-xs text-[#52667A] italic leading-relaxed font-medium">
                     "{t.quote}"
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-3 pt-4 border-t border-[#D9EAF7]">
                   <img 
                     src={t.image} 
                     alt={t.name}
-                    className="w-11 h-11 rounded-full object-cover border-2 border-emerald-500"
+                    className="w-11 h-11 rounded-full object-cover border-2 border-[#1677FF]"
                   />
                   <div>
-                    <h4 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <h4 className="font-extrabold text-sm text-[#102A43] flex items-center gap-1.5">
                       {t.name} <span className="text-xs">{t.country}</span>
                     </h4>
-                    <p className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">{t.university}</p>
-                    <p className="text-[10px] text-slate-400">{t.course}</p>
+                    <p className="text-[11px] font-bold text-[#1677FF]">{t.university}</p>
+                    <p className="text-[10px] text-[#52667A]">{t.course}</p>
                   </div>
                 </div>
               </div>
@@ -764,7 +866,7 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
           <div className="text-center pt-2">
             <button
               onClick={() => setActiveTab('testimonials')}
-              className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer inline-flex items-center gap-1"
+              className="text-xs font-bold text-[#1677FF] hover:underline cursor-pointer inline-flex items-center gap-1"
             >
               <span>Read all student reviews and stories</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -777,16 +879,16 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
 
       {/* 7. FREQUENTLY ASKED QUESTIONS (FAQS) */}
       <section className="w-full max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+        <div className="bg-white rounded-3xl p-8 border border-[#D9EAF7] shadow-sm space-y-6">
           
           <div className="text-center space-y-2">
-            <span className="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
+            <span className="text-xs font-black uppercase tracking-widest text-[#1677FF] bg-[#EBF5FE] px-3 py-1 rounded-full border border-[#BFDBFE]">
               Student Helpdesk FAQ
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-black text-[#102A43] tracking-tight">
               Frequently Asked Questions
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 text-xs">
+            <p className="text-[#52667A] text-xs">
               Everything you need to know about studying in India with Fresh Study India.
             </p>
           </div>
@@ -797,21 +899,21 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
               return (
                 <div 
                   key={idx}
-                  className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden transition"
+                  className="border border-[#D9EAF7] rounded-2xl overflow-hidden transition"
                 >
                   <button
                     onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                    className="w-full text-left p-4 sm:p-5 font-bold text-sm text-slate-900 dark:text-white flex items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                    className="w-full text-left p-4 sm:p-5 font-bold text-sm text-[#102A43] flex items-center justify-between gap-4 bg-[#F5FAFF] hover:bg-[#EBF5FE] transition cursor-pointer"
                   >
                     <span className="flex items-center gap-2.5">
-                      <HelpCircle className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <HelpCircle className="w-4 h-4 text-[#1677FF] shrink-0" />
                       {faq.q}
                     </span>
-                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180 text-emerald-500' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 text-[#52667A] transition-transform ${isOpen ? 'rotate-180 text-[#1677FF]' : ''}`} />
                   </button>
 
                   {isOpen && (
-                    <div className="p-4 sm:p-5 text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+                    <div className="p-4 sm:p-5 text-xs text-[#52667A] leading-relaxed bg-white border-t border-[#D9EAF7] font-medium">
                       {faq.a}
                     </div>
                   )}
@@ -820,12 +922,12 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
             })}
           </div>
 
-          <div className="text-center pt-4 border-t border-slate-100 dark:border-slate-800">
-            <p className="text-xs text-slate-500">
+          <div className="text-center pt-4 border-t border-[#D9EAF7]">
+            <p className="text-xs text-[#52667A]">
               Have a custom question not answered here?{' '}
               <button
                 onClick={() => setActiveTab('contact')}
-                className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline cursor-pointer"
+                className="text-[#1677FF] font-bold hover:underline cursor-pointer"
               >
                 Contact our counselors directly
               </button>
@@ -838,44 +940,40 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
 
       {/* 8. CONTACT & FREE CONSULTATION CTA SECTION */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-slate-900 text-white rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="bg-gradient-to-r from-[#1677FF] via-[#0284C7] to-[#06B6D4] text-white rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
           
           <div className="space-y-4 max-w-xl">
-            <span className="text-xs font-black uppercase tracking-widest bg-white/20 text-white px-3 py-1 rounded-full border border-white/30">
+            <span className="text-xs font-black uppercase tracking-widest bg-white/20 text-white px-3 py-1 rounded-full border border-white/30 backdrop-blur-xs">
               Start Your India Journey Today
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
               Ready to Secure Your Seat at a Top Indian University?
             </h2>
-            <p className="text-emerald-100 text-sm leading-relaxed">
+            <p className="text-blue-50 text-sm leading-relaxed">
               Contact our admission desk now for free eligibility evaluation, course selection, and scholarship allocation.
             </p>
-            <div className="flex flex-wrap gap-4 text-xs font-semibold text-emerald-100 pt-2">
+            <div className="flex flex-wrap gap-4 text-xs font-semibold text-blue-50 pt-2">
               <span className="flex items-center gap-1.5"><Mail className="w-4 h-4 text-white" /> freshstudyindia@gmail.com</span>
               <span className="flex items-center gap-1.5"><PhoneCall className="w-4 h-4 text-white" /> +231 889425645</span>
+              <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-white" /> Monrovia, Liberia / New Delhi, India</span>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 shrink-0 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row md:flex-col gap-3 w-full md:w-auto shrink-0">
             {openApplyModal && (
               <button
                 onClick={openApplyModal}
-                className="px-6 py-4 bg-white hover:bg-slate-100 text-slate-900 font-black rounded-2xl transition shadow-xl text-sm flex items-center justify-center gap-2 cursor-pointer"
+                className="px-8 py-4 bg-white hover:bg-blue-50 text-[#1677FF] font-black rounded-2xl transition shadow-xl text-center text-sm cursor-pointer hover:scale-105"
               >
-                <Sparkles className="w-4 h-4 text-emerald-600" />
-                <span>Apply Online Now</span>
+                Apply Online Now
               </button>
             )}
-
-            <a
-              href="https://wa.me/231889425645?text=Hello%20Fresh%20Study%20India%20Counselor,%20I%20would%20like%20to%20inquire%20about%20university%20admissions%20and%20scholarships."
-              target="_blank"
-              rel="noreferrer"
-              className="px-6 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-2xl transition shadow-xl text-sm flex items-center justify-center gap-2 cursor-pointer border border-emerald-400/40"
+            <button
+              onClick={() => setActiveTab('contact')}
+              className="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold rounded-2xl transition text-center text-sm cursor-pointer"
             >
-              <MessageCircle className="w-4 h-4 fill-slate-950 text-emerald-500" />
-              <span>WhatsApp Counseling</span>
-            </a>
+              Contact Counselors
+            </button>
           </div>
 
         </div>

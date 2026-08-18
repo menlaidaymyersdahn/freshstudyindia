@@ -499,9 +499,9 @@ export default function App() {
   }) => {
     if (authLoading) {
       return (
-        <div className="max-w-lg mx-auto my-16 p-8 bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 text-center space-y-4">
-          <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-xs font-bold text-slate-600 dark:text-slate-300">Authenticating session with Firebase...</p>
+        <div className="max-w-lg mx-auto my-16 p-8 bg-white rounded-3xl shadow-xl border border-[#D9EAF7] text-center space-y-4">
+          <div className="w-10 h-10 border-4 border-[#1677FF] border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-xs font-bold text-[#52667A]">Authenticating session with Firebase...</p>
         </div>
       );
     }
@@ -511,15 +511,15 @@ export default function App() {
     const loginTab: ActiveTab = requiredPortal === 'admin' ? 'admin-login' : requiredPortal === 'counselor' ? 'counselor-login' : 'student-login';
 
     return (
-      <div className="max-w-lg mx-auto my-16 p-8 bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 text-center space-y-4">
+      <div className="max-w-lg mx-auto my-16 p-8 bg-white rounded-3xl shadow-xl border border-[#D9EAF7] text-center space-y-4">
         {isUnauthorizedLoggedInUser ? (
           <>
-            <div className="w-16 h-16 bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 rounded-2xl flex items-center justify-center mx-auto border border-red-200 dark:border-red-800">
+            <div className="w-16 h-16 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mx-auto border border-red-200">
               <Lock className="w-8 h-8 text-red-500" />
             </div>
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white">Access Denied</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm mx-auto">
-              Your account (<span className="font-bold text-slate-800 dark:text-slate-200">{userProfile?.email}</span>) is assigned the <span className="font-extrabold uppercase text-emerald-600">{userRole}</span> role and does not have permission to access the {portalTitle}.
+            <h2 className="text-2xl font-black text-[#102A43]">Access Denied</h2>
+            <p className="text-xs text-[#52667A] leading-relaxed max-w-sm mx-auto font-medium">
+              Your account (<span className="font-bold text-[#102A43]">{userProfile?.email}</span>) is assigned the <span className="font-extrabold uppercase text-[#1677FF]">{userRole}</span> role and does not have permission to access the {portalTitle}.
             </p>
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
@@ -535,13 +535,13 @@ export default function App() {
                     window.history.pushState({}, '', '/admin-dashboard');
                   }
                 }}
-                className="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-xs shadow-md transition cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2.5 bg-[#1677FF] hover:bg-[#005cd6] text-white font-bold rounded-2xl text-xs shadow-md transition cursor-pointer"
               >
                 Go to My Dashboard
               </button>
               <button
                 onClick={handleLogout}
-                className="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-200 font-bold rounded-2xl text-xs transition cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2.5 bg-[#F5FAFF] hover:bg-[#EBF5FE] border border-[#D9EAF7] text-[#102A43] font-bold rounded-2xl text-xs transition cursor-pointer"
               >
                 Sign Out to Switch
               </button>
@@ -549,11 +549,11 @@ export default function App() {
           </>
         ) : (
           <>
-            <div className="w-16 h-16 bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mx-auto border border-emerald-200 dark:border-emerald-800">
-              <Lock className="w-8 h-8 text-emerald-600" />
+            <div className="w-16 h-16 bg-[#EBF5FE] text-[#1677FF] rounded-2xl flex items-center justify-center mx-auto border border-[#BFDBFE]">
+              <Lock className="w-8 h-8 text-[#1677FF]" />
             </div>
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white">Protected Portal Access</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm mx-auto">
+            <h2 className="text-2xl font-black text-[#102A43]">Protected Portal Access</h2>
+            <p className="text-xs text-[#52667A] leading-relaxed max-w-sm mx-auto font-medium">
               {description}
             </p>
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -562,7 +562,7 @@ export default function App() {
                   setActiveTab(loginTab);
                   window.history.pushState({}, '', loginRoutePath);
                 }}
-                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-xs shadow-md transition cursor-pointer inline-flex items-center gap-2"
+                className="px-6 py-3 bg-gradient-to-r from-[#1677FF] to-[#38BDF8] hover:from-[#005cd6] hover:to-[#0284c7] text-white font-bold rounded-2xl text-xs shadow-md transition cursor-pointer inline-flex items-center gap-2"
               >
                 <User className="w-4 h-4" /> Sign In at {loginRoutePath}
               </button>
@@ -574,7 +574,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 flex flex-col justify-between selection:bg-emerald-100 selection:text-emerald-900 transition-colors">
+    <div className="min-h-screen bg-[#F5FAFF] font-sans text-[#102A43] flex flex-col justify-between selection:bg-[#EBF5FE] selection:text-[#1677FF] transition-colors">
       
       {/* Top Header Navbar */}
       <Navbar
@@ -808,17 +808,17 @@ export default function App() {
         <button
           type="button"
           onClick={() => setGeminiFloatingOpen(!geminiFloatingOpen)}
-          className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-3 rounded-full shadow-2xl flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95 group border-2 border-emerald-500/40 cursor-pointer"
+          className="bg-[#102A43] hover:bg-[#1e3a5f] text-white font-bold px-4 py-3 rounded-full shadow-2xl flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95 group border-2 border-[#38BDF8]/40 cursor-pointer"
           title="Ask Gemini AI Admissions Advisor"
         >
           <div className="relative">
-            <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
-              <Bot className="w-3.5 h-3.5 text-slate-950 font-bold" />
+            <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-[#1677FF] to-[#38BDF8] flex items-center justify-center">
+              <Bot className="w-3.5 h-3.5 text-white font-bold" />
             </div>
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#38BDF8] rounded-full animate-ping"></span>
           </div>
           <span className="text-xs font-extrabold flex items-center gap-1 tracking-tight">
-            AI Advisor <Sparkles className="w-3 h-3 text-emerald-400" />
+            AI Advisor <Sparkles className="w-3 h-3 text-[#38BDF8]" />
           </span>
         </button>
 
@@ -827,11 +827,11 @@ export default function App() {
           href="https://wa.me/231889425645?text=Hello%20Fresh%20Study%20India%20Counselor,%20I%20would%20like%20to%20inquire%20about%20university%20admissions%20and%20scholarships."
           target="_blank"
           rel="noreferrer"
-          className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-4 py-3 rounded-full shadow-2xl flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95 group border-2 border-white/20"
+          className="bg-[#25D366] hover:bg-[#20ba59] text-white font-bold px-4 py-3 rounded-full shadow-2xl flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95 group border-2 border-white/20"
           title="Chat live on WhatsApp with Fresh Study India (+231 889425645)"
         >
           <div className="relative">
-            <MessageCircle className="w-5 h-5 fill-white text-emerald-500" />
+            <MessageCircle className="w-5 h-5 fill-white text-[#25D366]" />
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-white rounded-full animate-ping"></span>
           </div>
           <span className="text-xs font-extrabold hidden sm:inline-block tracking-tight">WhatsApp Desk</span>

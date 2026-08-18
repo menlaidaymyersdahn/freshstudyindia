@@ -72,7 +72,6 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Filter out any stale error messages from previous session
           const sanitized = parsed.filter(m => !m.text?.includes('Unexpected token') && !m.text?.includes('is not valid JSON'));
           if (sanitized.length > 0) return sanitized;
         }
@@ -113,7 +112,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       modelName: 'gemini-3.5-flash',
       desc: 'Agency admissions process, intake dates & eligibility',
       icon: GraduationCap,
-      color: 'bg-emerald-600'
+      color: 'bg-[#1677FF]'
     },
     {
       id: 'scholarship_navigator' as const,
@@ -122,7 +121,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       modelName: 'gemini-3.1-pro-preview',
       desc: 'Merit scholarship evaluation & tuition reduction calculation',
       icon: Award,
-      color: 'bg-amber-600'
+      color: 'bg-[#0284C7]'
     },
     {
       id: 'visa_specialist' as const,
@@ -131,7 +130,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       modelName: 'gemini-3.5-flash',
       desc: 'Embassy interviews, bonafide letters & immigration clearance',
       icon: ShieldCheck,
-      color: 'bg-indigo-600'
+      color: 'bg-[#0891B2]'
     },
     {
       id: 'campus_life_guide' as const,
@@ -140,7 +139,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       modelName: 'gemini-3.5-flash',
       desc: 'Airport pickup, hostels, food, safety & on-ground team',
       icon: Compass,
-      color: 'bg-teal-600'
+      color: 'bg-[#0284C7]'
     },
     {
       id: 'fast_faq' as const,
@@ -149,7 +148,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       modelName: 'gemini-3.1-flash-lite',
       desc: 'Instant answers for agency fees, deadlines & contact info',
       icon: Zap,
-      color: 'bg-purple-600'
+      color: 'bg-[#1677FF]'
     }
   ];
 
@@ -240,7 +239,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
         console.info('Server chat API unreachable, activating intelligent agency knowledge base fallback:', networkErr);
       }
 
-      // 2. If server API returned HTML/404 (e.g. static hosting) or failed, use Knowledge Engine
+      // 2. If server API returned HTML/404 or failed, use Knowledge Engine
       if (!fetchedSuccessfully || !replyText) {
         const fallbackResult = generateAdvisorResponse(
           messageContent,
@@ -268,7 +267,6 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       setMessages((prev) => [...prev, botMessage]);
     } catch (err: any) {
       console.warn('Gemini chat handled gracefully:', err);
-      // Fallback with agency guidance
       const emergencyFallback = generateAdvisorResponse(messageContent, selectedRole, { name: currentUser?.name });
       const fallbackMsg: ChatMessageItem = {
         id: `bot-fallback-${Date.now()}`,
@@ -291,11 +289,11 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
     }
   };
 
-  // Render formatted markdown text simply
+  // Render formatted markdown text cleanly
   const renderFormattedMessage = (content: string) => {
     const lines = content.split('\n');
     return (
-      <div className="space-y-1.5 text-xs sm:text-sm leading-relaxed">
+      <div className="space-y-1.5 text-xs sm:text-sm leading-relaxed text-[#102A43]">
         {lines.map((line, idx) => {
           if (!line.trim()) {
             return <div key={idx} className="h-1" />;
@@ -306,8 +304,8 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
             const clean = line.replace(/^[\*\-•]\s*/, '');
             return (
               <div key={idx} className="flex items-start gap-2 pl-1">
-                <span className="text-emerald-500 font-bold">•</span>
-                <span>{formatInlineText(clean)}</span>
+                <span className="text-[#1677FF] font-bold">•</span>
+                <span className="text-[#102A43]">{formatInlineText(clean)}</span>
               </div>
             );
           }
@@ -316,32 +314,31 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
           if (/^\d+\.\s/.test(line)) {
             return (
               <div key={idx} className="flex items-start gap-2 pl-1">
-                <span className="font-bold text-slate-500">{line.match(/^\d+\./)?.[0]}</span>
-                <span>{formatInlineText(line.replace(/^\d+\.\s*/, ''))}</span>
+                <span className="font-bold text-[#1677FF]">{line.match(/^\d+\./)?.[0]}</span>
+                <span className="text-[#102A43]">{formatInlineText(line.replace(/^\d+\.\s*/, ''))}</span>
               </div>
             );
           }
 
           // Heading
           if (line.startsWith('### ')) {
-            return <h5 key={idx} className="font-bold text-slate-900 mt-2 text-xs uppercase tracking-wider">{line.replace('### ', '')}</h5>;
+            return <h5 key={idx} className="font-extrabold text-[#102A43] mt-2 text-xs uppercase tracking-wider">{line.replace('### ', '')}</h5>;
           }
           if (line.startsWith('## ')) {
-            return <h4 key={idx} className="font-extrabold text-slate-900 mt-2 text-sm">{line.replace('## ', '')}</h4>;
+            return <h4 key={idx} className="font-black text-[#102A43] mt-2 text-sm">{line.replace('## ', '')}</h4>;
           }
 
-          return <p key={idx}>{formatInlineText(line)}</p>;
+          return <p key={idx} className="text-[#102A43]">{formatInlineText(line)}</p>;
         })}
       </div>
     );
   };
 
   const formatInlineText = (text: string) => {
-    // Basic bold **text** parsing
     const parts = text.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, i) => {
       if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={i} className="font-extrabold text-slate-900">{part.slice(2, -2)}</strong>;
+        return <strong key={i} className="font-black text-[#102A43]">{part.slice(2, -2)}</strong>;
       }
       return part;
     });
@@ -349,13 +346,12 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
 
   const currentActiveRole = roles.find((r) => r.id === selectedRole) || roles[0];
 
-  // If floating widget and not opened, render toggle bubble
   if (isFloatingWidget && !isOpenFloating) {
     return null;
   }
 
   return (
-    <div className={`flex flex-col bg-white border border-slate-200/80 shadow-2xl overflow-hidden transition-all duration-300 ${
+    <div className={`flex flex-col bg-white border border-[#D9EAF7] shadow-2xl overflow-hidden transition-all duration-300 ${
       isFloatingWidget 
         ? isExpanded 
           ? 'fixed inset-4 sm:inset-10 z-50 rounded-3xl' 
@@ -364,13 +360,13 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
     }`}>
       
       {/* CHATBOT HEADER */}
-      <div className="bg-slate-900 text-white p-4 sm:p-5 flex items-center justify-between border-b border-slate-800">
+      <div className="bg-[#102A43] text-white p-4 sm:p-5 flex items-center justify-between border-b border-[#102A43]/40">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#1677FF] to-[#38BDF8] flex items-center justify-center shadow-md shadow-blue-500/20">
               <Bot className="w-5 h-5 text-white" />
             </div>
-            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 border-2 border-slate-900 rounded-full" />
+            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#38BDF8] border-2 border-[#102A43] rounded-full" />
           </div>
 
           <div>
@@ -378,25 +374,25 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
               <h3 className="font-extrabold text-sm sm:text-base text-white tracking-tight flex items-center gap-1.5">
                 Fresh Study India AI Advisor
               </h3>
-              <span className="px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-800/80 text-[10px] font-bold rounded-full flex items-center gap-1">
-                <Sparkles className="w-2.5 h-2.5" /> Gemini Powered
+              <span className="px-2 py-0.5 bg-[#1677FF]/20 text-[#38BDF8] border border-[#38BDF8]/40 text-[10px] font-bold rounded-full flex items-center gap-1">
+                <Sparkles className="w-2.5 h-2.5" /> Gemini
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 flex items-center gap-2">
+            <p className="text-[11px] text-blue-200 flex items-center gap-2 font-medium">
               <span>{currentActiveRole.name}</span>
               <span>•</span>
-              <span className="text-emerald-400 font-mono">{currentActiveRole.modelName}</span>
+              <span className="text-[#38BDF8] font-mono">{currentActiveRole.modelName}</span>
             </p>
           </div>
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-1.5 text-slate-400">
+        <div className="flex items-center gap-1.5 text-blue-200">
           <button
             type="button"
             onClick={handleClearHistory}
             title="Clear Chat History"
-            className="p-2 hover:text-rose-400 hover:bg-slate-800 rounded-xl transition cursor-pointer"
+            className="p-2 hover:text-rose-300 hover:bg-white/10 rounded-xl transition cursor-pointer"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -406,7 +402,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
               title={isExpanded ? 'Minimize Window' : 'Expand Fullscreen'}
-              className="p-2 hover:text-white hover:bg-slate-800 rounded-xl transition cursor-pointer hidden sm:block"
+              className="p-2 hover:text-white hover:bg-white/10 rounded-xl transition cursor-pointer hidden sm:block"
             >
               {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </button>
@@ -417,7 +413,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
               type="button"
               onClick={onCloseFloating}
               title="Close Chat"
-              className="p-2 hover:text-white hover:bg-slate-800 rounded-xl transition cursor-pointer"
+              className="p-2 hover:text-white hover:bg-white/10 rounded-xl transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -426,8 +422,8 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       </div>
 
       {/* ROLE & MODEL SELECTOR TABS */}
-      <div className="bg-slate-50 p-2 border-b border-slate-200 overflow-x-auto scrollbar-none flex items-center gap-1.5">
-        <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider px-2 shrink-0">
+      <div className="bg-[#F5FAFF] p-2 border-b border-[#D9EAF7] overflow-x-auto scrollbar-none flex items-center gap-1.5">
+        <span className="text-[10px] font-extrabold uppercase text-[#52667A] tracking-wider px-2 shrink-0">
           Specialist:
         </span>
         {roles.map((r) => {
@@ -440,17 +436,17 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
               onClick={() => handleRoleSelect(r.id)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 cursor-pointer ${
                 isSelected
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/80'
+                  ? 'bg-[#1677FF] text-white shadow-xs'
+                  : 'bg-white text-[#52667A] hover:bg-[#EBF5FE] hover:text-[#102A43] border border-[#D9EAF7]'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
               <span>{r.name}</span>
               {r.modelType === 'complex' && (
-                <span className="px-1.5 py-0.2 bg-amber-500/20 text-amber-600 text-[9px] rounded-md font-mono">PRO</span>
+                <span className="px-1.5 py-0.2 bg-blue-100 text-[#1677FF] text-[9px] rounded-md font-mono">PRO</span>
               )}
               {r.modelType === 'fast' && (
-                <span className="px-1.5 py-0.2 bg-purple-500/20 text-purple-600 text-[9px] rounded-md font-mono">LITE</span>
+                <span className="px-1.5 py-0.2 bg-cyan-100 text-[#0891B2] text-[9px] rounded-md font-mono">LITE</span>
               )}
             </button>
           );
@@ -458,18 +454,18 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       </div>
 
       {/* ROLE DESCRIPTION BANNER */}
-      <div className="px-4 py-2 bg-emerald-50/60 border-b border-emerald-100/80 flex items-center justify-between text-[11px] text-emerald-900">
+      <div className="px-4 py-2 bg-[#EBF5FE] border-b border-[#BFDBFE] flex items-center justify-between text-[11px] text-[#1677FF]">
         <div className="flex items-center gap-2 truncate">
-          <currentActiveRole.icon className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+          <currentActiveRole.icon className="w-3.5 h-3.5 text-[#1677FF] shrink-0" />
           <span className="font-semibold truncate">{currentActiveRole.desc}</span>
         </div>
-        <div className="flex items-center gap-1 shrink-0 font-mono text-[10px] text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md font-bold">
+        <div className="flex items-center gap-1 shrink-0 font-mono text-[10px] text-[#1677FF] bg-white px-2 py-0.5 rounded-md font-bold border border-[#BFDBFE]">
           <Cpu className="w-3 h-3" /> {currentActiveRole.modelName}
         </div>
       </div>
 
       {/* SCROLLABLE MESSAGE THREAD */}
-      <div className="flex-1 p-4 sm:p-5 overflow-y-auto space-y-4 bg-slate-50/40">
+      <div className="flex-1 p-4 sm:p-5 overflow-y-auto space-y-4 bg-[#F5FAFF]/60">
         {messages.map((msg) => {
           const isUser = msg.sender === 'user';
           return (
@@ -478,38 +474,38 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
               className={`flex items-start gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} group`}
             >
               {/* Avatar */}
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-sm text-xs font-bold ${
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-xs text-xs font-bold ${
                 isUser 
-                  ? 'bg-slate-900 text-white' 
-                  : 'bg-emerald-600 text-white'
+                  ? 'bg-[#102A43] text-white' 
+                  : 'bg-gradient-to-tr from-[#1677FF] to-[#38BDF8] text-white shadow-blue-500/20'
               }`}>
                 {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
               </div>
 
               {/* Message Bubble */}
-              <div className={`max-w-[85%] sm:max-w-[78%] rounded-2xl p-3.5 sm:p-4 text-xs sm:text-sm shadow-sm transition-all ${
+              <div className={`max-w-[85%] sm:max-w-[78%] rounded-2xl p-3.5 sm:p-4 text-xs sm:text-sm shadow-xs transition-all ${
                 isUser 
-                  ? 'bg-slate-900 text-white rounded-tr-none' 
-                  : 'bg-white text-slate-800 border border-slate-200/90 rounded-tl-none'
+                  ? 'bg-gradient-to-r from-[#1677FF] to-[#0284C7] text-white rounded-tr-none' 
+                  : 'bg-white text-[#102A43] border border-[#D9EAF7] rounded-tl-none'
               }`}>
                 
                 {/* Content */}
                 {isUser ? (
-                  <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
+                  <p className="whitespace-pre-wrap leading-relaxed text-white font-medium">{msg.text}</p>
                 ) : (
                   renderFormattedMessage(msg.text)
                 )}
 
                 {/* Footer Metadata */}
                 <div className={`mt-2.5 pt-2 flex items-center justify-between text-[10px] ${
-                  isUser ? 'border-t border-slate-800 text-slate-400' : 'border-t border-slate-100 text-slate-400'
+                  isUser ? 'border-t border-white/20 text-blue-100' : 'border-t border-[#D9EAF7] text-[#52667A]'
                 }`}>
                   <div className="flex items-center gap-2">
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 font-medium">
                       <Clock className="w-2.5 h-2.5" /> {msg.timestamp}
                     </span>
                     {msg.modelUsed && !isUser && (
-                      <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded font-mono font-bold text-[9px]">
+                      <span className="px-1.5 py-0.5 bg-[#F5FAFF] text-[#1677FF] rounded font-mono font-bold text-[9px] border border-[#D9EAF7]">
                         {msg.modelUsed}
                       </span>
                     )}
@@ -519,10 +515,10 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
                     <button
                       type="button"
                       onClick={() => handleCopyText(msg.id, msg.text)}
-                      className="p-1 hover:text-emerald-600 rounded transition cursor-pointer"
+                      className="p-1 hover:text-[#1677FF] rounded transition cursor-pointer"
                       title="Copy response"
                     >
-                      {copiedId === msg.id ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                      {copiedId === msg.id ? <Check className="w-3 h-3 text-[#1677FF]" /> : <Copy className="w-3 h-3" />}
                     </button>
                   )}
                 </div>
@@ -534,16 +530,16 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
         {/* Loading Bubble */}
         {isLoading && (
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm animate-pulse">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#1677FF] to-[#38BDF8] text-white flex items-center justify-center shrink-0 shadow-sm animate-pulse">
               <Bot className="w-4 h-4" />
             </div>
-            <div className="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-4 shadow-sm flex items-center gap-3">
+            <div className="bg-white border border-[#D9EAF7] rounded-2xl rounded-tl-none p-4 shadow-xs flex items-center gap-3">
               <div className="flex gap-1.5">
-                <span className="w-2 h-2 bg-emerald-600 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                <span className="w-2 h-2 bg-emerald-600 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                <span className="w-2 h-2 bg-emerald-600 rounded-full animate-bounce" />
+                <span className="w-2 h-2 bg-[#1677FF] rounded-full animate-bounce [animation-delay:-0.3s]" />
+                <span className="w-2 h-2 bg-[#1677FF] rounded-full animate-bounce [animation-delay:-0.15s]" />
+                <span className="w-2 h-2 bg-[#1677FF] rounded-full animate-bounce" />
               </div>
-              <span className="text-xs font-semibold text-slate-500">
+              <span className="text-xs font-semibold text-[#52667A]">
                 Consulting {currentActiveRole.name} ({currentActiveRole.modelName})...
               </span>
             </div>
@@ -551,7 +547,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
         )}
 
         {errorStatus && (
-          <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-2xl">
+          <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-2xl">
             {errorStatus}
           </div>
         )}
@@ -560,8 +556,8 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       </div>
 
       {/* QUICK PROMPT SUGGESTIONS (Chips) */}
-      <div className="p-2.5 bg-white border-t border-slate-100 overflow-x-auto scrollbar-none flex items-center gap-1.5">
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0 flex items-center gap-1 pl-1">
+      <div className="p-2.5 bg-white border-t border-[#D9EAF7] overflow-x-auto scrollbar-none flex items-center gap-1.5">
+        <span className="text-[10px] font-extrabold text-[#52667A] uppercase tracking-wider shrink-0 flex items-center gap-1 pl-1">
           <HelpCircle className="w-3 h-3" /> Quick:
         </span>
         {suggestedPrompts.map((p, idx) => (
@@ -570,7 +566,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
             type="button"
             onClick={() => handleSendMessage(p.text)}
             disabled={isLoading}
-            className="px-2.5 py-1 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-200 border border-slate-200/80 rounded-xl text-[11px] font-semibold text-slate-700 transition shrink-0 cursor-pointer disabled:opacity-50"
+            className="px-2.5 py-1 bg-[#F5FAFF] hover:bg-[#EBF5FE] hover:text-[#1677FF] hover:border-[#BFDBFE] border border-[#D9EAF7] rounded-xl text-[11px] font-semibold text-[#102A43] transition shrink-0 cursor-pointer disabled:opacity-50"
           >
             {p.label}
           </button>
@@ -578,7 +574,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       </div>
 
       {/* CHAT INPUT FORM */}
-      <div className="p-3 sm:p-4 bg-white border-t border-slate-200">
+      <div className="p-3 sm:p-4 bg-white border-t border-[#D9EAF7]">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -586,7 +582,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
           }}
           className="flex items-end gap-2"
         >
-          <div className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl p-2.5 focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-emerald-100 transition shadow-inner">
+          <div className="flex-1 bg-[#F5FAFF] border border-[#D9EAF7] rounded-2xl p-2.5 focus-within:border-[#1677FF] focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100 transition shadow-inner">
             <textarea
               ref={inputRef}
               rows={2}
@@ -594,14 +590,14 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
               onChange={(e) => setInputPrompt(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={`Ask ${currentActiveRole.name} about universities, fees, or visas...`}
-              className="w-full bg-transparent border-0 resize-none text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none"
+              className="w-full bg-transparent border-0 resize-none text-xs sm:text-sm text-[#102A43] placeholder-[#52667A]/60 font-medium focus:outline-none"
             />
           </div>
 
           <button
             type="submit"
             disabled={!inputPrompt.trim() || isLoading}
-            className="p-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold shadow-md hover:shadow-lg transition flex items-center justify-center shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            className="p-3.5 bg-gradient-to-r from-[#1677FF] to-[#38BDF8] hover:from-[#005cd6] hover:to-[#0284c7] text-white rounded-2xl font-bold shadow-md hover:shadow-lg transition flex items-center justify-center shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <RefreshCw className="w-5 h-5 animate-spin" />
@@ -612,13 +608,13 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
         </form>
 
         {/* Footer shortcuts */}
-        <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500">
+        <div className="mt-2 flex items-center justify-between text-[11px] text-[#52667A]">
           <span>Press Enter to send, Shift + Enter for newline</span>
           {onOpenApplyModal && (
             <button
               type="button"
               onClick={onOpenApplyModal}
-              className="text-emerald-700 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+              className="text-[#1677FF] font-bold hover:underline flex items-center gap-1 cursor-pointer"
             >
               Ready to Apply? <ArrowRight className="w-3 h-3" />
             </button>
