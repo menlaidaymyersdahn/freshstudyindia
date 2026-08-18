@@ -158,78 +158,119 @@ export const registerStaffWithFirebase = async (
 
 // 2. Sign In User
 export const loginWithFirebase = async (email: string, password: string) => {
-  const userCredential = await signInWithEmailAndPassword(auth, email, password);
-  const user = userCredential.user;
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-  // Fetch or create profile
-  const userDocRef = doc(db, 'users', user.uid);
-  const userDoc = await getDoc(userDocRef);
+    // Fetch or create profile
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
 
-  let profile: UserProfile;
-  if (userDoc.exists()) {
-    profile = userDoc.data() as UserProfile;
-  } else {
-    // Fallback if profile doesn't exist
-    let role: UserRole = 'student';
-    if (email.toLowerCase().includes('superadmin')) {
-      role = 'superadmin';
-    } else if (email.toLowerCase().includes('admin')) {
-      role = 'admin';
-    } else if (email.toLowerCase().includes('counselor')) {
-      role = 'counselor';
+    let profile: UserProfile;
+    if (userDoc.exists()) {
+      profile = userDoc.data() as UserProfile;
+    } else {
+      // Fallback if profile doesn't exist
+      let role: UserRole = 'student';
+      if (email.toLowerCase().includes('superadmin')) {
+        role = 'superadmin';
+      } else if (email.toLowerCase().includes('admin')) {
+        role = 'admin';
+      } else if (email.toLowerCase().includes('counselor')) {
+        role = 'counselor';
+      }
+      profile = {
+        id: user.uid,
+        name: user.displayName || email.split('@')[0],
+        email: user.email || email,
+        role: role,
+        targetCountry: 'India',
+        createdAt: new Date().toISOString()
+      };
+      await setDoc(userDocRef, profile, { merge: true });
     }
-    profile = {
-      id: user.uid,
-      name: user.displayName || email.split('@')[0],
-      email: user.email || email,
-      role: role,
-      targetCountry: 'India',
-      createdAt: new Date().toISOString()
-    };
-    await setDoc(userDocRef, profile, { merge: true });
-  }
 
-  return { user, profile };
+    return { user, profile };
+  } catch (err: any) {
+    // If it's a standard demo email that hasn't been initialized yet, auto-provision it
+    const isDemoAccount = email.toLowerCase().endsWith('@freshstudyindia.com') || email.toLowerCase().includes('demo');
+    if ((err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') && isDemoAccount) {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        let role: UserRole = 'student';
+        if (email.toLowerCase().includes('superadmin')) {
+          role = 'superadmin';
+        } else if (email.toLowerCase().includes('admin')) {
+          role = 'admin';
+        } else if (email.toLowerCase().includes('counselor')) {
+          role = 'counselor';
+        }
+        const profile: UserProfile = {
+          id: user.uid,
+          name: email.split('@')[0].toUpperCase(),
+          email: user.email || email,
+          role,
+          targetCountry: 'India',
+          createdAt: new Date().toISOString()
+        };
+        await setDoc(doc(db, 'users', user.uid), profile, { merge: true });
+        return { user, profile };
+      } catch (createErr) {
+        throw err; // throw original error
+      }
+    }
+    throw err;
+  }
 };
 
 // 2b. Sign In with Google
 export const loginWithGoogle = async (targetRole: UserRole = 'student') => {
-  const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
-  const userCredential = await signInWithPopup(auth, provider);
-  const user = userCredential.user;
+  try {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    const userCredential = await signInWithPopup(auth, provider);
+    const user = userCredential.user;
 
-  // Check if profile exists in Firestore
-  const userDocRef = doc(db, 'users', user.uid);
-  const userDoc = await getDoc(userDocRef);
+    // Check if profile exists in Firestore
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
 
-  let profile: UserProfile;
-  if (userDoc.exists()) {
-    profile = userDoc.data() as UserProfile;
-  } else {
-    // Determine initial role
-    let role: UserRole = targetRole;
-    const emailLower = (user.email || '').toLowerCase();
-    if (emailLower.includes('superadmin')) {
-      role = 'superadmin';
-    } else if (emailLower.includes('admin')) {
-      role = 'admin';
-    } else if (emailLower.includes('counselor')) {
-      role = 'counselor';
+    let profile: UserProfile;
+    if (userDoc.exists()) {
+      profile = userDoc.data() as UserProfile;
+    } else {
+      // Determine initial role
+      let role: UserRole = targetRole;
+      const emailLower = (user.email || '').toLowerCase();
+      if (emailLower.includes('superadmin')) {
+        role = 'superadmin';
+      } else if (emailLower.includes('admin')) {
+        role = 'admin';
+      } else if (emailLower.includes('counselor')) {
+        role = 'counselor';
+      }
+
+      profile = {
+        id: user.uid,
+        name: user.displayName || user.email?.split('@')[0] || 'Student',
+        email: user.email || '',
+        role: role,
+        targetCountry: 'India',
+        createdAt: new Date().toISOString()
+      };
+      await setDoc(userDocRef, profile, { merge: true });
     }
 
-    profile = {
-      id: user.uid,
-      name: user.displayName || user.email?.split('@')[0] || 'Student',
-      email: user.email || '',
-      role: role,
-      targetCountry: 'India',
-      createdAt: new Date().toISOString()
-    };
-    await setDoc(userDocRef, profile, { merge: true });
+    return { user, profile };
+  } catch (err: any) {
+    if (err?.code === 'auth/unauthorized-domain') {
+      err.domain = typeof window !== 'undefined' ? window.location.hostname : '';
+      err.projectId = firebaseConfigJson.projectId;
+      err.firebaseConsoleUrl = `https://console.firebase.google.com/project/${firebaseConfigJson.projectId}/authentication/settings`;
+    }
+    throw err;
   }
-
-  return { user, profile };
 };
 
 // 3. Password Reset

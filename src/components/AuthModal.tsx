@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, ShieldCheck, Mail, CheckCircle2, AlertCircle, RefreshCw, UserCheck, Lock, Eye, EyeOff } from 'lucide-react';
+import { 
+  X, 
+  User, 
+  ShieldCheck, 
+  Mail, 
+  CheckCircle2, 
+  AlertCircle, 
+  RefreshCw, 
+  UserCheck, 
+  Lock, 
+  Eye, 
+  EyeOff,
+  Copy,
+  Check,
+  ExternalLink,
+  Zap,
+  Info
+} from 'lucide-react';
 import { UserRole } from '../types';
 import { 
   registerStudentWithFirebase, 
@@ -8,6 +25,7 @@ import {
   triggerPasswordReset, 
   triggerEmailVerification 
 } from '../lib/firebase';
+import firebaseConfigJson from '../../firebase-applet-config.json';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -38,6 +56,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [unverifiedEmailUser, setUnverifiedEmailUser] = useState<any | null>(null);
 
+  // Unauthorized Domain specific state
+  const [unauthorizedDomainState, setUnauthorizedDomainState] = useState<{
+    domain: string;
+    projectId: string;
+  } | null>(null);
+  const [copiedDomain, setCopiedDomain] = useState(false);
+
   useEffect(() => {
     if (initialPortal) {
       setPortal(initialPortal);
@@ -50,6 +75,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setError(null);
     setSuccessMsg(null);
     setUnverifiedEmailUser(null);
+    setUnauthorizedDomainState(null);
   };
 
   const handlePortalChange = (newPortal: 'student' | 'counselor' | 'admin') => {
@@ -58,11 +84,35 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     handleResetState();
   };
 
+  const handleCopyDomain = (domainToCopy: string) => {
+    navigator.clipboard.writeText(domainToCopy);
+    setCopiedDomain(true);
+    setTimeout(() => setCopiedDomain(false), 2500);
+  };
+
+  const handleFillDemoCredentials = (roleType: 'student' | 'counselor' | 'admin') => {
+    handlePortalChange(roleType);
+    setMode('login');
+    if (roleType === 'student') {
+      setEmail('student@freshstudyindia.com');
+      setPassword('student123456');
+    } else if (roleType === 'counselor') {
+      setEmail('counselor@freshstudyindia.com');
+      setPassword('counselor123456');
+    } else {
+      setEmail('admin@freshstudyindia.com');
+      setPassword('admin123456');
+    }
+    setError(null);
+    setUnauthorizedDomainState(null);
+  };
+
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccessMsg(null);
+    setUnauthorizedDomainState(null);
 
     try {
       if (mode === 'forgot_password') {
@@ -137,7 +187,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       console.error('Firebase Auth Error:', err);
       let message = err.message || 'Authentication failed. Please verify credentials.';
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-        message = 'Invalid email address or password. Please try again.';
+        message = 'Invalid email address or password. If you do not have an account yet, click "Create a Student account" below.';
       } else if (err.code === 'auth/email-already-in-use') {
         message = 'An account with this email address already exists. Please log in.';
       } else if (err.code === 'auth/weak-password') {
@@ -166,6 +216,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     setError(null);
     setSuccessMsg(null);
+    setUnauthorizedDomainState(null);
 
     try {
       const { user, profile } = await loginWithGoogle(portal);
@@ -189,18 +240,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         onClose();
       }, 1000);
     } catch (err: any) {
-      if (err?.code === 'auth/popup-closed-by-user' || err?.code === 'auth/cancelled-popup-request') {
-        setError('Sign-in cancelled or popup closed. Please click below to try again.');
+      const currentHost = typeof window !== 'undefined' ? window.location.hostname : '';
+      if (err?.code === 'auth/unauthorized-domain' || err?.message?.includes('unauthorized-domain')) {
+        setUnauthorizedDomainState({
+          domain: currentHost,
+          projectId: firebaseConfigJson.projectId || 'project'
+        });
+      } else if (err?.code === 'auth/popup-closed-by-user' || err?.code === 'auth/cancelled-popup-request') {
+        setError('Google sign-in popup was closed before completing. Click below to try again.');
       } else if (err?.code === 'auth/popup-blocked') {
-        setError('Google sign-in popup was blocked by your browser. Please allow popups for this site.');
+        setError('Google sign-in popup was blocked by your browser. Please allow popups for this website.');
       } else {
         console.warn('Google Sign-In note:', err?.message || err);
-        setError(err.message || 'Google sign-in failed. Please try standard login.');
+        setError(err.message || 'Google sign-in failed. Please use email/password login below.');
       }
     } finally {
       setLoading(false);
     }
   };
+
+  const currentHost = typeof window !== 'undefined' ? window.location.hostname : '';
 
   return (
     <div className="fixed inset-0 bg-[#102A43]/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
@@ -239,7 +298,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         {/* Portal Tab Selection */}
-        <div className="grid grid-cols-3 gap-1 bg-[#F5FAFF] p-1 rounded-2xl mb-5 text-xs font-bold border border-[#D9EAF7]">
+        <div className="grid grid-cols-3 gap-1 bg-[#F5FAFF] p-1 rounded-2xl mb-4 text-xs font-bold border border-[#D9EAF7]">
           <button
             type="button"
             onClick={() => handlePortalChange('student')}
@@ -280,8 +339,68 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </button>
         </div>
 
-        {/* Alerts & Notifications */}
-        {error && (
+        {/* UNAUTHORIZED DOMAIN INSTRUCTIONAL BANNER */}
+        {unauthorizedDomainState && (
+          <div className="mb-4 p-4 bg-[#FFF8E6] border border-[#FDE68A] rounded-2xl text-[#92400E] text-xs space-y-2.5 shadow-xs">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-[#D97706] shrink-0 mt-0.5" />
+              <div>
+                <span className="font-extrabold text-[#78350F] block">
+                  Google Auth Domain Authorization Required
+                </span>
+                <p className="text-[11px] leading-relaxed text-[#92400E] mt-0.5">
+                  Firebase Authentication requires this domain to be added to Authorized Domains in your Firebase Console before Google Sign-In can execute.
+                </p>
+              </div>
+            </div>
+
+            {/* Current Domain Box with Copy */}
+            <div className="bg-white p-2.5 rounded-xl border border-[#FCD34D] flex items-center justify-between gap-2">
+              <div className="truncate font-mono text-[11px] font-bold text-[#78350F] select-all">
+                {unauthorizedDomainState.domain || currentHost}
+              </div>
+              <button
+                type="button"
+                onClick={() => handleCopyDomain(unauthorizedDomainState.domain || currentHost)}
+                className="px-2.5 py-1 bg-[#D97706] hover:bg-[#B45309] text-white font-bold text-[10px] rounded-lg transition shrink-0 flex items-center gap-1 cursor-pointer"
+              >
+                {copiedDomain ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                {copiedDomain ? 'Copied!' : 'Copy Domain'}
+              </button>
+            </div>
+
+            {/* Steps Guide */}
+            <div className="text-[10px] text-[#78350F] bg-amber-100/50 p-2 rounded-lg space-y-1">
+              <span className="font-bold block">How to enable in Firebase:</span>
+              <div>1. Go to <strong>Firebase Console → Authentication → Settings</strong></div>
+              <div>2. Scroll to <strong>Authorized domains</strong> → click <strong>Add domain</strong></div>
+              <div>3. Paste the copied domain and click <strong>Save</strong></div>
+            </div>
+
+            {/* Direct Console Link & Email Login Bypass */}
+            <div className="pt-1 flex flex-col gap-1.5">
+              <a
+                href={`https://console.firebase.google.com/project/${unauthorizedDomainState.projectId}/authentication/settings`}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full py-1.5 bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#78350F] border border-[#FCD34D] rounded-xl text-center font-bold text-[11px] flex items-center justify-center gap-1.5 transition"
+              >
+                Open Firebase Auth Settings <ExternalLink className="w-3 h-3" />
+              </a>
+
+              <button
+                type="button"
+                onClick={() => handleFillDemoCredentials(portal)}
+                className="w-full py-1.5 bg-[#1677FF] hover:bg-[#005cd6] text-white rounded-xl text-center font-bold text-[11px] flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs"
+              >
+                <Zap className="w-3 h-3" /> Fill Instant Test Account ({portal})
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Regular Alerts & Notifications */}
+        {error && !unauthorizedDomainState && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-2xl flex items-start gap-2">
             <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
             <span className="font-semibold leading-relaxed">{error}</span>
@@ -315,6 +434,51 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </button>
           </div>
         )}
+
+        {/* Quick 1-Click Demo Accounts Tray */}
+        <div className="mb-4 p-2.5 bg-[#F5FAFF] border border-[#D9EAF7] rounded-2xl">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#52667A] flex items-center gap-1">
+              <Zap className="w-3 h-3 text-[#1677FF]" /> 1-Click Test Accounts:
+            </span>
+            <span className="text-[10px] text-[#1677FF] font-semibold">Instant Access</span>
+          </div>
+          <div className="grid grid-cols-3 gap-1.5">
+            <button
+              type="button"
+              onClick={() => handleFillDemoCredentials('student')}
+              className={`py-1 px-2 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1 cursor-pointer border ${
+                portal === 'student'
+                  ? 'bg-[#1677FF] text-white border-[#1677FF]'
+                  : 'bg-white text-[#52667A] hover:bg-[#EBF5FE] border-[#D9EAF7]'
+              }`}
+            >
+              Student
+            </button>
+            <button
+              type="button"
+              onClick={() => handleFillDemoCredentials('counselor')}
+              className={`py-1 px-2 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1 cursor-pointer border ${
+                portal === 'counselor'
+                  ? 'bg-[#0284C7] text-white border-[#0284C7]'
+                  : 'bg-white text-[#52667A] hover:bg-[#EBF5FE] border-[#D9EAF7]'
+              }`}
+            >
+              Counselor
+            </button>
+            <button
+              type="button"
+              onClick={() => handleFillDemoCredentials('admin')}
+              className={`py-1 px-2 rounded-lg text-[10px] font-bold transition flex items-center justify-center gap-1 cursor-pointer border ${
+                portal === 'admin'
+                  ? 'bg-[#102A43] text-white border-[#102A43]'
+                  : 'bg-white text-[#52667A] hover:bg-[#EBF5FE] border-[#D9EAF7]'
+              }`}
+            >
+              Admin
+            </button>
+          </div>
+        </div>
 
         {/* Auth Form */}
         <form onSubmit={handleAuthSubmit} className="space-y-3.5 text-xs">
