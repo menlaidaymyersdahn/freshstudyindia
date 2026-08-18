@@ -5,15 +5,17 @@ import {
   X, 
   ArrowRight, 
   GraduationCap,
-  MessageCircle
+  MessageCircle,
+  Share2
 } from 'lucide-react';
 import { BRAND, getWhatsAppLink } from '../lib/constants';
 
 interface NavbarProps {
   onOpenApplication: (presetField?: string) => void;
+  onOpenShare?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication, onOpenShare }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -106,7 +108,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
           </div>
 
           {/* Action CTAs */}
-          <div className="hidden sm:flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2.5">
+            {onOpenShare && (
+              <button
+                onClick={onOpenShare}
+                className="p-2.5 rounded-xl text-slate-600 hover:text-[#0B192C] bg-slate-100 hover:bg-slate-200 transition-colors flex items-center justify-center cursor-pointer"
+                title="Share Fresh Study India"
+                aria-label="Share Fresh Study India"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
+            )}
+
             <a
               href={getWhatsAppLink('india')}
               target="_blank"
@@ -119,7 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
 
             <button
               onClick={() => onOpenApplication()}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold tracking-wide uppercase text-white bg-[#0B192C] hover:bg-[#1E2E48] transition-all duration-200 shadow-md hover:shadow-lg active:scale-98"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold tracking-wide uppercase text-white bg-[#0B192C] hover:bg-[#1E2E48] transition-all duration-200 shadow-md hover:shadow-lg active:scale-98 cursor-pointer"
             >
               <span>Start Application</span>
               <ArrowRight className="w-3.5 h-3.5 text-sky-400" />
@@ -183,6 +196,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
                   <span>🇱🇷 Liberia WhatsApp</span>
                 </a>
               </div>
+
+              {onOpenShare && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenShare();
+                  }}
+                  className="w-full py-2.5 px-3 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                >
+                  <Share2 className="w-4 h-4 text-sky-600" />
+                  <span>Share Website on Social Media</span>
+                </button>
+              )}
             </div>
           </div>
         )}

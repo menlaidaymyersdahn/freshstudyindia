@@ -13,11 +13,25 @@ import { Footer } from './components/Footer';
 import { ApplicationModal } from './components/ApplicationModal';
 import { PrivacyModal } from './components/PrivacyModal';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
+import { ShareModal } from './components/ShareModal';
+import { useDynamicSEO } from './hooks/useDynamicSEO';
 
 export function App() {
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
   const [presetStudyField, setPresetStudyField] = useState<string | undefined>(undefined);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  // Dynamic OpenGraph and Meta Description tags
+  useDynamicSEO({
+    title: presetStudyField 
+      ? `Study ${presetStudyField} in India | Fresh Study India Admissions`
+      : 'Fresh Study India | Study in India — International Admissions & Student Advisory',
+    description: presetStudyField
+      ? `Explore top accredited Indian universities for ${presetStudyField}. Complete admissions, visa filing, and arrival support with Fresh Study India.`
+      : 'Helping students from Africa and around the world study in India. Dedicated guidance for university admissions, student visas, accommodation, and airport arrival assistance.',
+    image: '/og-image.svg'
+  });
 
   const handleOpenApplication = (presetField?: string) => {
     setPresetStudyField(presetField);
@@ -32,7 +46,10 @@ export function App() {
   return (
     <div className="min-h-screen bg-[#F4F8FC] text-[#0B192C] selection:bg-sky-500 selection:text-white font-sans antialiased">
       {/* Top Fixed Header & Navigation */}
-      <Navbar onOpenApplication={() => handleOpenApplication()} />
+      <Navbar 
+        onOpenApplication={() => handleOpenApplication()} 
+        onOpenShare={() => setIsShareModalOpen(true)}
+      />
 
       {/* Main Page Flow */}
       <main>
@@ -68,6 +85,7 @@ export function App() {
       <Footer 
         onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
         onOpenApplication={() => handleOpenApplication()}
+        onOpenShare={() => setIsShareModalOpen(true)}
       />
 
       {/* Express Application & Consultation Modal */}
@@ -81,6 +99,13 @@ export function App() {
       <PrivacyModal
         isOpen={isPrivacyModalOpen}
         onClose={() => setIsPrivacyModalOpen(false)}
+      />
+
+      {/* Social Share & OpenGraph Preview Modal */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        customTitle={presetStudyField ? `Study ${presetStudyField} in India with Fresh Study India` : undefined}
       />
 
       {/* Floating Direct WhatsApp Access */}

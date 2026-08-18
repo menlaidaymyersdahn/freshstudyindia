@@ -1,13 +1,14 @@
 import React from 'react';
-import { GraduationCap, Phone, MapPin, ArrowUp, MessageCircle } from 'lucide-react';
+import { GraduationCap, Phone, MapPin, ArrowUp, MessageCircle, Share2 } from 'lucide-react';
 import { BRAND, getWhatsAppLink } from '../lib/constants';
 
 interface FooterProps {
   onOpenPrivacy: () => void;
   onOpenApplication: () => void;
+  onOpenShare?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenApplication }) => {
+export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenApplication, onOpenShare }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -67,6 +68,17 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenApplication
                   Privacy Policy
                 </button>
               </li>
+              {onOpenShare && (
+                <li>
+                  <button 
+                    onClick={onOpenShare} 
+                    className="hover:text-sky-400 transition-colors text-left cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                    <span>Share With Friends</span>
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
 
