@@ -10,6 +10,8 @@ import {
   ArrowRight,
   CheckCircle2
 } from 'lucide-react';
+import { IMAGES } from '../lib/images';
+import { ImageWithFallback } from './ImageWithFallback';
 
 interface JourneyTimelineProps {
   onOpenApplication: (stepContext?: string) => void;
@@ -204,14 +206,14 @@ export const JourneyTimeline: React.FC<JourneyTimelineProps> = ({ onOpenApplicat
             {/* Visual Photo Card in Spotlight */}
             <div className="lg:col-span-5">
               <div className="rounded-2xl overflow-hidden border border-white/20 bg-slate-900 shadow-2xl aspect-[16/10] relative group">
-                <img
-                  src={activeStep >= 3 ? "/DSC_9367.jpeg" : "/DSC_9531.jpeg"}
-                  onError={(e) => {
-                    if (e.currentTarget.src.endsWith('.jpeg')) {
-                      e.currentTarget.src = activeStep >= 3 ? '/DSC_9367.jpg' : '/DSC_9531.jpg';
-                    }
-                  }}
-                  alt="Student Academic Journey in India"
+                <ImageWithFallback
+                  src={activeStep >= 3 ? IMAGES.convocation.src : IMAGES.graduate.src}
+                  fallbackSrcs={
+                    activeStep >= 3
+                      ? [IMAGES.convocation.webp, IMAGES.convocation.publicUrl, '/DSC_9367.jpeg', IMAGES.convocation.png, IMAGES.convocation.svg]
+                      : [IMAGES.graduate.webp, IMAGES.graduate.publicUrl, '/DSC_9531.jpeg', IMAGES.graduate.png, IMAGES.graduate.svg]
+                  }
+                  alt={activeStep >= 3 ? IMAGES.convocation.alt : IMAGES.graduate.alt}
                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#071322] via-[#071322]/20 to-transparent flex items-end p-4">

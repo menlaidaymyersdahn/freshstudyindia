@@ -13,6 +13,8 @@ import {
   Award
 } from 'lucide-react';
 import { BRAND, getWhatsAppLink } from '../lib/constants';
+import { IMAGES } from '../lib/images';
+import { ImageWithFallback } from './ImageWithFallback';
 
 interface HeroProps {
   onOpenApplication: () => void;
@@ -23,15 +25,18 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication }) => {
     <section id="hero" className="relative pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-28 lg:pb-32 overflow-hidden bg-[#071322] text-white">
       {/* 1. Large High-Resolution Convocation Background Photo with Sleek Deep-Navy Visual Tint */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0">
-        <img
-          src="/DSC_9367.jpeg"
-          onError={(e) => {
-            if (e.currentTarget.src.endsWith('.jpeg')) {
-              e.currentTarget.src = '/DSC_9367.jpg';
-            }
-          }}
-          alt="International Students Graduation Convocation Ceremony in India"
+        <ImageWithFallback
+          src={IMAGES.convocation.src}
+          fallbackSrcs={[
+            IMAGES.convocation.webp,
+            IMAGES.convocation.publicUrl,
+            '/DSC_9367.jpeg',
+            IMAGES.convocation.png,
+            IMAGES.convocation.svg
+          ]}
+          alt={IMAGES.convocation.alt}
           className="w-full h-full object-cover object-[center_28%] sm:object-[center_35%] md:object-center scale-105 opacity-60 sm:opacity-65 transition-transform duration-1000"
+          loading="eager"
         />
         {/* Optical Duotone & Legibility Scrims */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#071322]/95 via-[#071322]/85 to-[#071322]/70 sm:to-[#071322]/60" />
@@ -118,14 +123,16 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication }) => {
                 
                 {/* Main Hero Image: Real Graduate Portrait */}
                 <div className="relative rounded-[22px] overflow-hidden bg-slate-900 aspect-[4/5] sm:aspect-[5/6] lg:aspect-[4/5] shadow-2xl group">
-                  <img
-                    src="/DSC_9531.jpeg"
-                    onError={(e) => {
-                      if (e.currentTarget.src.endsWith('.jpeg')) {
-                        e.currentTarget.src = '/DSC_9531.jpg';
-                      }
-                    }}
-                    alt="Myers Dahn - Liberian Student & Microbiology Graduate in India"
+                  <ImageWithFallback
+                    src={IMAGES.graduate.src}
+                    fallbackSrcs={[
+                      IMAGES.graduate.webp,
+                      IMAGES.graduate.publicUrl,
+                      '/DSC_9531.jpeg',
+                      IMAGES.graduate.png,
+                      IMAGES.graduate.svg
+                    ]}
+                    alt={IMAGES.graduate.alt}
                     className="w-full h-full object-cover object-top transform group-hover:scale-103 transition-transform duration-700"
                     loading="eager"
                   />

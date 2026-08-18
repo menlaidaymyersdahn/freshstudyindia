@@ -9,6 +9,8 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { BRAND, getWhatsAppLink } from '../lib/constants';
+import { IMAGES } from '../lib/images';
+import { ImageWithFallback } from './ImageWithFallback';
 
 interface BigCTAProps {
   onOpenApplication: () => void;
@@ -19,14 +21,16 @@ export const BigCTA: React.FC<BigCTAProps> = ({ onOpenApplication }) => {
     <section className="py-24 sm:py-32 bg-[#071322] text-white relative overflow-hidden">
       {/* 1. Background Convocation Photo with rich visibility */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0">
-        <img
-          src="/DSC_9367.jpeg"
-          onError={(e) => {
-            if (e.currentTarget.src.endsWith('.jpeg')) {
-              e.currentTarget.src = '/DSC_9367.jpg';
-            }
-          }}
-          alt="International Convocation Ceremony in India"
+        <ImageWithFallback
+          src={IMAGES.convocation.src}
+          fallbackSrcs={[
+            IMAGES.convocation.webp,
+            IMAGES.convocation.publicUrl,
+            '/DSC_9367.jpeg',
+            IMAGES.convocation.png,
+            IMAGES.convocation.svg
+          ]}
+          alt={IMAGES.convocation.alt}
           className="w-full h-full object-cover object-center opacity-50 sm:opacity-55 scale-105 transition-transform duration-1000"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#071322]/95 via-[#071322]/80 to-[#071322]/90" />

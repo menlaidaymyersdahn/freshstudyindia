@@ -12,6 +12,8 @@ import {
   GraduationCap
 } from 'lucide-react';
 import { BRAND, getWhatsAppLink } from '../lib/constants';
+import { IMAGES } from '../lib/images';
+import { ImageWithFallback } from './ImageWithFallback';
 
 interface AfricaToIndiaProps {
   onOpenApplication: () => void;
@@ -22,14 +24,16 @@ export const AfricaToIndia: React.FC<AfricaToIndiaProps> = ({ onOpenApplication 
     <section className="py-24 sm:py-32 bg-slate-900 text-white relative overflow-hidden">
       {/* Background Convocation Photo with rich dark atmospheric filter */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0">
-        <img
-          src="/DSC_9367.jpeg"
-          onError={(e) => {
-            if (e.currentTarget.src.endsWith('.jpeg')) {
-              e.currentTarget.src = '/DSC_9367.jpg';
-            }
-          }}
-          alt="International Graduates at Convocation in India"
+        <ImageWithFallback
+          src={IMAGES.convocation.src}
+          fallbackSrcs={[
+            IMAGES.convocation.webp,
+            IMAGES.convocation.publicUrl,
+            '/DSC_9367.jpeg',
+            IMAGES.convocation.png,
+            IMAGES.convocation.svg
+          ]}
+          alt={IMAGES.convocation.alt}
           className="w-full h-full object-cover object-center opacity-25 filter brightness-75 scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-900/85 to-slate-900" />
@@ -164,13 +168,15 @@ export const AfricaToIndia: React.FC<AfricaToIndiaProps> = ({ onOpenApplication 
             {/* Dual Real Photo Cards: Convocation & Student Portrait */}
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-2xl overflow-hidden border border-white/15 bg-white/5 backdrop-blur-md relative group aspect-[4/3] shadow-lg">
-                <img
-                  src="/DSC_9367.jpeg"
-                  onError={(e) => {
-                    if (e.currentTarget.src.endsWith('.jpeg')) {
-                      e.currentTarget.src = '/DSC_9367.jpg';
-                    }
-                  }}
+                <ImageWithFallback
+                  src={IMAGES.convocation.src}
+                  fallbackSrcs={[
+                    IMAGES.convocation.webp,
+                    IMAGES.convocation.publicUrl,
+                    '/DSC_9367.jpeg',
+                    IMAGES.convocation.png,
+                    IMAGES.convocation.svg
+                  ]}
                   alt="Convocation Ceremony at Indian University"
                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 />
@@ -185,13 +191,15 @@ export const AfricaToIndia: React.FC<AfricaToIndiaProps> = ({ onOpenApplication 
               </div>
 
               <div className="rounded-2xl overflow-hidden border border-white/15 bg-white/5 backdrop-blur-md relative group aspect-[4/3] shadow-lg">
-                <img
-                  src="/DSC_9531.jpeg"
-                  onError={(e) => {
-                    if (e.currentTarget.src.endsWith('.jpeg')) {
-                      e.currentTarget.src = '/DSC_9531.jpg';
-                    }
-                  }}
+                <ImageWithFallback
+                  src={IMAGES.graduate.src}
+                  fallbackSrcs={[
+                    IMAGES.graduate.webp,
+                    IMAGES.graduate.publicUrl,
+                    '/DSC_9531.jpeg',
+                    IMAGES.graduate.png,
+                    IMAGES.graduate.svg
+                  ]}
                   alt="Myers - Liberian Student Graduate in India"
                   className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
                 />

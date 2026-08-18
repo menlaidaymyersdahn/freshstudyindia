@@ -1,5 +1,7 @@
 import React from 'react';
 import { ArrowRight, Sparkles, GraduationCap, ShieldCheck } from 'lucide-react';
+import { IMAGES } from '../lib/images';
+import { ImageWithFallback } from './ImageWithFallback';
 
 interface FutureHeroBannerProps {
   onOpenApplication: () => void;
@@ -17,16 +19,18 @@ export const FutureHeroBanner: React.FC<FutureHeroBannerProps> = ({ onOpenApplic
         >
           {/* 1. Real Uploaded Graduation Photo as Full-Cover Background with Optimized Subject Centering */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
-            <img
-              src="/DSC_9367.jpeg"
-              onError={(e) => {
-                // Fallback to .jpg extension if needed
-                if (e.currentTarget.src.endsWith('.jpeg')) {
-                  e.currentTarget.src = '/DSC_9367.jpg';
-                }
-              }}
+            <ImageWithFallback
+              src={IMAGES.convocation.src}
+              fallbackSrcs={[
+                IMAGES.convocation.webp,
+                IMAGES.convocation.publicUrl,
+                '/DSC_9367.jpeg',
+                IMAGES.convocation.png,
+                IMAGES.convocation.svg
+              ]}
               alt="International Students in Graduation Robes at Indian University Convocation"
               className="w-full h-full object-cover object-[center_28%] sm:object-[center_35%] md:object-center transform scale-100 group-hover:scale-102 transition-transform duration-1000 ease-out"
+              loading="eager"
             />
             
             {/* 2. Subtle Dark Navy Overlay for optimal contrast & text legibility while keeping students clearly visible */}

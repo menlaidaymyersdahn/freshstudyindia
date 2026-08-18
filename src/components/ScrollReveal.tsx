@@ -3,30 +3,33 @@ import React, { useEffect, useRef, useState } from 'react';
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
-  delay?: number; // delay in ms
-  threshold?: number;
+  delay?: number;
+  delayMs?: number;
   direction?: 'up' | 'none';
+  id?: string;
 }
 
 export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   children,
   className = '',
   delay = 0,
-  threshold = 0.12,
+  delayMs = 0,
   direction = 'up',
+  id,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
+  const effectiveDelay = delay || delayMs;
 
   useEffect(() => {
-    // Check if IntersectionObserver is supported
-    if (!('IntersectionObserver' in window)) {
+    const element = ref.current;
+    if (!element) return;
+
+    // Support reduced motion preference
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setIsVisible(true);
       return;
     }
-
-    const element = containerRef.current;
-    if (!element) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -36,8 +39,8 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
         }
       },
       {
-        threshold,
-        rootMargin: '0px 0px -60px 0px',
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px',
       }
     );
 
@@ -46,19 +49,25 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
     return () => {
       observer.disconnect();
     };
-  }, [threshold]);
+  }, []);
 
-  const transformClass = direction === 'up' 
-    ? (isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-7')
-    : (isVisible ? 'opacity-100' : 'opacity-0');
+  const translateClass =
+    direction === 'up'
+      ? isVisible
+        ? 'translate-y-0 opacity-100'
+        : 'translate-y-6 sm:translate-y-8 opacity-0'
+      : isVisible
+      ? 'opacity-100'
+      : 'opacity-0';
 
   return (
     <div
-      ref={containerRef}
+      ref={ref}
+      id={id}
       style={{
-        transitionDelay: `${delay}ms`,
+        transitionDelay: `${effectiveDelay}ms`,
       }}
-      className={`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform will-change-[transform,opacity] ${transformClass} ${className}`}
+      className={`transition-all duration-700 ease-out will-change-transform ${translateClass} ${className}`}
     >
       {children}
     </div>

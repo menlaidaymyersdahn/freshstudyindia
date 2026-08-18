@@ -11,6 +11,8 @@ import {
   MapPin
 } from 'lucide-react';
 import { BRAND, getWhatsAppLink } from '../lib/constants';
+import { IMAGES } from '../lib/images';
+import { ImageWithFallback } from './ImageWithFallback';
 
 interface WhyUsProps {
   onOpenApplication: () => void;
@@ -45,14 +47,16 @@ export const WhyUs: React.FC<WhyUsProps> = ({ onOpenApplication }) => {
     <section id="about" className="py-24 sm:py-32 bg-[#071322] text-white relative overflow-hidden">
       {/* Background Convocation Photo with rich cinematic treatment */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0">
-        <img
-          src="/DSC_9367.jpeg"
-          onError={(e) => {
-            if (e.currentTarget.src.endsWith('.jpeg')) {
-              e.currentTarget.src = '/DSC_9367.jpg';
-            }
-          }}
-          alt="Convocation Ceremony at Indian University"
+        <ImageWithFallback
+          src={IMAGES.convocation.src}
+          fallbackSrcs={[
+            IMAGES.convocation.webp,
+            IMAGES.convocation.publicUrl,
+            '/DSC_9367.jpeg',
+            IMAGES.convocation.png,
+            IMAGES.convocation.svg
+          ]}
+          alt={IMAGES.convocation.alt}
           className="w-full h-full object-cover object-center opacity-20 filter contrast-125"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#071322] via-[#071322]/90 to-[#071322]" />
@@ -107,13 +111,15 @@ export const WhyUs: React.FC<WhyUsProps> = ({ onOpenApplication }) => {
               
               {/* Primary Photo Showcase Container: Real Graduation Ceremony */}
               <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-slate-900 shadow-2xl group">
-                <img
-                  src="/DSC_9367.jpeg"
-                  onError={(e) => {
-                    if (e.currentTarget.src.endsWith('.jpeg')) {
-                      e.currentTarget.src = '/DSC_9367.jpg';
-                    }
-                  }}
+                <ImageWithFallback
+                  src={IMAGES.convocation.src}
+                  fallbackSrcs={[
+                    IMAGES.convocation.webp,
+                    IMAGES.convocation.publicUrl,
+                    '/DSC_9367.jpeg',
+                    IMAGES.convocation.png,
+                    IMAGES.convocation.svg
+                  ]}
                   alt="Real International Students Convocation in India"
                   className="w-full h-full object-cover object-[center_28%] sm:object-[center_35%] md:object-center group-hover:scale-103 transition-transform duration-700"
                 />
@@ -138,13 +144,15 @@ export const WhyUs: React.FC<WhyUsProps> = ({ onOpenApplication }) => {
 
               {/* Secondary Student Highlight Bar */}
               <div className="mt-2.5 p-3 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center gap-3">
-                <img
-                  src="/DSC_9531.jpeg"
-                  onError={(e) => {
-                    if (e.currentTarget.src.endsWith('.jpeg')) {
-                      e.currentTarget.src = '/DSC_9531.jpg';
-                    }
-                  }}
+                <ImageWithFallback
+                  src={IMAGES.graduate.src}
+                  fallbackSrcs={[
+                    IMAGES.graduate.webp,
+                    IMAGES.graduate.publicUrl,
+                    '/DSC_9531.jpeg',
+                    IMAGES.graduate.png,
+                    IMAGES.graduate.svg
+                  ]}
                   alt="Myers Graduate"
                   className="w-12 h-12 rounded-xl object-cover object-top border border-emerald-400/40 shrink-0"
                 />
