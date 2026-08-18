@@ -22,6 +22,7 @@ import {
   Cpu
 } from 'lucide-react';
 import { UserProfile } from '../types';
+import { generateAdvisorResponse } from '../lib/geminiAdvisorKnowledge';
 
 export interface ChatMessageItem {
   id: string;
@@ -196,53 +197,80 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
     setIsLoading(true);
 
     try {
-      // Prepare payload for backend Express route /api/gemini/chat
-      const response = await fetch('/api/gemini/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: newHistory.map((m) => ({
-            sender: m.sender,
-            text: m.text
-          })),
-          role: selectedRole,
-          modelType: selectedModelType,
-          userContext: currentUser ? {
+      let replyText = '';
+      let modelUsed = selectedModelType === 'complex' ? 'gemini-3.1-pro-preview' : selectedModelType === 'fast' ? 'gemini-3.1-flash-lite' : 'gemini-3.5-flash';
+      let fetchedSuccessfully = false;
+
+      // 1. Try server-side endpoint first
+      try {
+        const response = await fetch('/api/gemini/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: newHistory.map((m) => ({
+              sender: m.sender,
+              text: m.text
+            })),
+            role: selectedRole,
+            modelType: selectedModelType,
+            userContext: currentUser ? {
+              name: currentUser.name,
+              email: currentUser.email,
+              role: currentUser.role,
+              country: currentUser.targetCountry || 'International'
+            } : undefined
+          })
+        });
+
+        const contentType = response.headers.get('content-type') || '';
+        if (response.ok && contentType.includes('application/json')) {
+          const data = await response.json();
+          if (data && data.reply) {
+            replyText = data.reply;
+            if (data.modelUsed) modelUsed = data.modelUsed;
+            fetchedSuccessfully = true;
+          }
+        }
+      } catch (networkErr) {
+        console.info('Server chat API unreachable, activating intelligent knowledge base fallback:', networkErr);
+      }
+
+      // 2. If server API returned HTML/404 (e.g. static hosting) or failed, use Knowledge Engine
+      if (!fetchedSuccessfully || !replyText) {
+        const fallbackResult = generateAdvisorResponse(
+          messageContent,
+          selectedRole,
+          currentUser ? {
             name: currentUser.name,
             email: currentUser.email,
             role: currentUser.role,
             country: currentUser.targetCountry || 'International'
           } : undefined
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || data.error) {
-        throw new Error(data.error || 'Failed to receive response from Gemini AI');
+        );
+        replyText = fallbackResult.reply;
+        modelUsed = fallbackResult.modelUsed;
       }
 
       const botMessage: ChatMessageItem = {
         id: `bot-${Date.now()}`,
         sender: 'model',
-        text: data.reply || "I'm ready to assist you. What specific question do you have about studying in India?",
+        text: replyText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        modelUsed: data.modelUsed || (selectedModelType === 'complex' ? 'gemini-3.1-pro-preview' : selectedModelType === 'fast' ? 'gemini-3.1-flash-lite' : 'gemini-3.5-flash'),
+        modelUsed: modelUsed,
         roleType: selectedRole
       };
 
       setMessages((prev) => [...prev, botMessage]);
     } catch (err: any) {
-      console.error('Gemini chat error:', err);
-      setErrorStatus(err.message || 'Unable to connect to Gemini AI.');
-
-      // Fallback friendly guidance message if offline
+      console.warn('Gemini chat handled gracefully:', err);
+      // Emergency fallback with official contact
+      const emergencyFallback = generateAdvisorResponse(messageContent, selectedRole, { name: currentUser?.name });
       const fallbackMsg: ChatMessageItem = {
-        id: `bot-err-${Date.now()}`,
+        id: `bot-fallback-${Date.now()}`,
         sender: 'model',
-        text: `⚠️ **Advisory Notice**: I encountered a temporary connection glitch. \n\nIn the meantime, you can reach our admission desk directly via WhatsApp at **+91 98765 43210** or submit your inquiry for priority counseling!`,
+        text: emergencyFallback.reply,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        modelUsed: 'offline-fallback'
+        modelUsed: 'Fresh Study India Admissions Guide'
       };
       setMessages((prev) => [...prev, fallbackMsg]);
     } finally {
