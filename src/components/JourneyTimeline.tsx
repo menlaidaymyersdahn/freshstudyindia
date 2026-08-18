@@ -173,32 +173,58 @@ export const JourneyTimeline: React.FC<JourneyTimelineProps> = ({ onOpenApplicat
 
         </div>
 
-        {/* Selected Step Expanded Spotlight Panel */}
-        <div className="mt-10 p-6 sm:p-8 rounded-3xl bg-[#0B192C] text-white border border-slate-800 shadow-2xl relative overflow-hidden">
-          <div className="absolute right-0 bottom-0 w-80 h-80 bg-sky-600/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Selected Step Expanded Spotlight Panel with Real Photographic Context */}
+        <div className="mt-10 p-6 sm:p-8 rounded-3xl bg-[#071322] text-white border border-white/15 shadow-2xl relative overflow-hidden">
+          <div className="absolute right-0 bottom-0 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center relative z-10">
-            <div className="lg:col-span-8 space-y-3">
-              <div className="flex items-center gap-2.5 text-xs text-sky-400 font-bold uppercase tracking-wider">
-                <span className="w-2 h-2 rounded-full bg-sky-400" />
-                <span>Deep Dive into Stage {steps[activeStep].num} — {steps[activeStep].tag}</span>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+            <div className="lg:col-span-7 space-y-4">
+              <div className="flex items-center gap-2.5 text-xs text-sky-300 font-bold uppercase tracking-wider">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Stage {steps[activeStep].num} Breakdown • {steps[activeStep].tag}</span>
               </div>
-              <h4 className="text-xl sm:text-2xl font-black text-white">
+              <h4 className="text-xl sm:text-3xl font-black text-white leading-tight">
                 {steps[activeStep].title}
               </h4>
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-3xl">
+              <p className="text-sm sm:text-base text-slate-200 leading-relaxed">
                 {steps[activeStep].details}
               </p>
+
+              <div className="pt-2">
+                <button
+                  onClick={() => onOpenApplication(steps[activeStep].tag)}
+                  className="w-full sm:w-auto py-4 px-8 rounded-2xl bg-white hover:bg-sky-50 text-[#071322] font-black text-xs sm:text-sm uppercase tracking-wider transition shadow-xl hover:shadow-sky-400/20 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 cursor-pointer"
+                >
+                  <span>Apply with Stage {steps[activeStep].num} Guidance</span>
+                  <ArrowRight className="w-4 h-4 text-sky-600" />
+                </button>
+              </div>
             </div>
 
-            <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-end">
-              <button
-                onClick={() => onOpenApplication(steps[activeStep].tag)}
-                className="w-full py-3.5 px-6 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-extrabold text-xs uppercase tracking-wide transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>Get Started with Stage {steps[activeStep].num}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+            {/* Visual Photo Card in Spotlight */}
+            <div className="lg:col-span-5">
+              <div className="rounded-2xl overflow-hidden border border-white/20 bg-slate-900 shadow-2xl aspect-[16/10] relative group">
+                <img
+                  src={activeStep >= 3 ? "/DSC_9367.jpeg" : "/DSC_9531.jpeg"}
+                  onError={(e) => {
+                    if (e.currentTarget.src.endsWith('.jpeg')) {
+                      e.currentTarget.src = activeStep >= 3 ? '/DSC_9367.jpg' : '/DSC_9531.jpg';
+                    }
+                  }}
+                  alt="Student Academic Journey in India"
+                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#071322] via-[#071322]/20 to-transparent flex items-end p-4">
+                  <div>
+                    <span className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-500/90 text-white font-mono text-[10px] font-bold uppercase tracking-wider">
+                      {activeStep >= 3 ? "Convocation in India" : "Real Student Guidance"}
+                    </span>
+                    <p className="text-xs sm:text-sm font-black text-white mt-1">
+                      {activeStep >= 3 ? "International Students Graduation Ceremony" : "Myers • From Liberia to Indian University"}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
+import { FutureHeroBanner } from './components/FutureHeroBanner';
 import { TrustBar } from './components/TrustBar';
 import { JourneyTimeline } from './components/JourneyTimeline';
 import { ServicesGrid } from './components/ServicesGrid';
@@ -59,7 +60,10 @@ export function App() {
         {/* 1. Visually Powerful Hero Section */}
         <Hero onOpenApplication={() => handleOpenApplication()} />
 
-        {/* 2. Quick Trust Bar */}
+        {/* 2. Visual Convocation Feature Section: YOUR FUTURE STARTS HERE */}
+        <FutureHeroBanner onOpenApplication={() => handleOpenApplication()} />
+
+        {/* 3. Quick Trust Bar */}
         <TrustBar />
 
         {/* 3. The Journey (From Home to Campus) */}
