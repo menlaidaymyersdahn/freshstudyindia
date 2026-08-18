@@ -14,6 +14,7 @@ import { ApplicationModal } from './components/ApplicationModal';
 import { PrivacyModal } from './components/PrivacyModal';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { ShareModal } from './components/ShareModal';
+import { AdmissionsPortal } from './components/AdmissionsPortal';
 import { useDynamicSEO } from './hooks/useDynamicSEO';
 
 export function App() {
@@ -21,6 +22,7 @@ export function App() {
   const [presetStudyField, setPresetStudyField] = useState<string | undefined>(undefined);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isAdmissionsPortalOpen, setIsAdmissionsPortalOpen] = useState(false);
 
   // Dynamic OpenGraph and Meta Description tags
   useDynamicSEO({
@@ -49,6 +51,7 @@ export function App() {
       <Navbar 
         onOpenApplication={() => handleOpenApplication()} 
         onOpenShare={() => setIsShareModalOpen(true)}
+        onOpenPortal={() => setIsAdmissionsPortalOpen(true)}
       />
 
       {/* Main Page Flow */}
@@ -86,6 +89,7 @@ export function App() {
         onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
         onOpenApplication={() => handleOpenApplication()}
         onOpenShare={() => setIsShareModalOpen(true)}
+        onOpenPortal={() => setIsAdmissionsPortalOpen(true)}
       />
 
       {/* Express Application & Consultation Modal */}
@@ -93,6 +97,12 @@ export function App() {
         isOpen={isAppModalOpen}
         onClose={handleCloseApplication}
         presetField={presetStudyField}
+      />
+
+      {/* Admissions Management & Document Verification Portal */}
+      <AdmissionsPortal
+        isOpen={isAdmissionsPortalOpen}
+        onClose={() => setIsAdmissionsPortalOpen(false)}
       />
 
       {/* Privacy Policy Modal */}

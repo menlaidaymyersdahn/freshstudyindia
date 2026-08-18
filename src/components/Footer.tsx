@@ -6,9 +6,10 @@ interface FooterProps {
   onOpenPrivacy: () => void;
   onOpenApplication: () => void;
   onOpenShare?: () => void;
+  onOpenPortal?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenApplication, onOpenShare }) => {
+export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenApplication, onOpenShare, onOpenPortal }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -68,6 +69,17 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenApplication
                   Privacy Policy
                 </button>
               </li>
+              {onOpenPortal && (
+                <li>
+                  <button 
+                    onClick={onOpenPortal} 
+                    className="hover:text-sky-400 transition-colors text-left cursor-pointer flex items-center gap-1.5 font-bold text-sky-400/90"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>Staff Admissions Portal</span>
+                  </button>
+                </li>
+              )}
               {onOpenShare && (
                 <li>
                   <button 

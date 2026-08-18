@@ -183,7 +183,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication }) => {
                 {/* Main Hero Image / Visual Presentation */}
                 <div className="relative rounded-[22px] overflow-hidden bg-slate-950 aspect-[4/5] sm:aspect-[5/6] lg:aspect-[4/5] shadow-inner group">
                   <img
-                    src={customPhoto || "/graduate-myers.svg"}
+                    src={customPhoto || "/DSC_9531.jpeg"}
                     alt="Myers - Liberian Graduate in B.Sc Microbiology at Shri Rawatpura Sarkar University, India"
                     className="w-full h-full object-cover object-top transform group-hover:scale-102 transition-transform duration-700"
                     loading="eager"

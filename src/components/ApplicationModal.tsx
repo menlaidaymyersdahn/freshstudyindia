@@ -91,34 +91,47 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
     return 'Other Supporting Documents';
   };
 
-  const processFiles = (files: FileList | File[]) => {
+  const readFileAsDataUrl = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const processFiles = async (files: FileList | File[]) => {
     const allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
+    const filesArray = Array.from(files);
+    const validFiles = filesArray.filter((file) => {
+      const extension = file.name.split('.').pop()?.toLowerCase() || '';
+      return allowedExtensions.includes(extension) || file.type.startsWith('image/') || file.type === 'application/pdf';
+    });
+
     const newItems: UploadedFileItem[] = [];
 
-    Array.from(files).forEach((file) => {
+    for (const file of validFiles) {
       const extension = file.name.split('.').pop()?.toLowerCase() || '';
-      if (allowedExtensions.includes(extension) || file.type.startsWith('image/') || file.type === 'application/pdf') {
-        const id = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-        const newItem: UploadedFileItem = {
-          id,
-          file,
-          name: file.name,
-          size: file.size,
-          formattedSize: formatFileSize(file.size),
-          type: extension.toUpperCase() || 'FILE',
-          category: getDocTypeCategory(file.name),
-        };
-
-        // Read data URL for secure persistence
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          newItem.dataUrl = e.target?.result as string;
-        };
-        reader.readAsDataURL(file);
-
-        newItems.push(newItem);
+      const id = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      let dataUrl: string | undefined = undefined;
+      
+      try {
+        dataUrl = await readFileAsDataUrl(file);
+      } catch (e) {
+        console.error('Error reading file data URL:', e);
       }
-    });
+
+      newItems.push({
+        id,
+        file,
+        name: file.name,
+        size: file.size,
+        formattedSize: formatFileSize(file.size),
+        type: extension.toUpperCase() || 'FILE',
+        category: getDocTypeCategory(file.name),
+        dataUrl
+      });
+    }
 
     if (newItems.length > 0) {
       setUploadedFiles(prev => [...prev, ...newItems]);

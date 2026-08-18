@@ -164,7 +164,7 @@ export const AfricaToIndia: React.FC<AfricaToIndiaProps> = ({ onOpenApplication 
             </div>
 
             {/* Clear Country Support Badge */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left space-y-2">
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left space-y-3">
               <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
                 <CheckCircle2 className="w-4 h-4 text-sky-600 shrink-0" />
                 <span>Currently assisting students from Liberia and other international destinations.</span>
@@ -172,6 +172,20 @@ export const AfricaToIndia: React.FC<AfricaToIndiaProps> = ({ onOpenApplication 
               <p className="text-xs text-slate-500 leading-relaxed pl-6">
                 Students from Liberia, Ghana, Nigeria, Kenya, Sierra Leone, and across the African continent receive personalized guidance on admissions, currency, Indian consular paperwork, and academic transfers.
               </p>
+
+              {/* Photo preview of real graduates in convocation */}
+              <div className="mt-2 rounded-xl overflow-hidden border border-slate-200 relative group">
+                <img
+                  src="/DSC_9367.jpeg"
+                  alt="International Graduates at Convocation Ceremony in India"
+                  className="w-full h-36 object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0B192C]/80 via-transparent to-transparent flex items-end p-2.5">
+                  <span className="text-[11px] font-bold text-white tracking-wide">
+                    🎓 International Students Convocation Ceremony • Raipur, India
+                  </span>
+                </div>
+              </div>
             </div>
 
             {/* Action CTAs */}

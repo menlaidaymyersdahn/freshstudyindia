@@ -2,7 +2,7 @@
   "entities": {
     "users": {
       "title": "Users",
-      "description": "Student and admin profiles",
+      "description": "Student, counselor, and admin profiles",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
@@ -10,66 +10,83 @@
         "email": { "type": "string" },
         "role": { "type": "string" },
         "phone": { "type": "string" },
-        "county": { "type": "string" },
         "createdAt": { "type": "string" }
       },
       "required": ["id", "email", "role"]
     },
     "applications": {
       "title": "Applications",
-      "description": "University application entries saved to Firestore",
+      "description": "Student university applications with document attachments and status tracking",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
-        "studentId": { "type": "string" },
-        "studentName": { "type": "string" },
-        "studentEmail": { "type": "string" },
-        "universityName": { "type": "string" },
-        "courseName": { "type": "string" },
-        "degree": { "type": "string" },
-        "country": { "type": "string" },
         "trackingId": { "type": "string" },
+        "fullName": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "country": { "type": "string" },
+        "studyField": { "type": "string" },
+        "qualification": { "type": "string" },
         "status": { "type": "string" },
-        "progressPercentage": { "type": "number" },
-        "submittedDate": { "type": "string" },
-        "intake": { "type": "string" },
         "notes": { "type": "string" },
-        "county": { "type": "string" }
+        "documentsCount": { "type": "number" },
+        "documents": { "type": "array" },
+        "submittedAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
       },
-      "required": ["studentId", "universityName", "courseName", "status"]
+      "required": ["id", "fullName", "phone", "country", "studyField"]
     },
     "documents": {
       "title": "Documents",
-      "description": "Student uploaded documents",
+      "description": "Student uploaded academic and identity documents",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
-        "studentId": { "type": "string" },
+        "applicationId": { "type": "string" },
         "name": { "type": "string" },
         "category": { "type": "string" },
-        "uploadDate": { "type": "string" },
-        "status": { "type": "string" },
-        "size": { "type": "string" }
+        "type": { "type": "string" },
+        "size": { "type": "number" },
+        "formattedSize": { "type": "string" },
+        "dataUrl": { "type": "string" },
+        "uploadedAt": { "type": "string" },
+        "status": { "type": "string" }
       },
-      "required": ["studentId", "name", "category"]
+      "required": ["id", "applicationId", "name", "category"]
     },
     "inquiries": {
       "title": "Inquiries",
-      "description": "Contact admin inquiries",
+      "description": "Contact messages and advisor inquiries",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
-        "studentId": { "type": "string" },
         "name": { "type": "string" },
         "email": { "type": "string" },
         "phone": { "type": "string" },
-        "county": { "type": "string" },
-        "courseLevel": { "type": "string" },
-        "desiredCourse": { "type": "string" },
+        "country": { "type": "string" },
+        "studyField": { "type": "string" },
         "message": { "type": "string" },
         "createdAt": { "type": "string" }
       },
-      "required": ["name", "email", "phone"]
+      "required": ["name", "phone", "message"]
+    }
+  },
+  "firestore": {
+    "/applications/{appId}": {
+      "schema": { "$ref": "#/entities/applications" },
+      "description": "University admission applications submitted by students"
+    },
+    "/documents/{docId}": {
+      "schema": { "$ref": "#/entities/documents" },
+      "description": "Academic certificates, passports, transcripts, and photos"
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": { "$ref": "#/entities/inquiries" },
+      "description": "Student inquiries from contact forms"
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/users" },
+      "description": "Admissions counselor and staff records"
     }
   }
 }
