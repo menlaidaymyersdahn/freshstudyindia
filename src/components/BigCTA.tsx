@@ -15,7 +15,22 @@ interface BigCTAProps {
 
 export const BigCTA: React.FC<BigCTAProps> = ({ onOpenApplication }) => {
   return (
-    <section className="py-24 sm:py-32 bg-gradient-to-b from-[#0B192C] to-[#081220] text-white relative overflow-hidden">
+    <section className="py-24 sm:py-32 bg-[#0B192C] text-white relative overflow-hidden">
+      {/* Background Convocation Atmosphere */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-0">
+        <img
+          src="/DSC_9367.jpeg"
+          onError={(e) => {
+            if (e.currentTarget.src.endsWith('.jpeg')) {
+              e.currentTarget.src = '/DSC_9367.jpg';
+            }
+          }}
+          alt="International Convocation Ceremony"
+          className="w-full h-full object-cover object-center opacity-25 filter blur-[0.5px] scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0B192C]/90 via-[#0B192C]/80 to-[#081220]/95" />
+      </div>
+
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-sky-500/10 rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />

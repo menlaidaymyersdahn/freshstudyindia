@@ -89,17 +89,22 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication }) => {
   };
 
   return (
-    <section id="hero" className="relative pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-24 lg:pb-28 overflow-hidden bg-slate-50">
-      {/* Background Convocation Photo with Elegant Subtle Fade & Scrim */}
+    <section id="hero" className="relative pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-24 lg:pb-28 overflow-hidden bg-slate-100">
+      {/* Background Convocation Photo with Crisp Subtle Atmosphere */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10 select-none">
         <img
           src={customBg || "/DSC_9367.jpeg"}
-          alt="Fresh Study India International Graduates Convocation Ceremony"
-          className="w-full h-full object-cover object-center opacity-20 sm:opacity-25 filter blur-[0.6px] scale-105 transition-opacity duration-500"
+          onError={(e) => {
+            if (e.currentTarget.src.endsWith('.jpeg')) {
+              e.currentTarget.src = '/DSC_9367.jpg';
+            }
+          }}
+          alt="Fresh Study India International Graduates Convocation Ceremony in India"
+          className="w-full h-full object-cover object-center opacity-30 sm:opacity-35 scale-105 transition-opacity duration-500"
         />
-        {/* Multilayered Gradient Scrim to ensure 100% crisp typography legibility */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#F4F8FC]/92 via-white/85 to-[#FAFBFD]/95 backdrop-blur-[1px]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/85 to-white/70 lg:to-white/40" />
+        {/* Balanced Scrim to ensure crisp typography while keeping convocation hall clearly visible */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#F4F8FC]/80 via-white/70 to-[#F4F8FC]/90" />
+        <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-white/50 lg:to-transparent" />
       </div>
 
       {/* Subtle Background Glows */}
@@ -184,6 +189,11 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication }) => {
                 <div className="relative rounded-[22px] overflow-hidden bg-slate-950 aspect-[4/5] sm:aspect-[5/6] lg:aspect-[4/5] shadow-inner group">
                   <img
                     src={customPhoto || "/DSC_9531.jpeg"}
+                    onError={(e) => {
+                      if (e.currentTarget.src.endsWith('.jpeg')) {
+                        e.currentTarget.src = '/DSC_9531.jpg';
+                      }
+                    }}
                     alt="Myers - Liberian Graduate in B.Sc Microbiology at Shri Rawatpura Sarkar University, India"
                     className="w-full h-full object-cover object-top transform group-hover:scale-102 transition-transform duration-700"
                     loading="eager"

@@ -39,6 +39,21 @@ export const WhyUs: React.FC<WhyUsProps> = ({ onOpenApplication }) => {
 
   return (
     <section className="py-28 sm:py-36 bg-[#0B192C] text-white relative overflow-hidden">
+      {/* Background Convocation Atmosphere */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-0 opacity-15">
+        <img
+          src="/DSC_9367.jpeg"
+          onError={(e) => {
+            if (e.currentTarget.src.endsWith('.jpeg')) {
+              e.currentTarget.src = '/DSC_9367.jpg';
+            }
+          }}
+          alt="International Graduates Convocation"
+          className="w-full h-full object-cover object-center filter grayscale"
+        />
+        <div className="absolute inset-0 bg-[#0B192C]/90" />
+      </div>
+
       {/* Ambient background glows */}
       <div className="absolute top-0 right-1/4 w-[600px] h-[400px] bg-sky-600/10 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-0 left-10 w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
@@ -46,21 +61,51 @@ export const WhyUs: React.FC<WhyUsProps> = ({ onOpenApplication }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
         
         {/* Large Typography Headline */}
-        <div className="max-w-4xl mb-20 sm:mb-28">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-sky-300 text-xs font-bold uppercase tracking-wider mb-6">
-            <span>The Fresh Study India Promise</span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-end mb-16 sm:mb-20">
+          <div className="lg:col-span-8">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-sky-300 text-xs font-bold uppercase tracking-wider mb-6">
+              <span>The Fresh Study India Promise</span>
+            </div>
+
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white">
+              INDIA IS A BIG MOVE.
+              <span className="block text-sky-400 mt-1 sm:mt-2">
+                YOU DON'T HAVE TO FIGURE IT OUT ALONE.
+              </span>
+            </h2>
+
+            <p className="mt-6 text-lg sm:text-xl text-slate-300 font-normal leading-relaxed max-w-2xl">
+              Studying internationally is one of the most significant investments of your life. We are dedicated to providing the clarity, integrity, and personal guidance you need.
+            </p>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white">
-            INDIA IS A BIG MOVE.
-            <span className="block text-sky-400 mt-1 sm:mt-2">
-              YOU DON'T HAVE TO FIGURE IT OUT ALONE.
-            </span>
-          </h2>
-
-          <p className="mt-6 text-lg sm:text-xl text-slate-300 font-normal leading-relaxed max-w-2xl">
-            Studying internationally is one of the most significant investments of your life. We are dedicated to providing the clarity, integrity, and personal guidance you need.
-          </p>
+          {/* Real Convocation Photo Badge Card */}
+          <div className="lg:col-span-4">
+            <div className="rounded-2xl overflow-hidden border border-white/15 bg-white/5 p-2 backdrop-blur-md shadow-xl group">
+              <div className="relative rounded-xl overflow-hidden aspect-[16/10]">
+                <img
+                  src="/DSC_9367.jpeg"
+                  onError={(e) => {
+                    if (e.currentTarget.src.endsWith('.jpeg')) {
+                      e.currentTarget.src = '/DSC_9367.jpg';
+                    }
+                  }}
+                  alt="Convocation Ceremony at Indian University"
+                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0B192C]/90 via-transparent to-transparent flex items-end p-3">
+                  <div>
+                    <span className="inline-block px-2 py-0.5 rounded bg-sky-500 text-white font-mono text-[9px] font-bold uppercase tracking-wide">
+                      Real Campus Proof
+                    </span>
+                    <p className="text-xs font-bold text-white mt-1">
+                      International Students Convocation Ceremony • India
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* 3 Strong Points with Large Typography (Not traditional boxy cards) */}

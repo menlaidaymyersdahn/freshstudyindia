@@ -173,17 +173,42 @@ export const AfricaToIndia: React.FC<AfricaToIndiaProps> = ({ onOpenApplication 
                 Students from Liberia, Ghana, Nigeria, Kenya, Sierra Leone, and across the African continent receive personalized guidance on admissions, currency, Indian consular paperwork, and academic transfers.
               </p>
 
-              {/* Photo preview of real graduates in convocation */}
-              <div className="mt-2 rounded-xl overflow-hidden border border-slate-200 relative group">
-                <img
-                  src="/DSC_9367.jpeg"
-                  alt="International Graduates at Convocation Ceremony in India"
-                  className="w-full h-36 object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0B192C]/80 via-transparent to-transparent flex items-end p-2.5">
-                  <span className="text-[11px] font-bold text-white tracking-wide">
-                    🎓 International Students Convocation Ceremony • Raipur, India
-                  </span>
+              {/* Dual Photo Showcase: Real Convocation and Real Graduate */}
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="rounded-xl overflow-hidden border border-slate-200 relative group aspect-[4/3] bg-slate-900 shadow-sm">
+                  <img
+                    src="/DSC_9367.jpeg"
+                    onError={(e) => {
+                      if (e.currentTarget.src.endsWith('.jpeg')) {
+                        e.currentTarget.src = '/DSC_9367.jpg';
+                      }
+                    }}
+                    alt="International Graduates at Convocation Ceremony in India"
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0B192C]/90 via-transparent to-transparent flex items-end p-2.5">
+                    <span className="text-[10px] font-bold text-white tracking-wide">
+                      🎓 Convocation Ceremony • India
+                    </span>
+                  </div>
+                </div>
+
+                <div className="rounded-xl overflow-hidden border border-slate-200 relative group aspect-[4/3] bg-slate-900 shadow-sm">
+                  <img
+                    src="/DSC_9531.jpeg"
+                    onError={(e) => {
+                      if (e.currentTarget.src.endsWith('.jpeg')) {
+                        e.currentTarget.src = '/DSC_9531.jpg';
+                      }
+                    }}
+                    alt="Myers - Liberian Graduate in India"
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0B192C]/90 via-transparent to-transparent flex items-end p-2.5">
+                    <span className="text-[10px] font-bold text-white tracking-wide">
+                      🇱🇷 Myers • B.Sc Microbiology Graduate
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
