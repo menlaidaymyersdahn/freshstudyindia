@@ -6,6 +6,28 @@ export type StudyField =
   | 'DATA & TECHNOLOGY'
   | 'OTHER';
 
+export interface ApplicationDocument {
+  id: string;
+  name: string;
+  size: number;
+  formattedSize: string;
+  type: string;
+  category: 'Passport' | 'Academic Certificate' | 'Academic Transcript' | 'Passport-size Photo' | 'Other Supporting Documents';
+  dataUrl?: string;
+}
+
+export interface StudentApplicationProfile {
+  id?: string;
+  fullName: string;
+  phone: string;
+  email?: string;
+  country: string;
+  studyField: string;
+  qualification: string;
+  documents: ApplicationDocument[];
+  submittedAt?: string;
+}
+
 export interface StudentEnquiry {
   fullName: string;
   country: string;

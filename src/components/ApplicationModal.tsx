@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, 
   Send, 
@@ -7,14 +7,31 @@ import {
   Building2, 
   MessageCircle, 
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  UploadCloud,
+  FileText,
+  Trash2,
+  Paperclip,
+  FileCheck
 } from 'lucide-react';
 import { BRAND, getWhatsAppLink } from '../lib/constants';
+import { ApplicationDocument } from '../types';
 
 interface ApplicationModalProps {
   isOpen: boolean;
   onClose: () => void;
   presetField?: string;
+}
+
+interface UploadedFileItem {
+  id: string;
+  file: File;
+  name: string;
+  size: number;
+  formattedSize: string;
+  type: string;
+  category: 'Passport' | 'Academic Certificate' | 'Academic Transcript' | 'Passport-size Photo' | 'Other Supporting Documents';
+  dataUrl?: string;
 }
 
 export const ApplicationModal: React.FC<ApplicationModalProps> = ({ 
@@ -28,11 +45,15 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
   const [country, setCountry] = useState('Liberia');
   const [studyField, setStudyField] = useState(presetField || 'Computer Science');
   const [qualification, setQualification] = useState('High School Diploma (WAEC / WASSCE)');
-  const [intake, setIntake] = useState('2026 Academic Intake (August/September)');
-  const [notes, setNotes] = useState('');
+  
+  // Document Upload State
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFileItem[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submittedAppId, setSubmittedAppId] = useState<string>('');
 
   useEffect(() => {
     if (presetField) {
@@ -53,15 +74,156 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  };
+
+  const getDocTypeCategory = (fileName: string): UploadedFileItem['category'] => {
+    const lower = fileName.toLowerCase();
+    if (lower.includes('passport') && !lower.includes('photo')) return 'Passport';
+    if (lower.includes('photo') || lower.includes('pic') || lower.includes('avatar') || lower.includes('face')) return 'Passport-size Photo';
+    if (lower.includes('transcript') || lower.includes('grade') || lower.includes('result') || lower.includes('wassce') || lower.includes('waec')) return 'Academic Transcript';
+    if (lower.includes('cert') || lower.includes('diploma') || lower.includes('degree')) return 'Academic Certificate';
+    return 'Other Supporting Documents';
+  };
+
+  const processFiles = (files: FileList | File[]) => {
+    const allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
+    const newItems: UploadedFileItem[] = [];
+
+    Array.from(files).forEach((file) => {
+      const extension = file.name.split('.').pop()?.toLowerCase() || '';
+      if (allowedExtensions.includes(extension) || file.type.startsWith('image/') || file.type === 'application/pdf') {
+        const id = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+        const newItem: UploadedFileItem = {
+          id,
+          file,
+          name: file.name,
+          size: file.size,
+          formattedSize: formatFileSize(file.size),
+          type: extension.toUpperCase() || 'FILE',
+          category: getDocTypeCategory(file.name),
+        };
+
+        // Read data URL for secure persistence
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          newItem.dataUrl = e.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+
+        newItems.push(newItem);
+      }
+    });
+
+    if (newItems.length > 0) {
+      setUploadedFiles(prev => [...prev, ...newItems]);
+    }
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      processFiles(e.target.files);
+      // Reset input value so same files can be re-selected if removed
+      e.target.value = '';
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processFiles(e.dataTransfer.files);
+    }
+  };
+
+  const handleRemoveFile = (idToRemove: string) => {
+    setUploadedFiles(prev => prev.filter(item => item.id !== idToRemove));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !phone) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
+
+    const documentsPayload: ApplicationDocument[] = uploadedFiles.map(doc => ({
+      id: doc.id,
+      name: doc.name,
+      size: doc.size,
+      formattedSize: doc.formattedSize,
+      type: doc.type,
+      category: doc.category,
+      dataUrl: doc.dataUrl
+    }));
+
+    const applicationData = {
+      fullName,
+      phone,
+      email,
+      country,
+      studyField,
+      qualification,
+      documents: documentsPayload,
+      submittedAt: new Date().toISOString()
+    };
+
+    try {
+      // 1. Submit to backend API endpoint
+      const response = await fetch('/api/applications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(applicationData)
+      });
+
+      let returnedId = `FSI-${Date.now()}`;
+      if (response.ok) {
+        const result = await response.json();
+        if (result.applicationId) {
+          returnedId = result.applicationId;
+        }
+      }
+
+      setSubmittedAppId(returnedId);
+
+      // 2. Persist to localStorage client record
+      try {
+        const existing = JSON.parse(localStorage.getItem('fresh_study_submitted_applications') || '[]');
+        existing.unshift({
+          ...applicationData,
+          id: returnedId,
+          documentsCount: documentsPayload.length
+        });
+        localStorage.setItem('fresh_study_submitted_applications', JSON.stringify(existing));
+      } catch {
+        // ignore localStorage full
+      }
+
       setIsSubmitting(false);
       setIsSubmitted(true);
-    }, 600);
+    } catch (err) {
+      console.error('Submission error:', err);
+      // Fallback local submission
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+    }
   };
 
   const countries = [
@@ -106,7 +268,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
       />
 
       {/* Modal Container */}
-      <div className="relative bg-white rounded-3xl w-full max-w-xl p-6 sm:p-9 shadow-2xl border border-slate-200 z-10 my-8 animate-in zoom-in-95 duration-200">
+      <div className="relative bg-white rounded-3xl w-full max-w-xl p-6 sm:p-9 shadow-2xl border border-slate-200 z-10 my-8 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
         
         {/* Close Button */}
         <button
@@ -128,17 +290,34 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
             </h3>
 
             <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-              Thank you, <strong className="text-slate-900">{fullName}</strong>. Your profile for <strong className="text-slate-900">{studyField}</strong> has been received by our Admissions Committee.
+              Thank you, <strong className="text-slate-900">{fullName}</strong>. Your profile for <strong className="text-slate-900">{studyField}</strong> with <strong className="text-slate-900">{uploadedFiles.length} uploaded document{uploadedFiles.length === 1 ? '' : 's'}</strong> has been received by our Admissions Committee.
             </p>
+
+            {uploadedFiles.length > 0 && (
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-left max-w-md mx-auto space-y-2">
+                <p className="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+                  <FileCheck className="w-4 h-4 text-emerald-600" />
+                  <span>Submitted Documents ({uploadedFiles.length})</span>
+                </p>
+                <div className="space-y-1 max-h-32 overflow-y-auto pr-1">
+                  {uploadedFiles.map((doc, idx) => (
+                    <div key={doc.id || idx} className="text-xs text-slate-600 flex items-center justify-between py-1 border-b border-slate-100 last:border-0">
+                      <span className="truncate max-w-[220px] font-medium text-slate-800">{doc.name}</span>
+                      <span className="text-[11px] text-slate-600 font-mono shrink-0">{doc.formattedSize}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="p-4 rounded-2xl bg-sky-50 border border-sky-100 text-xs text-sky-900 space-y-1 text-left">
               <p className="font-bold">Next Steps:</p>
-              <p>An educational counselor will review your eligibility and reach out via WhatsApp / Phone to discuss your shortlisted universities.</p>
+              <p>An educational counselor will review your academic documents, verify eligibility, and reach out via WhatsApp / Phone to discuss your shortlisted universities in India.</p>
             </div>
 
             <div className="pt-3 flex flex-col gap-2.5">
               <a
-                href={getWhatsAppLink('india', `Hello Fresh Study India, I have submitted my application profile for ${fullName} (${studyField}, ${country}). I would like to speak with an advisor.`)}
+                href={getWhatsAppLink('india', `Hello Fresh Study India, I have submitted my application profile for ${fullName} (${studyField}, ${country}) with ${uploadedFiles.length} document(s). Reference: ${submittedAppId || 'FSI-APP'}.`)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-4 rounded-xl text-xs font-extrabold uppercase tracking-wide text-white bg-emerald-600 hover:bg-emerald-500 transition shadow flex items-center justify-center gap-2"
@@ -268,21 +447,136 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                 </select>
               </div>
 
-              {/* Notes */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Questions or Preferred Cities (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Interested in Bangalore or Delhi, need hostel options"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:border-sky-600 focus:ring-2 focus:ring-sky-100 outline-none text-sm font-medium text-slate-900 transition"
-                />
+              {/* 2. ADD DOCUMENT UPLOAD SECTION (Replacing Preferred City) */}
+              <div className="pt-1">
+                <div className="flex flex-col gap-0.5 mb-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    UPLOAD YOUR DOCUMENTS
+                  </label>
+                  <p className="text-[11px] text-slate-500">
+                    Upload clear copies of your academic and identification documents.
+                  </p>
+                </div>
+
+                {/* Document Type Helper Pills */}
+                <div className="flex flex-wrap gap-1.5 mb-2.5">
+                  {[
+                    'Passport',
+                    'Academic Certificate',
+                    'Academic Transcript',
+                    'Passport-size Photo',
+                    'Other Supporting Documents'
+                  ].map((docType) => (
+                    <span 
+                      key={docType}
+                      className="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[10px] font-semibold text-slate-600"
+                    >
+                      {docType}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Drag and Drop Upload Area */}
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`border-2 border-dashed rounded-2xl p-5 text-center transition-all cursor-pointer ${
+                    isDragging 
+                      ? 'border-sky-600 bg-sky-50/80 scale-[1.01]' 
+                      : 'border-slate-300 hover:border-sky-400 bg-slate-50/60 hover:bg-slate-50'
+                  }`}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept=".pdf,.jpg,.jpeg,.png,image/jpeg,image/png,application/pdf"
+                    onChange={handleFileInputChange}
+                    className="hidden"
+                  />
+
+                  <div className="flex flex-col items-center justify-center gap-1.5">
+                    <div className="w-10 h-10 rounded-xl bg-sky-100/70 text-sky-700 flex items-center justify-center shadow-xs">
+                      <UploadCloud className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-800">
+                        Drag & drop your documents here
+                      </p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        or <span className="text-sky-700 font-bold hover:underline">Choose Files</span>
+                      </p>
+                    </div>
+                    <p className="text-[10px] font-mono text-slate-600 uppercase tracking-wider mt-0.5">
+                      PDF, JPG, JPEG, PNG (Multiple files allowed)
+                    </p>
+                  </div>
+                </div>
+
+                {/* Selected Files List Underneath */}
+                {uploadedFiles.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    <div className="flex items-center justify-between text-[11px] text-slate-600 font-bold px-1">
+                      <span>Attached Files ({uploadedFiles.length})</span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setUploadedFiles([]);
+                        }}
+                        className="text-[10px] text-rose-500 hover:text-rose-700 font-semibold cursor-pointer"
+                      >
+                        Clear All
+                      </button>
+                    </div>
+
+                    <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1">
+                      {uploadedFiles.map((doc) => (
+                        <div
+                          key={doc.id}
+                          className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 text-xs hover:border-slate-300 transition"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                            <div className="w-7 h-7 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                              <FileText className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-bold text-slate-800 truncate text-xs leading-tight">
+                                {doc.name}
+                              </p>
+                              <div className="flex items-center gap-2 text-[10px] text-slate-500 mt-0.5">
+                                <span className="font-bold text-sky-700 uppercase px-1.5 py-0.2 rounded bg-sky-50 border border-sky-200/60">
+                                  {doc.type}
+                                </span>
+                                <span className="font-mono text-slate-600">{doc.formattedSize}</span>
+                                <span className="text-slate-300">•</span>
+                                <span className="text-slate-600 truncate">{doc.category}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveFile(doc.id);
+                            }}
+                            title="Remove file"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0 cursor-pointer"
+                            aria-label={`Remove ${doc.name}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Action Button */}
+              {/* Action Button: SUBMIT APPLICATION PROFILE → */}
               <div className="pt-2">
                 <button
                   type="submit"

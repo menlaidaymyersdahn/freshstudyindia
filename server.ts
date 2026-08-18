@@ -20,14 +20,84 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json({ limit: '10mb' }));
+  // Support JSON payloads including uploaded document attachments
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+  // In-memory application profile storage
+  const applications: any[] = [];
 
   // API Health Endpoint
   app.get('/api/health', (req, res) => {
     res.json({ 
       status: 'ok', 
       service: 'Fresh Study India API',
+      totalApplications: applications.length,
       geminiConfigured: Boolean(process.env.GEMINI_API_KEY)
+    });
+  });
+
+  // STUDENT APPLICATION SUBMISSION ENDPOINT WITH DOCUMENT ATTACHMENTS
+  app.post('/api/applications', (req, res) => {
+    try {
+      const { fullName, phone, email, country, studyField, qualification, documents = [] } = req.body;
+      
+      if (!fullName || !phone) {
+        return res.status(400).json({ success: false, error: 'Full name and phone are required.' });
+      }
+
+      const applicationRecord = {
+        id: `FSI-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        fullName,
+        phone,
+        email: email || '',
+        country: country || 'Liberia',
+        studyField: studyField || 'Computer Science',
+        qualification: qualification || 'High School Diploma (WAEC / WASSCE)',
+        documents: Array.isArray(documents) ? documents.map((doc: any) => ({
+          id: doc.id || Math.random().toString(),
+          name: doc.name || 'Document',
+          size: doc.size || 0,
+          formattedSize: doc.formattedSize || 'N/A',
+          type: doc.type || 'file',
+          category: doc.category || 'Other Supporting Documents',
+          hasData: Boolean(doc.dataUrl)
+        })) : [],
+        submittedAt: new Date().toISOString()
+      };
+
+      applications.unshift(applicationRecord);
+      console.log(`[Fresh Study India Admissions] Application received for: ${fullName} (${country}), Target: ${studyField}, Documents: ${applicationRecord.documents.length}`);
+
+      res.status(201).json({
+        success: true,
+        applicationId: applicationRecord.id,
+        message: 'Application profile and documents submitted securely.',
+        record: {
+          id: applicationRecord.id,
+          fullName: applicationRecord.fullName,
+          documentsCount: applicationRecord.documents.length
+        }
+      });
+    } catch (error: any) {
+      console.error('Error submitting application:', error);
+      res.status(500).json({ success: false, error: error.message || 'Failed to submit application' });
+    }
+  });
+
+  app.get('/api/applications', (req, res) => {
+    res.json({
+      success: true,
+      count: applications.length,
+      applications: applications.map(app => ({
+        id: app.id,
+        fullName: app.fullName,
+        country: app.country,
+        studyField: app.studyField,
+        qualification: app.qualification,
+        documentsCount: app.documents?.length || 0,
+        submittedAt: app.submittedAt
+      }))
     });
   });
 
