@@ -12,7 +12,9 @@ import {
   ShieldCheck,
   MapPin,
   GraduationCap,
-  BookOpen
+  BookOpen,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { DocumentFile, ActiveTab } from '../types';
 
@@ -75,6 +77,7 @@ export const ApplyNowModal: React.FC<ApplyNowModalProps> = ({
   const [regEmail, setRegEmail] = useState('');
   const [regPhone, setRegPhone] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [showRegPassword, setShowRegPassword] = useState(false);
 
   // Form states for Upload Doc
   const [docCategory, setDocCategory] = useState<DocumentFile['category']>('International Passport');
@@ -250,51 +253,51 @@ export const ApplyNowModal: React.FC<ApplyNowModalProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Full Student Name *</label>
+                    <label className="font-bold text-slate-800 block mb-1">Full Student Name *</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. Emmanuel Johnson"
                       value={contactName}
                       onChange={(e) => setContactName(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
+                      className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Mobile / WhatsApp Number *</label>
+                    <label className="font-bold text-slate-800 block mb-1">Mobile / WhatsApp Number *</label>
                     <input
                       type="tel"
                       required
                       placeholder="+231 88 000 0000"
                       value={contactPhone}
                       onChange={(e) => setContactPhone(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
+                      className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Email Address *</label>
+                    <label className="font-bold text-slate-800 block mb-1">Email Address *</label>
                     <input
                       type="email"
                       required
                       placeholder="student@example.com"
                       value={contactEmail}
                       onChange={(e) => setContactEmail(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
+                      className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1 flex items-center gap-1">
+                    <label className="font-bold text-slate-800 block mb-1 flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5 text-emerald-600" /> County in Liberia *
                     </label>
                     <select
                       value={contactCounty}
                       onChange={(e) => setContactCounty(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium text-slate-800"
+                      className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                     >
                       {liberiaCounties.map(c => (
                         <option key={c} value={c}>{c} County</option>
@@ -305,13 +308,13 @@ export const ApplyNowModal: React.FC<ApplyNowModalProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1 flex items-center gap-1">
+                    <label className="font-bold text-slate-800 block mb-1 flex items-center gap-1">
                       <GraduationCap className="w-3.5 h-3.5 text-emerald-600" /> Course Level / Category *
                     </label>
                     <select
                       value={courseLevel}
                       onChange={(e) => setCourseLevel(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium text-slate-800"
+                      className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                     >
                       <option value="BSc / Undergraduate">BSc / Bachelor's Degree (Undergraduate)</option>
                       <option value="Master / Postgraduate">Master's Degree (Postgraduate / MBA)</option>
@@ -322,7 +325,7 @@ export const ApplyNowModal: React.FC<ApplyNowModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1 flex items-center gap-1">
+                    <label className="font-bold text-slate-800 block mb-1 flex items-center gap-1">
                       <BookOpen className="w-3.5 h-3.5 text-emerald-600" /> Specific Course Desired *
                     </label>
                     <input
@@ -331,18 +334,18 @@ export const ApplyNowModal: React.FC<ApplyNowModalProps> = ({
                       placeholder="e.g. Computer Science, Nursing, Civil Engineering, Public Health, Cyber Security"
                       value={desiredCourse}
                       onChange={(e) => setDesiredCourse(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
+                      className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Additional Notes / Message for Admin</label>
+                  <label className="font-bold text-slate-800 block mb-1">Additional Notes / Message for Admin</label>
                   <textarea
                     rows={2}
                     value={contactMessage}
                     onChange={(e) => setContactMessage(e.target.value)}
-                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
+                    className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                     placeholder="Provide any extra details about your academic background or funding..."
                   />
                 </div>
@@ -359,59 +362,69 @@ export const ApplyNowModal: React.FC<ApplyNowModalProps> = ({
             {/* TAB 2: CREATE ACCOUNT */}
             {activeTab === 'account' && (
               <form onSubmit={handleRegisterSubmit} className="space-y-3.5 text-xs">
-                <p className="text-slate-500 text-[11px] bg-indigo-50 p-3 rounded-2xl border border-indigo-100 text-indigo-900 leading-relaxed font-medium">
+                <p className="text-slate-700 text-[11px] bg-indigo-50 p-3 rounded-2xl border border-indigo-200 text-indigo-950 leading-relaxed font-semibold">
                   Register your account to access your personal student portal, upload marksheets, and track admission status.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Full Student Name *</label>
+                    <label className="font-bold text-slate-800 block mb-1">Full Student Name *</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. Blessing Dennis"
                       value={regName}
                       onChange={(e) => setRegName(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-indigo-500 font-medium"
+                      className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-indigo-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Phone Number *</label>
+                    <label className="font-bold text-slate-800 block mb-1">Phone Number *</label>
                     <input
                       type="tel"
                       required
                       placeholder="+231 88 000 0000"
                       value={regPhone}
                       onChange={(e) => setRegPhone(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-indigo-500 font-medium"
+                      className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-indigo-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Email Address *</label>
+                    <label className="font-bold text-slate-800 block mb-1">Email Address *</label>
                     <input
                       type="email"
                       required
-                      placeholder="student@freshstudyindia.in"
+                      placeholder="student@example.com"
                       value={regEmail}
                       onChange={(e) => setRegEmail(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-indigo-500 font-medium"
+                      className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-indigo-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Create Password *</label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="••••••••"
-                      value={regPassword}
-                      onChange={(e) => setRegPassword(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-indigo-500 font-medium"
-                    />
+                    <label className="font-bold text-slate-800 block mb-1">Create Password *</label>
+                    <div className="relative">
+                      <input
+                        type={showRegPassword ? 'text' : 'password'}
+                        required
+                        placeholder="Create a strong password"
+                        value={regPassword}
+                        onChange={(e) => setRegPassword(e.target.value)}
+                        className="w-full p-3 pr-11 bg-slate-50 border border-slate-300 focus:bg-white focus:border-indigo-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-indigo-100 focus:outline-none transition"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowRegPassword(!showRegPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-slate-800 rounded-lg transition cursor-pointer"
+                        title={showRegPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showRegPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
                 </div>
 

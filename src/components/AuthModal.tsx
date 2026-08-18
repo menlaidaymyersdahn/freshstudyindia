@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, ShieldCheck, Mail, CheckCircle2, AlertCircle, RefreshCw, UserCheck, Lock } from 'lucide-react';
+import { X, User, ShieldCheck, Mail, CheckCircle2, AlertCircle, RefreshCw, UserCheck, Lock, Eye, EyeOff } from 'lucide-react';
 import { UserRole } from '../types';
 import { 
   registerStudentWithFirebase, 
@@ -31,6 +31,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [county, setCounty] = useState('Montserrado');
+  const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
   const [loading, setLoading] = useState(false);
@@ -321,22 +322,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <form onSubmit={handleAuthSubmit} className="space-y-3.5 text-xs">
           {mode === 'register' && (
             <div>
-              <label className="font-bold text-slate-700 block mb-1">
-                Full Name *
+              <label className="font-bold text-slate-800 block mb-1 text-xs">
+                Full Name <span className="text-emerald-600">*</span>
               </label>
               <input
                 type="text"
                 required
-                placeholder="e.g. Dr. Rajesh Sharma or Emmanuel Johnson"
+                placeholder="e.g. Emmanuel Johnson"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
+                className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
               />
             </div>
           )}
 
           <div>
-            <label className="font-bold text-slate-700 block mb-1">Email Address *</label>
+            <label className="font-bold text-slate-800 block mb-1 text-xs">
+              Email Address <span className="text-emerald-600">*</span>
+            </label>
             <input
               type="email"
               required
@@ -347,54 +350,66 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               }
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
+              className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
             />
           </div>
 
           {mode !== 'forgot_password' && (
             <div>
               <div className="flex justify-between items-center mb-1">
-                <label className="font-bold text-slate-700">Password *</label>
+                <label className="font-bold text-slate-800 text-xs">
+                  Password <span className="text-emerald-600">*</span>
+                </label>
                 {mode === 'login' && (
                   <button
                     type="button"
                     onClick={() => { setMode('forgot_password'); handleResetState(); }}
-                    className="text-[11px] font-bold text-emerald-600 hover:underline cursor-pointer"
+                    className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer"
                   >
                     Forgot Password?
                   </button>
                 )}
               </div>
-              <input
-                type="password"
-                required
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  placeholder="Enter your account password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full p-3 pr-11 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-slate-800 rounded-lg transition cursor-pointer"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
           )}
 
           {mode === 'register' && portal === 'student' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Phone Number</label>
+                <label className="font-bold text-slate-800 block mb-1 text-xs">Phone Number / WhatsApp</label>
                 <input
                   type="tel"
                   placeholder="+231 88 000 0000"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
+                  className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">County in Liberia</label>
+                <label className="font-bold text-slate-800 block mb-1 text-xs">County in Liberia</label>
                 <select
                   value={county}
                   onChange={(e) => setCounty(e.target.value)}
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium text-slate-800"
+                  className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                 >
                   <option value="Montserrado">Montserrado</option>
                   <option value="Nimba">Nimba</option>
@@ -410,7 +425,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )}
 
           {mode === 'login' && (
-            <div className="flex items-center justify-between text-slate-600 font-medium pt-1">
+            <div className="flex items-center justify-between text-slate-700 font-semibold pt-1">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -420,8 +435,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 />
                 <span>Remember Session</span>
               </label>
-              <div className="flex items-center gap-1 text-[11px] text-slate-400">
-                <Lock className="w-3 h-3" /> SSL Encrypted
+              <div className="flex items-center gap-1 text-[11px] text-slate-500">
+                <Lock className="w-3 h-3 text-emerald-600" /> SSL Encrypted
               </div>
             </div>
           )}

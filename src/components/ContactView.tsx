@@ -174,38 +174,38 @@ export const ContactView: React.FC<ContactViewProps> = ({
                 <form onSubmit={handleFormSubmit} className="space-y-4 text-xs">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="font-bold text-slate-700 block mb-1">Full Student Name *</label>
+                      <label className="font-bold text-slate-800 block mb-1">Full Student Name *</label>
                       <input
                         type="text"
                         required
-                        placeholder="e.g. Aarav Sharma / Joseph Mulbah"
+                        placeholder="e.g. Joseph Mulbah"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
+                        className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                       />
                     </div>
                     <div>
-                      <label className="font-bold text-slate-700 block mb-1">Email Address *</label>
+                      <label className="font-bold text-slate-800 block mb-1">Email Address *</label>
                       <input
                         type="email"
                         required
                         placeholder="student@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
+                        className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Your Message or Course Questions *</label>
+                    <label className="font-bold text-slate-800 block mb-1">Your Message or Course Questions *</label>
                     <textarea
                       rows={5}
                       required
-                      placeholder="Specify course level (BSc, B.Tech, Master, PhD), county, and target university..."
+                      placeholder="Specify course level (BSc, B.Tech, Master, PhD), county, and target program..."
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
+                      className="w-full p-3 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                     ></textarea>
                   </div>
 

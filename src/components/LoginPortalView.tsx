@@ -10,7 +10,9 @@ import {
   ArrowRight,
   LogOut,
   Mail,
-  ShieldAlert
+  ShieldAlert,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { ActiveTab, UserRole, UserProfile } from '../types';
 import { 
@@ -45,6 +47,7 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [county, setCounty] = useState('Montserrado');
+  const [showPassword, setShowPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -481,8 +484,8 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
             <form onSubmit={handleAuthSubmit} className="space-y-4 text-xs">
               {mode === 'register' && portal === 'student' && (
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">
-                    Student Full Name *
+                  <label className="font-bold text-slate-800 block mb-1.5 text-xs sm:text-sm">
+                    Student Full Name <span className="text-emerald-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -490,14 +493,14 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
                     placeholder="e.g. Emmanuel Johnson"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
+                    className="w-full p-3.5 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold text-xs sm:text-sm shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                   />
                 </div>
               )}
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">
-                  Email Address *
+                <label className="font-bold text-slate-800 block mb-1.5 text-xs sm:text-sm">
+                  Email Address <span className="text-emerald-600">*</span>
                 </label>
                 <input
                   type="email"
@@ -509,54 +512,70 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
                   }
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
+                  className="w-full p-3.5 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold text-xs sm:text-sm shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                 />
               </div>
 
               {mode !== 'forgot_password' && (
                 <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="font-bold text-slate-700">Password *</label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="font-bold text-slate-800 text-xs sm:text-sm">
+                      Password <span className="text-emerald-600">*</span>
+                    </label>
                     {mode === 'login' && (
                       <button
                         type="button"
                         onClick={() => setMode('forgot_password')}
-                        className="text-[11px] font-bold text-emerald-600 hover:underline cursor-pointer"
+                        className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer"
                       >
                         Forgot Password?
                       </button>
                     )}
                   </div>
-                  <input
-                    type="password"
-                    required
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      placeholder="Enter your account password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full p-3.5 pr-12 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold text-xs sm:text-sm shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-slate-800 rounded-lg transition cursor-pointer"
+                      title={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
               )}
 
               {mode === 'register' && portal === 'student' && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Phone Number</label>
+                    <label className="font-bold text-slate-800 block mb-1.5 text-xs sm:text-sm">
+                      Phone Number / WhatsApp
+                    </label>
                     <input
                       type="tel"
-                      placeholder="+231 889425645"
+                      placeholder="+231 88 000 0000"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium"
+                      className="w-full p-3.5 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 placeholder:text-slate-500 font-semibold text-xs sm:text-sm shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">County in Liberia</label>
+                    <label className="font-bold text-slate-800 block mb-1.5 text-xs sm:text-sm">
+                      County in Liberia
+                    </label>
                     <select
                       value={county}
                       onChange={(e) => setCounty(e.target.value)}
-                      className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-emerald-500 font-medium text-slate-800"
+                      className="w-full p-3.5 bg-slate-50 border border-slate-300 focus:bg-white focus:border-emerald-500 rounded-2xl text-slate-900 font-semibold text-xs sm:text-sm shadow-xs focus:ring-2 focus:ring-emerald-100 focus:outline-none transition"
                     >
                       <option value="Montserrado">Montserrado</option>
                       <option value="Nimba">Nimba</option>
@@ -572,7 +591,7 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
               )}
 
               {mode === 'login' && (
-                <div className="flex items-center justify-between text-slate-600 font-medium pt-1">
+                <div className="flex items-center justify-between text-slate-700 font-semibold pt-1">
                   <label className="flex items-center gap-2 cursor-pointer select-none">
                     <input
                       type="checkbox"
@@ -581,8 +600,8 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({
                     />
                     <span>Remember Login Session</span>
                   </label>
-                  <div className="flex items-center gap-1 text-[11px] text-slate-400">
-                    <Lock className="w-3 h-3" /> SSL Encrypted
+                  <div className="flex items-center gap-1 text-[11px] text-slate-500">
+                    <Lock className="w-3 h-3 text-emerald-600" /> SSL Encrypted
                   </div>
                 </div>
               )}
