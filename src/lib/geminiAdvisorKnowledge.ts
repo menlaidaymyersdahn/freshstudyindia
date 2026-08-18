@@ -1,7 +1,7 @@
 /**
- * Fresh Study India - Built-in Intelligent Admissions Knowledge Engine
- * Powers instant, highly detailed academic and admissions advice even during offline
- * or static hosting scenarios (e.g. Vercel static deployments).
+ * Fresh Study India - Agency AI Admissions & Counseling Knowledge Engine
+ * Exclusively focused on Fresh Study India's agency services, admission process,
+ * scholarship processing, visa assistance, and student support.
  */
 
 export interface AdvisorContext {
@@ -20,7 +20,7 @@ export function generateAdvisorResponse(
   const q = query.toLowerCase();
   const studentName = context?.name || 'Future Scholar';
 
-  // 1. Scholarship Queries
+  // 1. Scholarship & Fee Assistance
   if (
     q.includes('scholarship') || 
     q.includes('discount') || 
@@ -30,34 +30,34 @@ export function generateAdvisorResponse(
     role === 'scholarship_navigator'
   ) {
     return {
-      modelUsed: 'gemini-3.1-pro-preview (Knowledge Base)',
-      reply: `### 🎓 Fresh Study India Merit Scholarship Guide 2025/2026
+      modelUsed: 'Fresh Study India Scholarship Desk',
+      reply: `### 🎓 Fresh Study India Merit Scholarship Guidance
 
-Hello **${studentName}**! International students (especially from Africa, SAARC, and the Middle East) are eligible for **up to 50% – 100% Tuition Fee Scholarships** based on their high school or undergraduate academic scores.
-
----
-
-#### 🏆 Scholarship Percentage Brackets
-1. **90%+ or Grade A1/A in WASSCE / WAEC / KCSE / High School**:
-   - **Scholarship**: **70% to 100% Tuition Fee Waiver** at partner universities (e.g., Lovely Professional University, Sharda, Chandigarh University).
-2. **75% – 89% or Grade B2/B3**:
-   - **Scholarship**: **50% Tuition Fee Waiver** throughout the degree program.
-3. **60% – 74% or Grade C4/C5/C6**:
-   - **Scholarship**: **30% to 40% Early Bird & Regional Diversity Grant**.
+Hello **${studentName}**! At **Fresh Study India**, our primary mission is to secure maximum tuition scholarships for international students through our direct institutional partnerships.
 
 ---
 
-#### 📋 Required Documents for Scholarship Evaluation
-* High School Result Certificate (WASSCE, WAEC, NECO, KCSE, or National Diploma)
-* International Passport Bio-data Page
-* Passport-size photograph with white background
-* Statement of Purpose / Academic transcript (for Masters/PhD applicants)
+#### 🏆 How Our Agency Processes Your Scholarship:
+1. **Academic Transcript Evaluation**:
+   - We evaluate your high school qualifications (WASSCE, WAEC, NECO, KCSE, or equivalent diploma) or bachelor's transcript against our partner scholarship brackets.
+2. **Merit Scholarship Brackets**:
+   - **Excellent Results (Grade A/B or 75%+ average)**: Eligible for **50% to 100% Tuition Fee Scholarships**.
+   - **Credit/Pass Results (Grade C or 50%–74%)**: Eligible for **30% to 40% Regional Diversity Grants**.
+3. **Zero Processing Fees for Evaluation**:
+   - Fresh Study India assesses your scholarship eligibility completely free of charge within **24 to 48 hours**.
 
-💡 **Pro-Tip**: Fresh Study India counselors process your direct scholarship evaluation within **24–48 hours** completely free of charge! Contact our admissions team directly via WhatsApp at **+231 889425645** or click **Apply Now** above.`
+---
+
+#### 📋 Documents Required for Agency Assessment:
+* High school result certificate or university transcript
+* International passport bio-data page
+* Passport-sized photograph
+
+💡 **Next Step**: Click **Apply Now** in the menu or message our agency counselors directly on WhatsApp at **+231 889425645** for a free scholarship calculation!`
     };
   }
 
-  // 2. Visa & FRRO Queries
+  // 2. Visa, Embassy & FRRO Support
   if (
     q.includes('visa') || 
     q.includes('embassy') || 
@@ -68,69 +68,63 @@ Hello **${studentName}**! International students (especially from Africa, SAARC,
     role === 'visa_specialist'
   ) {
     return {
-      modelUsed: 'gemini-3.5-flash (Admissions Desk)',
-      reply: `### 🛂 Indian Student Visa & FRRO Clearance Blueprint
+      modelUsed: 'Fresh Study India Visa & Compliance Desk',
+      reply: `### 🛂 Fresh Study India Visa & Immigration Support
 
-Hello **${studentName}**, our visa clearance rate for international students is **99.4%** across Africa and Asia. Here is your step-by-step visa checklist:
-
----
-
-#### 📑 Mandatory Documents for the Indian Embassy Visa:
-1. **Provisional Admission Letter & Bonafide Certificate** issued by the Indian university.
-2. **AIU Equivalence Certificate** (Fresh Study India assists in obtaining this).
-3. **Proof of Financial Solvency**: Bank statement showing living expenses + tuition deposit for at least 1 academic year (approx. $2,500 – $4,000 USD).
-4. **Yellow Fever Vaccination Card** & Polio certificate (for designated African/South American countries).
-5. **Police Clearance Certificate** (PCC) from your home country.
-6. **Valid International Passport** with at least 18 months validity.
+Hello **${studentName}**! Our agency maintains a **99.4% visa approval record** for international students through structured document verification and mock interview coaching.
 
 ---
 
-#### 🛬 On-Arrival FRRO Registration in India:
-* **Mandatory Window**: You must register with the **Foreigners Regional Registration Officer (FRRO)** online within **14 days** of arrival in India.
-* **Our Support**: Fresh Study India's on-ground Indian officers will physically accompany you to complete your biometric verification and residential permit (RP) at no extra cost.
+#### 📑 How Fresh Study India Assists Your Visa Process:
+1. **Official Bonafide & Provisional Admission Letters**:
+   - We issue certified institutional admission documents required by the Indian Embassy.
+2. **AIU Equivalence Certification**:
+   - Our legal desk coordinates with the Association of Indian Universities (AIU) to certify your academic equivalence.
+3. **Embassy Interview Coaching**:
+   - We prepare you with sample questions, financial documentation review, and statement of purpose refinement.
+4. **On-Ground FRRO Registration**:
+   - Upon arriving in India, our local agency coordinators physically guide you through the Foreigners Regional Registration Office (FRRO) registration and resident permit procedures within your first 14 days.
 
-📞 Need interview coaching? Message our visa officers on WhatsApp: **+231 889425645**.`
+📞 **Contact Our Visa Desk**: Chat directly with our visa officers on WhatsApp at **+231 889425645**.`
     };
   }
 
-  // 3. University Comparison Queries
+  // 3. Agency Services & How We Work
   if (
-    q.includes('compare') || 
-    q.includes('lpu') || 
-    q.includes('chandigarh') || 
-    q.includes('sharda') || 
-    q.includes('amity') || 
-    q.includes('parul') || 
-    q.includes('vit') || 
-    q.includes('srm') ||
-    q.includes('manipal')
+    q.includes('agency') || 
+    q.includes('service') || 
+    q.includes('about') || 
+    q.includes('fresh study') || 
+    q.includes('who are you') || 
+    q.includes('why fresh study') ||
+    q.includes('what do you do') ||
+    q.includes('support')
   ) {
     return {
-      modelUsed: 'gemini-3.5-flash (University Desk)',
-      reply: `### 🏛️ Comparison of Top Partner Indian Universities
+      modelUsed: 'Fresh Study India Advisory Desk',
+      reply: `### 🏢 About Fresh Study India
 
-Here is an objective overview of top accredited universities for international students:
-
----
-
-| University | NAAC Grade | Key Strengths | Approx. Tuition (After 50% Scholarship) |
-| :--- | :--- | :--- | :--- |
-| **Lovely Professional University (LPU)** | **A++** | Largest campus (600+ acres), 3,000+ international students, top tech placements. | **$1,800 – $2,800 / year** |
-| **Chandigarh University (CU)** | **A+** | QS Ranked #1 Private University in India, high research output, affordable hostels. | **$1,600 – $2,400 / year** |
-| **Sharda University (Delhi NCR)** | **A+** | Located next to New Delhi, highest diversity of African & Arab students, strong medical programs. | **$2,000 – $3,200 / year** |
-| **Parul University (Gujarat)** | **A++** | Best for Pharmacy, Nursing, and Engineering; very secure & peaceful campus environment. | **$1,500 – $2,200 / year** |
-| **Amity University** | **A+** | Prestigious global alumni network, advanced AI and Robotics research centers. | **$2,400 – $3,800 / year** |
+**Fresh Study India** is a premier international educational consultancy and student facilitation agency dedicated to connecting students from across the globe to accredited, top-tier higher education institutions in India.
 
 ---
 
-🎯 **Recommendation**:
-* For **Computer Science / AI / Software**: Choose **LPU** or **Chandigarh University**.
-* For **Medical / Pharmacy / Nursing**: Choose **Sharda** or **Parul University**.
-* For **Business / MBA**: Choose **Amity** or **LPU**.`
+#### 🌟 Our End-to-End Agency Services:
+1. **Academic Profiling & Course Selection**: Guidance across Engineering, Computer Science & AI, Medicine & Health Sciences, Business Administration, Pharmacy, and Law.
+2. **Direct Partner Admissions**: Guaranteed fast-track application processing without third-party middleman delays.
+3. **Scholarship Facilitation**: Securing 30%–100% tuition scholarships based on academic merit.
+4. **Visa Filing & Embassy Support**: Complete documentation checks, visa letters, and interview prep.
+5. **On-Ground Indian Student Desk**:
+   - 🛬 Airport reception and private transfer to campus
+   - 📱 Local SIM card and connectivity setup
+   - 🏢 Campus hostel room allocation and mess enrollment
+   - 🛡️ FRRO registration and residence permit clearance
+   - 🤝 Continuous academic and pastoral mentorship throughout your studies
+
+📲 **Speak with an Agency Counselor**: WhatsApp **+231 889425645** | Email: **freshstudyindia@gmail.com**`
     };
   }
 
-  // 4. Cost Breakdown Queries
+  // 4. Cost Breakdown & Agency Transparency
   if (
     q.includes('cost') || 
     q.includes('fee') || 
@@ -138,129 +132,125 @@ Here is an objective overview of top accredited universities for international s
     q.includes('usd') || 
     q.includes('budget') || 
     q.includes('how much') ||
-    q.includes('expenses')
+    q.includes('charge')
   ) {
     return {
-      modelUsed: 'gemini-3.5-flash (Cost Calculator)',
-      reply: `### 💰 Comprehensive Cost Breakdown: Studying in India (in USD)
+      modelUsed: 'Fresh Study India Finance Desk',
+      reply: `### 💰 Estimated Study Costs & Agency Fee Policy
 
-Studying in India provides world-class British-curriculum degrees at **1/5th the cost of the UK, USA, or Canada**.
-
----
-
-#### 1. Annual Tuition Fees (with Fresh Study India Scholarship)
-* **B.Tech / Computer Science / AI**: $1,600 – $2,800 USD / year
-* **BBA / B.Com / Arts**: $1,400 – $2,000 USD / year
-* **MBA / Master of Computer Applications**: $2,000 – $3,200 USD / year
-* **B.Pharmacy / Nursing / Physiotherapy**: $1,800 – $2,900 USD / year
-* **MBBS (Medicine)**: $8,000 – $14,000 USD / year
+At **Fresh Study India**, we practice 100% transparency with zero hidden charges.
 
 ---
 
-#### 2. Accommodation & Food (Hostel Mess)
-* **3-Seater / 4-Seater Room with 3 Daily Meals**: $900 – $1,200 USD / year
-* **2-Seater AC Room with Attached Bathroom & Meals**: $1,500 – $2,200 USD / year
+#### 📌 Fresh Study India Fee Policy:
+* **Initial Profile Assessment & Counseling**: **100% FREE**
+* **Scholarship Evaluation**: **100% FREE**
+* **Admission Letter Processing**: **FREE via our authorized partner network**
 
 ---
 
-#### 3. One-Time Setup Costs
-* **Airport Pickup & Local SIM Card**: Free through Fresh Study India
-* **FRRO Registration & Medical Insurance**: ~$100 – $150 USD
-* **Books & Personal Pocket Money**: ~$50 – $100 USD / month
+#### 💵 Average Yearly Study & Living Budget in India (in USD):
+* **Tuition Fees (After Fresh Study India Scholarship)**: ~$1,500 – $3,200 USD / year (depending on degree)
+* **Hostel Accommodation & 3 Meals/Day**: ~$900 – $1,800 USD / year
+* **Personal Living & Books**: ~$50 – $100 USD / month
 
-📊 **Total Estimated Annual Living + Tuition Budget**: **$2,600 to $4,500 USD total per year**.`
+💡 **Total Estimated Annual Budget**: **$2,500 to $4,500 USD total per year** covering both tuition and living.
+
+Contact our financial counselor on WhatsApp at **+231 889425645** for a personalized estimate.`
     };
   }
 
-  // 5. Medical / MBBS / Nursing / Pharmacy
+  // 5. Academic Programs & Courses
   if (
+    q.includes('course') || 
+    q.includes('program') || 
+    q.includes('major') || 
+    q.includes('degree') || 
+    q.includes('btech') || 
+    q.includes('cs') || 
     q.includes('mbbs') || 
-    q.includes('medicine') || 
-    q.includes('doctor') || 
-    q.includes('pharmacy') || 
+    q.includes('mba') || 
     q.includes('nursing') || 
-    q.includes('bds')
+    q.includes('pharmacy')
   ) {
     return {
-      modelUsed: 'gemini-3.5-flash (Medical Desk)',
-      reply: `### 🏥 Medical & Healthcare Admissions in India (MBBS / Pharmacy / Nursing)
+      modelUsed: 'Fresh Study India Academic Desk',
+      reply: `### 📚 Academic Programs Facilitated by Fresh Study India
 
-Hello **${studentName}**, medical education in India is globally recognized by the **WHO, ECFMG (USA), GMC (UK), and Medical Councils worldwide**.
+Our agency facilitates admissions across a comprehensive portfolio of accredited undergraduate, postgraduate, and doctoral degree programs:
 
 ---
 
-#### 🩺 Medical Programs Available:
-1. **MBBS (5.5 Years including 1-year clinical internship)**
-   * **Eligibility**: Minimum 50% in Physics, Chemistry, and Biology (PCB) in 12th Grade / High School.
-   * **Medium of Instruction**: 100% English.
-2. **B.Pharmacy & Pharm.D (Doctor of Pharmacy)**
-   * **Eligibility**: High School with Science (PCB or PCM).
-   * **Tuition**: $1,800 – $2,800 USD/year.
-3. **B.Sc Nursing & BPT (Physiotherapy)**
-   * High demand with direct hospital clinical rotations in tertiary hospitals in Delhi NCR and Punjab.
+#### 🎓 Major Degree Fields:
+* **Engineering & Technology**: B.Tech / M.Tech in Computer Science, Artificial Intelligence & Machine Learning, Cyber Security, Data Science, Mechanical, and Civil Engineering.
+* **Healthcare & Medical Sciences**: MBBS, BDS (Dental), B.Pharmacy, Pharm.D, B.Sc Nursing, and Physiotherapy.
+* **Business & Management**: BBA, MBA (International Business, Finance, Marketing, Supply Chain), and B.Com.
+* **Computer Applications & IT**: BCA, MCA, and Cloud Computing certifications.
+* **Applied Sciences & Humanities**: Biotechnology, Microbiology, Agriculture, and International Relations.
 
-📌 **Note**: Seats for MBBS and Dental Surgery (BDS) fill up very quickly for international quotas. Submit your credentials early to reserve your seat!`
+---
+
+#### 🚀 How to Apply Through Our Agency:
+1. Submit your high school credentials or bachelor's transcript.
+2. Receive your personalized eligibility and scholarship offer within **48 hours**.
+3. Fresh Study India secures your provisional admission letter.
+
+Click **Apply Now** or chat with our desk on WhatsApp: **+231 889425645**.`
     };
   }
 
-  // 6. Campus Life / Hostels / Food / Safety
+  // 6. On-Ground Support, Hostels & Student Welfare
   if (
     q.includes('hostel') || 
+    q.includes('accommodation') || 
     q.includes('food') || 
     q.includes('safety') || 
-    q.includes('mess') || 
-    q.includes('climate') || 
-    q.includes('weather') ||
+    q.includes('airport') || 
+    q.includes('pickup') || 
     role === 'campus_life_guide'
   ) {
     return {
-      modelUsed: 'gemini-3.5-flash (Campus Life)',
-      reply: `### 🌍 Campus Life, Safety & International Hostels in India
+      modelUsed: 'Fresh Study India Student Welfare Desk',
+      reply: `### 🌍 Fresh Study India On-Ground Student Support
+
+Hello **${studentName}**! Unlike traditional agencies that stop at visa issuance, **Fresh Study India provides dedicated on-ground guardians** in India.
 
 ---
 
-#### 🏢 Hostel Accommodation
-* **Room Options**: Single, 2-seater, 3-seater, and 4-seater rooms with AC or Non-AC options.
-* **Amenities**: High-speed Wi-Fi, 24/7 power backup, laundry facilities, study lounges, gymnasiums, and indoor sports complexes.
+#### 🛡️ Our On-Arrival Assistance:
+1. **Airport Reception**: Our local team greets you at the airport (Delhi, Mumbai, Bengaluru, etc.) and provides safe transportation to campus.
+2. **Hostel Placement**: We arrange comfortable on-campus accommodation (AC / Non-AC with Wi-Fi, laundry, and 24/7 security).
+3. **Dining & Nutrition**: International student messes offering international, African, continental, and vegetarian/non-vegetarian cuisine options.
+4. **Local Orientation**: SIM card setup, local bank account assistance, and city orientation.
+5. **24/7 Emergency Helpline**: Dedicated agency student welfare officers on standby throughout your academic journey.
 
----
-
-#### 🍲 International Student Food & Mess
-* Dedicated international dining halls providing continental, African, Arabic, and vegetarian/non-vegetarian cuisines.
-* Self-cooking kitchens with refrigeration and induction burners are available in selected international wings.
-
----
-
-#### 🛡️ Campus Security & Health
-* **24/7 Security**: Gated campuses with biometric card access and CCTV monitoring.
-* **On-Campus Hospitals**: 24-hour medical centers and ambulances on campus.
-* **Vibrant Community**: Over 50,000 international students from 70+ countries study across India every year.`
+💬 Questions about settling in? Message our student support desk on WhatsApp: **+231 889425645**.`
     };
   }
 
   // Default General Advice
   return {
-    modelUsed: 'gemini-3.5-flash (Admissions Desk)',
-    reply: `### 🎓 Welcome to Fresh Study India Admissions Desk
+    modelUsed: 'Fresh Study India Advisory Desk',
+    reply: `### 🎓 Fresh Study India AI Admissions Advisor
 
-Hello **${studentName}**! We are your official academic gateway to top accredited universities in India.
-
----
-
-#### 🌟 How Fresh Study India Helps You:
-1. **Direct University Admissions**: Guaranteed admission letters from NAAC A++ rated universities without agency middleman delays.
-2. **Up to 100% Merit Scholarships**: We evaluate your WASSCE, WAEC, NECO, KCSE, or high school transcripts for maximum tuition waivers.
-3. **100% Visa Filing Assistance**: Complete bonafide certification, Embassy interview guidance, and documentation prep.
-4. **On-Ground Indian Desk**: Airport pickup in Delhi, Mumbai, or Bengaluru, university check-in, SIM card setup, and FRRO registration.
+Hello **${studentName}**! Welcome to **Fresh Study India** — your official educational consultancy and admissions facilitator.
 
 ---
 
-#### 🚀 What would you like to explore next?
-* Ask about **scholarships & tuition discounts**
-* Compare **B.Tech, MBBS, BBA, MBA, or Nursing programs**
-* Check **student visa and embassy requirements**
-* Calculate **total yearly budget in USD**
+#### 🌟 How Our Agency Helps You:
+* **Direct Partner Admissions**: Fast-track admission letters from top accredited partner universities in India.
+* **Up to 100% Scholarships**: Comprehensive merit evaluation for high-achieving international applicants.
+* **Complete Visa Assistance**: Embassy interview coaching, documentation, and bonafide certification.
+* **On-Ground Indian Desk**: Airport pickup, hostel check-in, SIM card setup, and FRRO registration.
 
-💬 Or chat with a human counselor directly on WhatsApp at **+231 889425645**!`
+---
+
+#### 💬 How can I assist you today?
+* Inquire about **merit scholarship eligibility**
+* Ask about **available degree programs (B.Tech, MBBS, BBA, Nursing, MBA)**
+* Learn about **visa & embassy interview preparation**
+* Ask about **our airport reception and on-ground student support**
+
+📞 **Official Agency Helpline**: WhatsApp: **+231 889425645** | Email: **freshstudyindia@gmail.com**`
   };
 }

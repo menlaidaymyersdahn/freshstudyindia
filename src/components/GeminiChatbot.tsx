@@ -59,7 +59,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
     {
       id: 'welcome-1',
       sender: 'model',
-      text: `Hello ${currentUser?.name || 'there'}! 👋 Welcome to **Fresh Study India's AI Admissions Advisor**.\n\nI can help you explore accredited Indian universities, calculate scholarship eligibility (up to 100%), prepare your student visa documentation, and guide you through hostel accommodation and FRRO registration.\n\nHow can I assist your educational journey to India today?`,
+      text: `Hello ${currentUser?.name || 'there'}! 👋 Welcome to **Fresh Study India's AI Admissions Advisor**.\n\nI can help you explore our accredited Indian partner university programs, evaluate your eligibility for up to 100% merit scholarships, prepare your student visa documentation, and organize your on-ground hostel placement and airport reception.\n\nHow can Fresh Study India assist your education journey today?`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       modelUsed: 'gemini-3.5-flash',
       roleType: 'general_advisor'
@@ -70,7 +70,12 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
     try {
       const saved = localStorage.getItem('fresh_study_india_gemini_chat');
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Filter out any stale error messages from previous session
+          const sanitized = parsed.filter(m => !m.text?.includes('Unexpected token') && !m.text?.includes('is not valid JSON'));
+          if (sanitized.length > 0) return sanitized;
+        }
       }
     } catch {
       // fallback
@@ -106,7 +111,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       name: 'Admissions Advisor',
       modelType: 'general' as const,
       modelName: 'gemini-3.5-flash',
-      desc: 'University matching, intake dates & application procedure',
+      desc: 'Agency admissions process, intake dates & eligibility',
       icon: GraduationCap,
       color: 'bg-emerald-600'
     },
@@ -115,7 +120,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       name: 'Scholarship AI',
       modelType: 'complex' as const,
       modelName: 'gemini-3.1-pro-preview',
-      desc: 'Complex academic grade calculations & merit grant assessments',
+      desc: 'Merit scholarship evaluation & tuition reduction calculation',
       icon: Award,
       color: 'bg-amber-600'
     },
@@ -130,10 +135,10 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
     },
     {
       id: 'campus_life_guide' as const,
-      name: 'Campus Life & Living',
+      name: 'Student Support & Welfare',
       modelType: 'general' as const,
       modelName: 'gemini-3.5-flash',
-      desc: 'Hostels, food, climate, safety & international student communities',
+      desc: 'Airport pickup, hostels, food, safety & on-ground team',
       icon: Compass,
       color: 'bg-teal-600'
     },
@@ -142,7 +147,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       name: 'Fast FAQ Assistant',
       modelType: 'fast' as const,
       modelName: 'gemini-3.1-flash-lite',
-      desc: 'Ultra-fast answers for quick fees, deadlines & requirements',
+      desc: 'Instant answers for agency fees, deadlines & contact info',
       icon: Zap,
       color: 'bg-purple-600'
     }
@@ -150,11 +155,11 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
 
   // Quick prompt suggestions
   const suggestedPrompts = [
-    { label: '🏆 Scholarship Eligibility', text: 'What are the scholarship requirements for African students applying to study in India?' },
-    { label: '🏛️ Compare Universities', text: 'Compare Computer Science programs at Lovely Professional University vs Chandigarh University vs Sharda University.' },
-    { label: '🛂 Indian Student Visa', text: 'What documents and bank statement proofs do I need for the Indian Embassy student visa interview?' },
-    { label: '💰 Total Cost in USD', text: 'Can you give an estimated breakdown of total cost per year for tuition, hostel, and food in India in USD?' },
-    { label: '🏥 MBBS in India', text: 'What are the eligibility criteria and NMC recognition details for international students taking MBBS or BDS in India?' }
+    { label: '🏆 Scholarship Evaluation', text: 'How does Fresh Study India evaluate and secure up to 100% scholarships for international students?' },
+    { label: '🏢 Agency Services', text: 'What end-to-end services does Fresh Study India provide from application to campus arrival?' },
+    { label: '🛂 Indian Student Visa', text: 'How does Fresh Study India assist with the Indian Embassy student visa application and interview preparation?' },
+    { label: '💰 Total Study Budget in USD', text: 'What is the estimated total cost per year for tuition, hostel, and meals when studying in India through Fresh Study India?' },
+    { label: '🛬 Airport & On-Ground Support', text: 'What on-ground assistance does Fresh Study India provide once I land in India (pickup, hostel, FRRO)?' }
   ];
 
   const handleRoleSelect = (roleId: typeof selectedRole) => {
@@ -224,15 +229,15 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
 
         const contentType = response.headers.get('content-type') || '';
         if (response.ok && contentType.includes('application/json')) {
-          const data = await response.json();
-          if (data && data.reply) {
+          const data = await response.json().catch(() => null);
+          if (data && data.reply && typeof data.reply === 'string') {
             replyText = data.reply;
             if (data.modelUsed) modelUsed = data.modelUsed;
             fetchedSuccessfully = true;
           }
         }
       } catch (networkErr) {
-        console.info('Server chat API unreachable, activating intelligent knowledge base fallback:', networkErr);
+        console.info('Server chat API unreachable, activating intelligent agency knowledge base fallback:', networkErr);
       }
 
       // 2. If server API returned HTML/404 (e.g. static hosting) or failed, use Knowledge Engine
@@ -263,7 +268,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
       setMessages((prev) => [...prev, botMessage]);
     } catch (err: any) {
       console.warn('Gemini chat handled gracefully:', err);
-      // Emergency fallback with official contact
+      // Fallback with agency guidance
       const emergencyFallback = generateAdvisorResponse(messageContent, selectedRole, { name: currentUser?.name });
       const fallbackMsg: ChatMessageItem = {
         id: `bot-fallback-${Date.now()}`,
