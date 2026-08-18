@@ -47,6 +47,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { LoginPortalView } from './components/LoginPortalView';
 import { AuthModal } from './components/AuthModal';
 import { ApplyNowModal } from './components/ApplyNowModal';
+import { GeminiChatbot } from './components/GeminiChatbot';
 import { Footer } from './components/Footer';
 
 // Firebase & Auth imports
@@ -61,7 +62,7 @@ import {
   saveInquiryToFirestore 
 } from './lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { Lock, User, MessageCircle } from 'lucide-react';
+import { Lock, User, MessageCircle, Sparkles, Bot } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('home');
@@ -72,6 +73,7 @@ export default function App() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalPortal, setAuthModalPortal] = useState<'student' | 'counselor' | 'admin'>('student');
   const [applyModalOpen, setApplyModalOpen] = useState(false);
+  const [geminiFloatingOpen, setGeminiFloatingOpen] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   // Dynamic state store
@@ -193,6 +195,8 @@ export default function App() {
         window.history.replaceState({}, '', '/courses');
       } else if (path === '/courses') {
         setActiveTab('courses');
+      } else if (path === '/ai-advisor' || path === '/advisor' || path === '/gemini' || path === '/chat') {
+        setActiveTab('ai-advisor');
       } else if (path === '/testimonials') {
         setActiveTab('testimonials');
       } else if (path === '/blog') {
@@ -226,6 +230,7 @@ export default function App() {
       'universities': 'Course & Degree Programs | Fresh Study India',
       'courses': 'Course Database - B.Tech, MBBS, MBA, BSc, MCA in India | Fresh Study India',
       'scholarships': 'Course Database & Financial Planning | Fresh Study India',
+      'ai-advisor': 'Gemini AI Admissions & Scholarship Advisor | Fresh Study India',
       'gallery': 'Campus Life & Campus Gallery | Study in India Experience',
       'testimonials': 'Student Success Stories & Verified Alumni Reviews | Fresh Study India',
       'blog': 'Study in India Blog - Visa Guidance, Entrance Exams & Admission Advice',
@@ -599,6 +604,32 @@ export default function App() {
           />
         )}
 
+        {activeTab === 'ai-advisor' && (
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-emerald-900/40">
+              <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative z-10 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-bold mb-3">
+                  <Sparkles className="w-3.5 h-3.5" /> Next-Generation Gemini Intelligence
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mb-2">
+                  Interactive AI Admissions & Scholarship Advisor
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  Ask our specialized multi-agent AI system anything regarding Indian university eligibility, tuition cost breakdowns, 50-100% scholarship evaluation, FRRO police registration, and visa documentation.
+                </p>
+              </div>
+            </div>
+
+            <div className="h-[680px]">
+              <GeminiChatbot
+                currentUser={userProfile}
+                onOpenApplyModal={() => setApplyModalOpen(true)}
+              />
+            </div>
+          </div>
+        )}
+
         {activeTab === 'gallery' && (
           <GalleryView />
         )}
@@ -771,20 +802,53 @@ export default function App() {
         setActiveTab={setActiveTab}
       />
 
-      {/* Floating WhatsApp Quick Chat Badge */}
-      <a
-        href="https://wa.me/231889425645?text=Hello%20Fresh%20Study%20India%20Counselor,%20I%20would%20like%20to%20inquire%20about%20university%20admissions%20and%20scholarships."
-        target="_blank"
-        rel="noreferrer"
-        className="fixed bottom-6 right-6 z-40 bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-4 py-3 rounded-full shadow-2xl flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95 group border-2 border-white/20"
-        title="Chat live on WhatsApp with Fresh Study India (+231 889425645)"
-      >
-        <div className="relative">
-          <MessageCircle className="w-5 h-5 fill-white text-emerald-500" />
-          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-white rounded-full animate-ping"></span>
-        </div>
-        <span className="text-xs font-extrabold hidden sm:inline-block tracking-tight">WhatsApp Helpdesk</span>
-      </a>
+      {/* Floating Action Controls */}
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col sm:flex-row items-end sm:items-center gap-3">
+        {/* Floating Gemini AI Chatbot Trigger */}
+        <button
+          type="button"
+          onClick={() => setGeminiFloatingOpen(!geminiFloatingOpen)}
+          className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-3 rounded-full shadow-2xl flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95 group border-2 border-emerald-500/40 cursor-pointer"
+          title="Ask Gemini AI Admissions Advisor"
+        >
+          <div className="relative">
+            <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+              <Bot className="w-3.5 h-3.5 text-slate-950 font-bold" />
+            </div>
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
+          </div>
+          <span className="text-xs font-extrabold flex items-center gap-1 tracking-tight">
+            AI Advisor <Sparkles className="w-3 h-3 text-emerald-400" />
+          </span>
+        </button>
+
+        {/* Floating WhatsApp Quick Chat Badge */}
+        <a
+          href="https://wa.me/231889425645?text=Hello%20Fresh%20Study%20India%20Counselor,%20I%20would%20like%20to%20inquire%20about%20university%20admissions%20and%20scholarships."
+          target="_blank"
+          rel="noreferrer"
+          className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-4 py-3 rounded-full shadow-2xl flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95 group border-2 border-white/20"
+          title="Chat live on WhatsApp with Fresh Study India (+231 889425645)"
+        >
+          <div className="relative">
+            <MessageCircle className="w-5 h-5 fill-white text-emerald-500" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-white rounded-full animate-ping"></span>
+          </div>
+          <span className="text-xs font-extrabold hidden sm:inline-block tracking-tight">WhatsApp Desk</span>
+        </a>
+      </div>
+
+      {/* Floating Gemini Chatbot Component */}
+      <GeminiChatbot
+        currentUser={userProfile}
+        onOpenApplyModal={() => {
+          setGeminiFloatingOpen(false);
+          setApplyModalOpen(true);
+        }}
+        isFloatingWidget={true}
+        isOpenFloating={geminiFloatingOpen}
+        onCloseFloating={() => setGeminiFloatingOpen(false)}
+      />
     </div>
   );
 }

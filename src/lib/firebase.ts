@@ -3,6 +3,8 @@ import {
   getAuth, 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
+  signInWithPopup,
+  GoogleAuthProvider,
   sendEmailVerification, 
   sendPasswordResetEmail, 
   signOut, 
@@ -180,6 +182,46 @@ export const loginWithFirebase = async (email: string, password: string) => {
       id: user.uid,
       name: user.displayName || email.split('@')[0],
       email: user.email || email,
+      role: role,
+      targetCountry: 'India',
+      createdAt: new Date().toISOString()
+    };
+    await setDoc(userDocRef, profile, { merge: true });
+  }
+
+  return { user, profile };
+};
+
+// 2b. Sign In with Google
+export const loginWithGoogle = async (targetRole: UserRole = 'student') => {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  const userCredential = await signInWithPopup(auth, provider);
+  const user = userCredential.user;
+
+  // Check if profile exists in Firestore
+  const userDocRef = doc(db, 'users', user.uid);
+  const userDoc = await getDoc(userDocRef);
+
+  let profile: UserProfile;
+  if (userDoc.exists()) {
+    profile = userDoc.data() as UserProfile;
+  } else {
+    // Determine initial role
+    let role: UserRole = targetRole;
+    const emailLower = (user.email || '').toLowerCase();
+    if (emailLower.includes('superadmin')) {
+      role = 'superadmin';
+    } else if (emailLower.includes('admin')) {
+      role = 'admin';
+    } else if (emailLower.includes('counselor')) {
+      role = 'counselor';
+    }
+
+    profile = {
+      id: user.uid,
+      name: user.displayName || user.email?.split('@')[0] || 'Student',
+      email: user.email || '',
       role: role,
       targetCountry: 'India',
       createdAt: new Date().toISOString()

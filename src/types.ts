@@ -3,6 +3,7 @@ export type ActiveTab =
   | 'universities' 
   | 'courses' 
   | 'scholarships' 
+  | 'ai-advisor'
   | 'testimonials' 
   | 'blog' 
   | 'gallery'

@@ -52,8 +52,9 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
   };
 
-  const navLinks: { label: string; tab: ActiveTab }[] = [
+  const navLinks: { label: string; tab: ActiveTab; highlight?: boolean }[] = [
     { label: 'Home', tab: 'home' },
+    { label: 'AI Advisor', tab: 'ai-advisor', highlight: true },
     { label: 'Courses', tab: 'courses' },
     { label: 'Gmail Desk', tab: 'gmail' },
     { label: 'Gallery', tab: 'gallery' },
@@ -145,13 +146,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               key={link.tab}
               onClick={() => setActiveTab(link.tab)}
-              className={`transition-colors duration-150 relative py-1 cursor-pointer ${
+              className={`transition-colors duration-150 relative py-1 flex items-center gap-1.5 cursor-pointer ${
                 isActive 
                   ? 'text-emerald-600 dark:text-emerald-400 font-bold' 
                   : 'hover:text-slate-900 dark:hover:text-white text-slate-600 dark:text-slate-300'
               }`}
             >
-              {link.label}
+              {link.highlight && <Sparkles className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />}
+              <span>{link.label}</span>
               {isActive && (
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full" />
               )}

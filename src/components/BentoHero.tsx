@@ -302,6 +302,14 @@ export const BentoHero: React.FC<BentoHeroProps> = ({ setActiveTab, openApplyMod
                     Apply for 2025/2026 Intake
                   </button>
                 )}
+
+                <button
+                  onClick={() => { setActiveTab('ai-advisor'); window.history.pushState({}, '', '/ai-advisor'); }}
+                  className="px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-900/30 flex items-center gap-2 text-sm cursor-pointer hover:scale-[1.02] active:scale-[0.98] border border-emerald-400/30"
+                >
+                  <Sparkles className="w-4 h-4 text-emerald-200" />
+                  Ask AI Advisor (Gemini)
+                </button>
                 
                 <button
                   onClick={() => setActiveTab('contact')}
