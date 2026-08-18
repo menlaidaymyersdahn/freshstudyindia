@@ -1,6 +1,6 @@
 {
   "name": "Fresh Study India",
-  "description": "Premier education consultancy platform for Fresh Study India providing end-to-end academic admissions, visa filing, airport pickup, accommodation, FRRO registration, and student support.",
+  "description": "Premium international student recruitment and education consultancy helping students from Africa and other international destinations study in India.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
