@@ -31,7 +31,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication }) => {
             }
           }}
           alt="International Students Graduation Convocation Ceremony in India"
-          className="w-full h-full object-cover object-center scale-105 opacity-60 sm:opacity-65 transition-transform duration-1000"
+          className="w-full h-full object-cover object-[center_28%] sm:object-[center_35%] md:object-center scale-105 opacity-60 sm:opacity-65 transition-transform duration-1000"
         />
         {/* Optical Duotone & Legibility Scrims */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#071322]/95 via-[#071322]/85 to-[#071322]/70 sm:to-[#071322]/60" />

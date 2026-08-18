@@ -109,12 +109,43 @@ select:-webkit-autofill:focus {
   color: #102A43 !important;
 }
 
+/* Fade In and Slide Up Keyframe Animations */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
 /* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   .animate-float-slow,
   .animate-float-reverse,
   .animate-float-gentle,
-  .animate-pulse-glow {
+  .animate-pulse-glow,
+  .animate-fade-in-up,
+  .animate-fade-in {
     animation: none !important;
   }
 }

@@ -115,7 +115,7 @@ export const WhyUs: React.FC<WhyUsProps> = ({ onOpenApplication }) => {
                     }
                   }}
                   alt="Real International Students Convocation in India"
-                  className="w-full h-full object-cover object-[center_35%] group-hover:scale-103 transition-transform duration-700"
+                  className="w-full h-full object-cover object-[center_28%] sm:object-[center_35%] md:object-center group-hover:scale-103 transition-transform duration-700"
                 />
 
                 {/* Gradient and Badge Overlay */}

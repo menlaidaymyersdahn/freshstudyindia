@@ -13,9 +13,9 @@ export const FutureHeroBanner: React.FC<FutureHeroBannerProps> = ({ onOpenApplic
         {/* Full-Width Visual Showcase Card with Rounded Corners & Subtly Filtered Real Photo */}
         <div 
           id="future-starts-here"
-          className="relative min-h-[520px] sm:min-h-[600px] lg:min-h-[660px] rounded-3xl sm:rounded-[2.5rem] overflow-hidden shadow-2xl border border-slate-200/80 flex items-center justify-center text-center p-6 sm:p-12 lg:p-16 group transition-all duration-700"
+          className="relative min-h-[560px] sm:min-h-[620px] md:min-h-[680px] lg:min-h-[720px] rounded-3xl sm:rounded-[2.5rem] overflow-hidden shadow-2xl border border-slate-200/80 flex items-center justify-center text-center p-6 sm:p-12 lg:p-16 group transition-all duration-700"
         >
-          {/* 1. Real Uploaded Graduation Photo as Full-Cover Background */}
+          {/* 1. Real Uploaded Graduation Photo as Full-Cover Background with Optimized Subject Centering */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
             <img
               src="/DSC_9367.jpeg"
@@ -26,11 +26,11 @@ export const FutureHeroBanner: React.FC<FutureHeroBannerProps> = ({ onOpenApplic
                 }
               }}
               alt="International Students in Graduation Robes at Indian University Convocation"
-              className="w-full h-full object-cover object-[center_35%] sm:object-center transform scale-100 group-hover:scale-102 transition-transform duration-1000 ease-out"
+              className="w-full h-full object-cover object-[center_28%] sm:object-[center_35%] md:object-center transform scale-100 group-hover:scale-102 transition-transform duration-1000 ease-out"
             />
             
             {/* 2. Subtle Dark Navy Overlay for optimal contrast & text legibility while keeping students clearly visible */}
-            <div className="absolute inset-0 bg-[#071322]/65 sm:bg-[#071322]/55 transition-colors duration-500" />
+            <div className="absolute inset-0 bg-[#071322]/70 sm:bg-[#071322]/55 transition-colors duration-500" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#071322]/95 via-[#071322]/40 to-[#071322]/70" />
             <div className="absolute inset-0 bg-radial-[at_center_center] from-transparent via-[#071322]/30 to-[#071322]/85" />
           </div>

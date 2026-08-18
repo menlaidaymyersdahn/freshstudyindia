@@ -228,7 +228,7 @@ export const AdmissionsPortal: React.FC<AdmissionsPortalProps> = ({ isOpen, onCl
       setPasscode('');
       setIsAuthenticating(false);
     } else {
-      setAuthError('Invalid passcode. Please enter counselor passkey (e.g. fresh2026)');
+      setAuthError('Invalid passkey. Please enter your authorized staff credentials.');
       setIsAuthenticating(false);
     }
   };
@@ -717,7 +717,7 @@ export const AdmissionsPortal: React.FC<AdmissionsPortalProps> = ({ isOpen, onCl
                   <input
                     type="password"
                     required
-                    placeholder="Enter passkey (e.g. fresh2026)"
+                    placeholder="Enter staff passkey"
                     value={passcode}
                     onChange={(e) => setPasscode(e.target.value)}
                     className="w-full px-4 py-3.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none text-sm text-white font-mono placeholder:text-slate-600 transition"
@@ -739,12 +739,6 @@ export const AdmissionsPortal: React.FC<AdmissionsPortalProps> = ({ isOpen, onCl
                 >
                   {isAuthenticating ? 'Authorizing Access...' : 'Unlock Admissions Portal'}
                 </button>
-
-                <div className="pt-2 text-center">
-                  <p className="text-[11px] text-slate-500">
-                    Demo Counselor Key: <span className="font-mono text-sky-400 font-bold">fresh2026</span>
-                  </p>
-                </div>
               </form>
             </div>
           </div>

@@ -16,6 +16,7 @@ import { PrivacyModal } from './components/PrivacyModal';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { ShareModal } from './components/ShareModal';
 import { AdmissionsPortal } from './components/AdmissionsPortal';
+import { ScrollReveal } from './components/ScrollReveal';
 import { useDynamicSEO } from './hooks/useDynamicSEO';
 
 export function App() {
@@ -56,36 +57,54 @@ export function App() {
       />
 
       {/* Main Page Flow */}
-      <main>
+      <main className="overflow-hidden">
         {/* 1. Visually Powerful Hero Section */}
         <Hero onOpenApplication={() => handleOpenApplication()} />
 
         {/* 2. Visual Convocation Feature Section: YOUR FUTURE STARTS HERE */}
-        <FutureHeroBanner onOpenApplication={() => handleOpenApplication()} />
+        <ScrollReveal>
+          <FutureHeroBanner onOpenApplication={() => handleOpenApplication()} />
+        </ScrollReveal>
 
         {/* 3. Quick Trust Bar */}
-        <TrustBar />
+        <ScrollReveal delay={50}>
+          <TrustBar />
+        </ScrollReveal>
 
-        {/* 3. The Journey (From Home to Campus) */}
-        <JourneyTimeline onOpenApplication={(step) => handleOpenApplication(step ? `Stage: ${step}` : undefined)} />
+        {/* 4. The Journey (From Home to Campus) */}
+        <ScrollReveal delay={50}>
+          <JourneyTimeline onOpenApplication={(step) => handleOpenApplication(step ? `Stage: ${step}` : undefined)} />
+        </ScrollReveal>
 
-        {/* 4. What We Actually Help With (4 Large Visual Services) */}
-        <ServicesGrid onOpenApplication={(service) => handleOpenApplication(service)} />
+        {/* 5. What We Actually Help With (4 Large Visual Services) */}
+        <ScrollReveal delay={50}>
+          <ServicesGrid onOpenApplication={(service) => handleOpenApplication(service)} />
+        </ScrollReveal>
 
-        {/* 5. Why Fresh Study India (Deep Navy High-Contrast Section) */}
-        <WhyUs onOpenApplication={() => handleOpenApplication()} />
+        {/* 6. Why Fresh Study India (Deep Navy High-Contrast Section) */}
+        <ScrollReveal delay={50}>
+          <WhyUs onOpenApplication={() => handleOpenApplication()} />
+        </ScrollReveal>
 
-        {/* 6. Africa -> India Route Section */}
-        <AfricaToIndia onOpenApplication={() => handleOpenApplication()} />
+        {/* 7. Africa -> India Route Section */}
+        <ScrollReveal delay={50}>
+          <AfricaToIndia onOpenApplication={() => handleOpenApplication()} />
+        </ScrollReveal>
 
-        {/* 7. Featured Study Options (Interactive Stream Picker) */}
-        <StudyOptions onSelectOption={(field) => handleOpenApplication(field)} />
+        {/* 8. Featured Study Options (Interactive Stream Picker) */}
+        <ScrollReveal delay={50}>
+          <StudyOptions onSelectOption={(field) => handleOpenApplication(field)} />
+        </ScrollReveal>
 
-        {/* 8. The Big Call to Action */}
-        <BigCTA onOpenApplication={() => handleOpenApplication()} />
+        {/* 9. The Big Call to Action */}
+        <ScrollReveal delay={50}>
+          <BigCTA onOpenApplication={() => handleOpenApplication()} />
+        </ScrollReveal>
 
-        {/* 9. Direct Contact & Enquiry Section */}
-        <ContactSection />
+        {/* 10. Direct Contact & Enquiry Section */}
+        <ScrollReveal delay={50}>
+          <ContactSection />
+        </ScrollReveal>
       </main>
 
       {/* Footer */}
