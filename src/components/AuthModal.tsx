@@ -190,10 +190,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         onClose();
       }, 1000);
     } catch (err: any) {
-      console.error('Google Sign-In Error:', err);
-      if (err.code === 'auth/popup-closed-by-user') {
-        setError('Sign-in cancelled. Please try again.');
+      if (err?.code === 'auth/popup-closed-by-user' || err?.code === 'auth/cancelled-popup-request') {
+        setError('Sign-in cancelled or popup closed. Please click below to try again.');
+      } else if (err?.code === 'auth/popup-blocked') {
+        setError('Google sign-in popup was blocked by your browser. Please allow popups for this site.');
       } else {
+        console.warn('Google Sign-In note:', err?.message || err);
         setError(err.message || 'Google sign-in failed. Please try standard login.');
       }
     } finally {

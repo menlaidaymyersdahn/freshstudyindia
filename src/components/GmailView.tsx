@@ -103,8 +103,13 @@ export const GmailView: React.FC<GmailViewProps> = ({ userProfile, onConnectSucc
       }
       await loadInbox(result.accessToken, 'INBOX', null);
     } catch (err: any) {
-      console.error('Sign-in failure:', err);
-      setAuthError(err.message || 'Unable to connect to Google Account. Please check browser popups and try again.');
+      if (err?.code === 'auth/popup-closed-by-user' || err?.code === 'auth/cancelled-popup-request') {
+        setAuthError('Sign-in popup was closed before completing authorization. Click "Connect Gmail Account" to try again.');
+      } else if (err?.code === 'auth/popup-blocked') {
+        setAuthError('Popup was blocked by your browser. Please allow popups for this site or open in a new browser tab.');
+      } else {
+        setAuthError(err?.message || 'Unable to connect to Google Account. Please check browser popups and try again.');
+      }
     } finally {
       setIsAuthenticating(false);
     }

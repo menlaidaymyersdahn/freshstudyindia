@@ -90,7 +90,11 @@ export const signInWithGoogleGmail = async (): Promise<{ user: FirebaseUser; acc
 
     return { user, accessToken: cachedGmailAccessToken, profile };
   } catch (error: any) {
-    console.error('Google Sign In Error with Gmail:', error);
+    if (error?.code === 'auth/popup-closed-by-user' || error?.code === 'auth/cancelled-popup-request') {
+      console.info('Google Sign-in popup was closed by user.');
+    } else {
+      console.warn('Google Sign In with Gmail note:', error?.message || error);
+    }
     throw error;
   } finally {
     isSigningIn = false;
