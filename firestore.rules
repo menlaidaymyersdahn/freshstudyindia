@@ -108,5 +108,13 @@ service cloud.firestore {
       allow read: if true;
       allow create, update, delete: if isAdmin();
     }
+
+    // Community & Campus Student Photo Gallery (Public forever)
+    match /communityPhotos/{photoId} {
+      allow read: if true; // Publicly viewable by all visitors forever
+      allow create: if true; // Public / student / admissions photo upload
+      allow update: if true; // Like counter or approval status update
+      allow delete: if isAdmin();
+    }
   }
 }

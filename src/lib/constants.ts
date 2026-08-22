@@ -11,7 +11,8 @@ export const BRAND = {
       phoneDisplay: '+91 9201330946',
       phoneRaw: '+919201330946',
       whatsappNumber: '919201330946',
-      label: 'Headquarters & Student Support'
+      label: 'Headquarters & Student Support',
+      address: 'University Partner Liaison & Student Arrival Desk, India'
     },
     liberia: {
       country: 'Liberia',
@@ -19,7 +20,8 @@ export const BRAND = {
       phoneDisplay: '+231 889425645',
       phoneRaw: '+231889425645',
       whatsappNumber: '231889425645',
-      label: 'West Africa Admissions Desk'
+      label: 'West Africa Admissions Desk',
+      address: 'Monrovia Admissions Consultation Desk, Liberia'
     }
   }
 };

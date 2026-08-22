@@ -69,9 +69,33 @@
         "createdAt": { "type": "string" }
       },
       "required": ["name", "phone", "message"]
+    },
+    "communityPhotos": {
+      "title": "Community Photos",
+      "description": "Student life, campus moments, graduations, arrivals, and admissions gallery photos",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "caption": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "uploaderName": { "type": "string" },
+        "uploaderRole": { "type": "string" },
+        "country": { "type": "string" },
+        "category": { "type": "string" },
+        "university": { "type": "string" },
+        "likesCount": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "isApproved": { "type": "boolean" }
+      },
+      "required": ["id", "imageUrl", "uploaderName", "category"]
     }
   },
   "firestore": {
+    "/communityPhotos/{photoId}": {
+      "schema": { "$ref": "#/entities/communityPhotos" },
+      "description": "Public student and campus photo gallery viewable by all visitors"
+    },
     "/applications/{appId}": {
       "schema": { "$ref": "#/entities/applications" },
       "description": "University admission applications submitted by students"

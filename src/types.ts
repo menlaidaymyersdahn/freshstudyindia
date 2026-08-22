@@ -70,3 +70,30 @@ export interface StudyOptionDetail {
   degreeTypes: string[];
 }
 
+export type PhotoCategory =
+  | 'All'
+  | 'Campus Life'
+  | 'Graduation & Success'
+  | 'Labs & Classrooms'
+  | 'Arrivals & Orientation'
+  | 'Hostel & Dining'
+  | 'Admissions Desks';
+
+export interface CommunityPhoto {
+  id: string;
+  title: string;
+  caption?: string;
+  imageUrl: string;
+  uploaderName: string;
+  uploaderRole: 'Student' | 'Alumni' | 'Admissions Team' | 'Parent' | 'Visitor';
+  country: string;
+  category: string;
+  university?: string;
+  city?: string;
+  likesCount: number;
+  likedBy?: string[];
+  createdAt: string;
+  isApproved?: boolean;
+  featured?: boolean;
+}
+

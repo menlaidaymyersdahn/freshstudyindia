@@ -1,132 +1,134 @@
 import React from 'react';
 import { 
   ShieldCheck, 
-  Building2, 
-  MapPin, 
-  PhoneCall, 
   CheckCircle2, 
-  Award,
-  Sparkles,
-  ArrowRight,
-  Clock,
-  HeartHandshake
+  XCircle, 
+  ArrowRight, 
+  Sparkles, 
+  Wallet, 
+  PhoneCall, 
+  Building2, 
+  Users,
+  Award
 } from 'lucide-react';
-import { BRAND, getWhatsAppLink } from '../lib/constants';
+import { getWhatsAppLink } from '../lib/constants';
 
 interface WhyUsProps {
   onOpenApplication: () => void;
 }
 
 export const WhyUs: React.FC<WhyUsProps> = ({ onOpenApplication }) => {
-  const pillars = [
+  const comparisons = [
     {
-      icon: <Building2 className="w-6 h-6 text-sky-400" />,
-      tag: 'University Liaison',
-      title: 'Direct University Representation',
-      desc: 'We do not pass your application through layers of commission agents. We work directly with recognized registrars in India, ensuring your admission letter is genuine and verifiable.'
+      feature: 'Tuition Fee Payment',
+      freshStudy: 'Direct student payment to accredited university bank account with official receipts',
+      unverified: 'Demands personal cash or third-party agent accounts with huge secret markups',
+      icon: <Wallet className="w-4 h-4 text-emerald-600" />
     },
     {
-      icon: <ShieldCheck className="w-6 h-6 text-rose-400" />,
-      tag: 'Full Transparency',
-      title: 'No Hidden or Secret Fees',
-      desc: 'All tuition fees are paid directly to the university official account. We maintain 100% financial clarity so students and parents are never surprised by arbitrary charges.'
+      feature: 'Admission & Bonafide Letter',
+      freshStudy: 'Issued directly by university registrar with verifiable accreditation numbers',
+      unverified: 'Fabricated or unaccredited college letters rejected by Indian embassies',
+      icon: <Building2 className="w-4 h-4 text-rose-600" />
     },
     {
-      icon: <MapPin className="w-6 h-6 text-emerald-400" />,
-      tag: 'India Ground Presence',
-      title: 'Real On-Ground Support in India',
-      desc: 'Most consultancies disappear once your flight takes off. We maintain dedicated advisors stationed in India who meet you at the airport and assist with housing, food, and local settling.'
+      feature: 'Dual Physical Desks',
+      freshStudy: 'Dedicated admissions offices in Monrovia, Liberia 🇱🇷 and India 🇮🇳 for total student safety',
+      unverified: 'Anonymous online agents who vanish once money is transferred',
+      icon: <Users className="w-4 h-4 text-blue-600" />
+    },
+    {
+      feature: 'Airport & FRRO Settlement',
+      freshStudy: 'Met directly at Indian airport, transported to campus hostel, assisted with SIM & FRRO',
+      unverified: 'Student stranded alone at airport with no local contacts or accommodation',
+      icon: <ShieldCheck className="w-4 h-4 text-purple-600" />
     }
   ];
 
   return (
-    <section id="about" className="py-24 sm:py-32 bg-[#060F1E] text-white relative overflow-hidden">
-      {/* Background Decorative Mesh & Red/Blue Glows */}
-      <div className="absolute inset-0 pointer-events-none select-none">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[300px] bg-blue-600/12 blur-[140px] rounded-full" />
-        <div className="absolute bottom-10 right-1/4 w-[500px] h-[300px] bg-rose-600/12 blur-[140px] rounded-full" />
-      </div>
+    <section className="py-24 sm:py-32 bg-[#F8FAFD] text-slate-900 relative overflow-hidden bg-grid-dense">
+      
+      {/* Ambient background glow */}
+      <div className="absolute top-1/4 right-0 w-96 h-96 bg-red-400/5 blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
         
         {/* Section Header */}
         <div className="max-w-3xl mb-16 sm:mb-20">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-bold uppercase tracking-wider mb-4">
-            <Award className="w-3.5 h-3.5" />
-            <span>Why Choose Fresh Study India</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-red-200 text-rose-700 text-xs font-bold uppercase tracking-wider mb-5 shadow-xs">
+            <ShieldCheck className="w-3.5 h-3.5 text-rose-600" />
+            <span>Honest Admissions</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-            TRUSTED ADMISSIONS ADVISORY.
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-rose-300 to-sky-400">
-              ZERO FALSE PROMISES.
-            </span>
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.05]">
+            ZERO FALSE PROMISES.
           </h2>
 
-          <p className="mt-4 text-base sm:text-lg text-slate-300 font-normal leading-relaxed">
-            International education is a life-changing investment. We protect students and families with truthful guidance, genuine accreditations, and real support in India.
+          <p className="mt-5 text-base sm:text-lg text-slate-600 font-normal leading-relaxed">
+            International education is an important investment for you and your family. Here is how Fresh Study India guarantees transparency and integrity.
           </p>
         </div>
 
-        {/* 3 Large Value Pillars */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {pillars.map((pillar, idx) => (
-            <div 
-              key={idx}
-              className="bg-white/[0.04] rounded-3xl p-8 border border-white/10 hover:border-red-400/40 hover:bg-white/[0.07] transition-all duration-300 flex flex-col justify-between group shadow-xl"
-            >
-              <div>
-                <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
-                  {pillar.icon}
+        {/* Comparison Table / Cards */}
+        <div className="rounded-3xl bg-white border border-sky-100 p-6 sm:p-10 shadow-lg space-y-6">
+          
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 pb-4 border-b border-slate-100 text-xs font-mono font-bold uppercase text-slate-500">
+            <div className="md:col-span-4">Admission Pillar</div>
+            <div className="md:col-span-4 text-emerald-700">Fresh Study India Standard</div>
+            <div className="md:col-span-4 text-rose-700">Unverified Agents</div>
+          </div>
+
+          <div className="space-y-4">
+            {comparisons.map((item, idx) => (
+              <div
+                key={idx}
+                className="grid grid-cols-1 md:grid-cols-12 gap-4 p-5 rounded-2xl bg-slate-50/70 border border-slate-100 hover:border-slate-200 transition items-center"
+              >
+                {/* Feature Title */}
+                <div className="md:col-span-4 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-white border border-slate-200/80 flex items-center justify-center shrink-0 shadow-xs">
+                    {item.icon}
+                  </div>
+                  <span className="text-sm font-extrabold text-slate-900">{item.feature}</span>
                 </div>
 
-                <span className="text-[11px] font-mono font-bold text-rose-400 uppercase tracking-wide block mb-2">
-                  {pillar.tag}
-                </span>
+                {/* Fresh Study India (Positive) */}
+                <div className="md:col-span-4 flex items-start gap-2.5 p-3 rounded-xl bg-emerald-50/70 border border-emerald-200/60">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span className="text-xs text-emerald-950 font-medium leading-relaxed">
+                    {item.freshStudy}
+                  </span>
+                </div>
 
-                <h3 className="text-xl font-bold text-white tracking-tight mb-3">
-                  {pillar.title}
-                </h3>
-
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  {pillar.desc}
-                </p>
+                {/* Unverified Agents (Negative) */}
+                <div className="md:col-span-4 flex items-start gap-2.5 p-3 rounded-xl bg-rose-50/70 border border-red-200/60">
+                  <XCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                  <span className="text-xs text-rose-950 font-medium leading-relaxed">
+                    {item.unverified}
+                  </span>
+                </div>
               </div>
+            ))}
+          </div>
 
-              <div className="pt-6 mt-6 border-t border-white/10 flex items-center gap-2 text-xs font-bold text-sky-400 group-hover:text-rose-300 transition-colors">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>Verified Fresh Study Guarantee</span>
-              </div>
+          {/* Action Row */}
+          <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-xs text-slate-600">
+              <Award className="w-4 h-4 text-rose-600" />
+              <span>Full compliance with UGC, AICTE & Association of Indian Universities (AIU).</span>
             </div>
-          ))}
-        </div>
 
-        {/* Reassurance Banner */}
-        <div className="mt-16 p-8 rounded-3xl bg-gradient-to-r from-[#0B1E38] to-[#12233E] border border-white/15 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-2xl">
-          <div className="space-y-1 text-center lg:text-left">
-            <h4 className="text-xl font-black text-white">
-              Have questions about university fees or living costs in India?
-            </h4>
-            <p className="text-xs sm:text-sm text-slate-300">
-              Speak directly with our counselor in Monrovia, Liberia or our university liaison in India.
-            </p>
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <button
+                onClick={onOpenApplication}
+                className="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-600 to-blue-700 hover:from-red-500 hover:to-blue-600 transition flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-red-600/20"
+              >
+                <span>APPLY WITH FRESH STUDY INDIA</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <a
-              href={`tel:${BRAND.contacts.india.phoneRaw}`}
-              className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition flex items-center gap-2"
-            >
-              <span>🇮🇳 Call India: {BRAND.contacts.india.phoneDisplay}</span>
-            </a>
-
-            <a
-              href={`tel:${BRAND.contacts.liberia.phoneRaw}`}
-              className="px-5 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-md shadow-red-600/20"
-            >
-              <span>🇱🇷 Call Liberia: {BRAND.contacts.liberia.phoneDisplay}</span>
-            </a>
-          </div>
         </div>
 
       </div>

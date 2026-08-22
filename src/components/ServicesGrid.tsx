@@ -1,184 +1,153 @@
 import React from 'react';
 import { 
   Building2, 
-  FileText, 
+  FileCheck2, 
+  Stamp, 
   Plane, 
-  MapPin, 
-  ShieldCheck, 
-  CheckCircle2, 
-  ArrowRight,
-  Sparkles,
+  HelpCircle, 
+  Compass, 
+  Sparkles, 
+  ArrowRight, 
+  CheckCircle2,
   PhoneCall,
-  FileCheck2,
-  Users2,
-  HeartHandshake
+  BedDouble,
+  ShieldAlert
 } from 'lucide-react';
-import { BRAND, getWhatsAppLink } from '../lib/constants';
+import { getWhatsAppLink } from '../lib/constants';
 
 interface ServicesGridProps {
-  onOpenApplication: (presetField?: string) => void;
+  onOpenApplication: (serviceTitle?: string) => void;
 }
 
 export const ServicesGrid: React.FC<ServicesGridProps> = ({ onOpenApplication }) => {
   const services = [
     {
-      id: 'admissions',
-      badge: 'Core Service',
-      badgeColor: 'bg-blue-50 text-blue-800 border-blue-200',
-      icon: <Building2 className="w-6 h-6 text-sky-400" />,
-      iconBg: 'bg-gradient-to-br from-blue-600 to-indigo-800 text-white',
-      title: 'Direct University Admissions',
-      tagline: 'Direct registrar applications — no middlemen or fake agents.',
-      desc: 'We place students into recognized and accredited universities across India (Delhi NCR, Bangalore, Chennai, Punjab, Pune, Hyderabad, and Gujarat). We ensure you receive an official Bonafide Admission Letter directly from the registrar.',
-      features: [
-        'Accreditation Verification (UGC, AICTE, NAAC, PCI)',
-        'Tuition fee discount & scholarship negotiation',
-        'Official Bonafide & Visa eligibility letter issuance',
-        'Course selection matching career objectives'
-      ],
-      actionLabel: 'Apply for Admission',
-      whatsappContext: 'Hello, I want to learn more about Direct University Admissions in India.'
+      id: 'selection',
+      icon: <Building2 className="w-5 h-5 text-rose-600" />,
+      tag: 'Accreditation',
+      tagClass: 'bg-red-50 text-rose-700 border-red-200',
+      title: 'University & Course Selection',
+      desc: 'We match your academic background, preferred location (Bangalore, Punjab, Delhi NCR, Chennai, Pune), and budget with accredited Indian universities.',
+      actionText: 'Find Matching University'
+    },
+    {
+      id: 'bonafide',
+      icon: <FileCheck2 className="w-5 h-5 text-blue-600" />,
+      tag: 'Embassy Requirement',
+      tagClass: 'bg-blue-50 text-blue-700 border-blue-200',
+      title: 'Official Bonafide Letters',
+      desc: 'Direct processing of registrar-signed bonafide acceptance letters, scholarship certificates, and transparent fee breakdown documents.',
+      actionText: 'Request Bonafide Support'
     },
     {
       id: 'visa',
-      badge: 'Documentation',
-      badgeColor: 'bg-rose-50 text-rose-800 border-rose-200',
-      icon: <FileText className="w-6 h-6 text-rose-400" />,
-      iconBg: 'bg-gradient-to-br from-red-600 to-rose-800 text-white',
-      title: 'Indian Student Visa Assistance',
-      tagline: 'Comprehensive dossier preparation for Indian Embassy approval.',
-      desc: 'Navigating student visa requirements can be difficult. We review all your documentation, sponsorship affidavits, financial proofs, and embassy interview preparation to ensure high visa success rates.',
-      features: [
-        'Embassy document checklist & verification',
-        'Sponsorship affidavit & bank statements formatting',
-        'Visa appointment scheduling assistance',
-        'Mock student interview preparation'
-      ],
-      actionLabel: 'Get Visa Assistance',
-      whatsappContext: 'Hello, I need assistance with the Indian Student Visa documentation process.'
+      icon: <Stamp className="w-5 h-5 text-purple-600" />,
+      tag: 'Embassy Guidance',
+      tagClass: 'bg-purple-50 text-purple-700 border-purple-200',
+      title: 'Student Visa Filing Support',
+      desc: 'Comprehensive document checklist compilation, sponsor affidavits, statement of purpose (SOP) guidance, and mock embassy interview prep.',
+      actionText: 'Get Visa Assistance'
     },
     {
-      id: 'arrival',
-      badge: 'On-Ground Care',
-      badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
-      icon: <Plane className="w-6 h-6 text-indigo-400" />,
-      iconBg: 'bg-gradient-to-br from-indigo-600 to-purple-800 text-white',
-      title: 'Airport Reception & Campus Transit',
-      tagline: 'We meet you at the airport gate in India so you never feel alone.',
-      desc: 'Landing in a new country for the first time is daunting. Our dedicated team in India greets you right at international airport arrivals, transports you to your university, and settles you into your hostel.',
-      features: [
-        'Airport pickup and direct vehicle transport',
-        'Hostel room allocation and check-in support',
-        'Local Indian mobile SIM card activation',
-        'Immediate parent notification upon arrival'
-      ],
-      actionLabel: 'Learn About Arrival',
-      whatsappContext: 'Hello, what does your Airport Pickup & Arrival Support service include?'
+      id: 'airport',
+      icon: <Plane className="w-5 h-5 text-emerald-600" />,
+      tag: 'On-Ground Safety',
+      tagClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      title: 'Airport Reception & Transit',
+      desc: 'Direct meeting at the airport upon arrival in India, safe transit to your campus city, and guidance through initial orientation.',
+      actionText: 'Book Airport Arrival'
+    },
+    {
+      id: 'hostel',
+      icon: <BedDouble className="w-5 h-5 text-amber-600" />,
+      tag: 'Comfortable Living',
+      tagClass: 'bg-amber-50 text-amber-700 border-amber-200',
+      title: 'Hostel & Meal Allocation',
+      desc: 'Securing safe campus accommodation with meal options (international student friendly), Wi-Fi, 24/7 campus security, and laundry.',
+      actionText: 'View Hostel Options'
     },
     {
       id: 'frro',
-      badge: 'Legal Compliance',
-      badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-      icon: <ShieldCheck className="w-6 h-6 text-emerald-400" />,
-      iconBg: 'bg-gradient-to-br from-emerald-600 to-teal-800 text-white',
-      title: 'FRRO & Police Registration Support',
-      tagline: 'Mandatory Foreigner Regional Registration Office filing in India.',
-      desc: 'Every international student studying in India must complete formal FRRO registration within 14 days of landing. We handle the entire digital portal submission and university documentation to keep your stay 100% legal.',
-      features: [
-        'Online e-FRRO registration filing',
-        'Residential certificate Form-C completion',
-        'Student Visa extension & exit permit guidance',
-        'Full legal compliance throughout your degree'
-      ],
-      actionLabel: 'Ask About FRRO',
-      whatsappContext: 'Hello, can you explain the FRRO registration process for international students in India?'
+      icon: <ShieldAlert className="w-5 h-5 text-cyan-600" />,
+      tag: 'Mandatory Compliance',
+      tagClass: 'bg-cyan-50 text-cyan-700 border-cyan-200',
+      title: 'FRRO & Legal Registration',
+      desc: 'Assisting international students with the mandatory Foreigners Regional Registration Officer (e-FRRO) filing within the initial 14-day window.',
+      actionText: 'Learn FRRO Process'
     }
   ];
 
   return (
-    <section id="services" className="py-24 sm:py-32 bg-white relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+    <section className="py-24 sm:py-32 bg-[#FFFFFF] text-slate-900 relative overflow-hidden bg-grid-light">
+      
+      {/* Ambient background glows */}
+      <div className="absolute top-1/3 left-0 w-96 h-96 bg-red-400/5 blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 right-0 w-96 h-96 bg-blue-400/10 blur-[140px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
         
         {/* Section Header */}
         <div className="max-w-3xl mb-16 sm:mb-20">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold uppercase tracking-wider mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-            <span>Comprehensive Student Services</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200 text-rose-700 text-xs font-bold uppercase tracking-wider mb-5">
+            <Compass className="w-3.5 h-3.5 text-rose-600" />
+            <span>End-to-End Support</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#060F1E] tracking-tight leading-tight">
-            EVERYTHING YOU NEED. ALL IN ONE PLACE.
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.05]">
+            WHAT WE ACTUALLY HELP WITH.
           </h2>
 
-          <p className="mt-4 text-base sm:text-lg text-slate-600 font-normal leading-relaxed">
-            From initial university application to airport pickup and police registration in India, we deliver end-to-end student support with complete transparency.
+          <p className="mt-5 text-base sm:text-lg text-slate-600 font-normal leading-relaxed">
+            From your hometown to your Indian university dorm room, Fresh Study India provides dedicated guidance at every milestone.
           </p>
         </div>
 
-        {/* 4 Large Comprehensive Service Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {services.map((svc) => (
-            <div 
-              key={svc.id}
-              className="bg-[#F8FAFD] rounded-3xl p-8 sm:p-10 border border-slate-200 hover:border-red-300 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+        {/* 6 Grid Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+          {services.map((srv) => (
+            <div
+              key={srv.id}
+              className="group rounded-3xl bg-white hover:bg-slate-50/50 border border-sky-100 hover:border-sky-300 p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 shadow-[0_10px_30px_rgba(15,23,42,0.04)] hover:shadow-xl flex flex-col justify-between"
             >
               <div>
-                {/* Header Row: Icon and Badge */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className={`w-14 h-14 rounded-2xl ${svc.iconBg} flex items-center justify-center shadow-md group-hover:scale-105 transition-transform`}>
-                    {svc.icon}
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-center group-hover:scale-105 group-hover:border-slate-300 transition shadow-2xs">
+                    {srv.icon}
                   </div>
 
-                  <span className={`text-[11px] font-extrabold uppercase px-3 py-1 rounded-full border ${svc.badgeColor}`}>
-                    {svc.badge}
+                  <span className={`text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full border ${srv.tagClass}`}>
+                    {srv.tag}
                   </span>
                 </div>
 
-                {/* Title and Tagline */}
-                <h3 className="text-xl sm:text-2xl font-black text-[#060F1E] tracking-tight mb-2">
-                  {svc.title}
+                <h3 className="text-xl font-black text-slate-900 tracking-tight group-hover:text-blue-900 transition-colors mb-3">
+                  {srv.title}
                 </h3>
-                
-                <p className="text-xs font-bold text-rose-600 mb-4">
-                  {svc.tagline}
-                </p>
 
-                <p className="text-sm text-slate-600 leading-relaxed mb-6">
-                  {svc.desc}
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                  {srv.desc}
                 </p>
-
-                {/* Features List */}
-                <div className="space-y-2.5 mb-8 bg-white p-5 rounded-2xl border border-slate-200/80">
-                  {svc.features.map((feat, idx) => (
-                    <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-700 font-medium">
-                      <CheckCircle2 className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                      <span>{feat}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
 
-              {/* Card Actions */}
-              <div className="pt-2 flex flex-col sm:flex-row items-center gap-3 border-t border-slate-200">
+              <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
                 <button
-                  onClick={() => onOpenApplication()}
-                  className="w-full sm:w-auto px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-[#060F1E] hover:bg-red-600 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  onClick={() => onOpenApplication(srv.title)}
+                  className="text-xs font-black uppercase tracking-wider text-rose-600 hover:text-rose-700 flex items-center gap-1.5 group-hover:gap-2 transition-all cursor-pointer"
                 >
-                  <span>{svc.actionLabel}</span>
+                  <span>{srv.actionText}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
 
                 <a
-                  href={getWhatsAppLink('india', svc.whatsappContext)}
+                  href={getWhatsAppLink('india', `Hello Fresh Study India, I want to inquire about your ${srv.title} service.`)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto px-4 py-3 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 transition-colors flex items-center justify-center gap-2"
+                  className="text-[11px] font-mono text-slate-400 hover:text-emerald-600 transition"
+                  title="Direct WhatsApp"
                 >
-                  <PhoneCall className="w-3.5 h-3.5 text-sky-600" />
-                  <span>Ask a Question</span>
+                  WhatsApp →
                 </a>
               </div>
-
             </div>
           ))}
         </div>

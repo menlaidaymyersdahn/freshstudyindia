@@ -3,11 +3,11 @@ import {
   ArrowRight, 
   Sparkles, 
   GraduationCap, 
-  Building2, 
-  Plane, 
-  MessageCircle,
-  Phone,
-  ShieldCheck
+  ShieldCheck, 
+  MessageCircle, 
+  CheckCircle2,
+  FileCheck2,
+  Building2
 } from 'lucide-react';
 import { BRAND, getWhatsAppLink } from '../lib/constants';
 
@@ -17,69 +17,73 @@ interface BigCTAProps {
 
 export const BigCTA: React.FC<BigCTAProps> = ({ onOpenApplication }) => {
   return (
-    <section className="py-20 sm:py-28 bg-[#060F1E] text-white relative overflow-hidden">
-      {/* Background Decorative Mesh & Red/Blue Atmospheric Light */}
-      <div className="absolute inset-0 pointer-events-none select-none">
-        <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-[600px] h-[350px] bg-red-600/15 blur-[160px] rounded-full" />
-        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[600px] h-[350px] bg-blue-600/18 blur-[160px] rounded-full" />
-      </div>
+    <section className="py-24 sm:py-32 bg-[#F4F8FD] text-slate-900 relative overflow-hidden bg-grid-dense">
+      
+      {/* Ambient background glows */}
+      <div className="absolute top-1/2 left-1/4 w-[600px] h-[400px] bg-red-400/8 blur-[160px] pointer-events-none" />
+      <div className="absolute top-1/2 right-1/4 w-[600px] h-[400px] bg-blue-400/10 blur-[160px] pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 relative z-10 text-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
         
-        {/* Top Tag Pill */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/20 border border-red-400/40 text-rose-300 text-xs font-bold uppercase tracking-wider mb-8 shadow-lg">
-          <GraduationCap className="w-4 h-4" />
-          <span>2026 Academic Admissions Open</span>
-        </div>
+        {/* Main Banner Box */}
+        <div className="rounded-3xl bg-white border border-sky-100 p-8 sm:p-14 lg:p-16 shadow-[0_20px_60px_rgba(15,23,42,0.06)] text-center relative overflow-hidden">
+          
+          {/* Subtle Top Accent Ribbon */}
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-rose-500 to-blue-600" />
 
-        {/* Heading */}
-        <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white max-w-4xl mx-auto leading-[1.08] mb-6">
-          READY TO BUILD YOUR CAREER AT AN
-          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-rose-300 via-blue-300 to-sky-400 drop-shadow-sm">
-            ACCREDITED INDIAN UNIVERSITY?
-          </span>
-        </h2>
-
-        {/* Subtitle */}
-        <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
-          Begin your application profile today. Our counselors verify your academic documents, issue direct university bonafide letters, and guide you every step of the way.
-        </p>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto">
-          <button
-            onClick={onOpenApplication}
-            className="w-full sm:w-auto px-8 py-4.5 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-600 via-rose-600 to-blue-700 hover:from-red-500 hover:via-rose-500 hover:to-blue-600 transition-all duration-200 shadow-2xl shadow-red-600/30 hover:shadow-red-500/40 hover:-translate-y-0.5 flex items-center justify-center gap-3 cursor-pointer"
-          >
-            <span>START YOUR APPLICATION</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-
-          <a
-            href={getWhatsAppLink('india', 'Hello Fresh Study India, I want to discuss university options and tuition fees for studying in India.')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full sm:w-auto px-7 py-4.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-white/10 hover:bg-white/20 border border-white/25 hover:border-sky-400/40 backdrop-blur-md transition flex items-center justify-center gap-2.5"
-          >
-            <MessageCircle className="w-4 h-4 text-emerald-400" />
-            <span>TALK ON WHATSAPP</span>
-          </a>
-        </div>
-
-        {/* Trust Badges Underneath */}
-        <div className="mt-12 pt-8 border-t border-white/10 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs text-slate-400">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-rose-400" />
-            <span>Zero Upfront Agency Fees</span>
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200 text-rose-700 text-xs font-bold uppercase tracking-wider mb-6">
+            <Sparkles className="w-3.5 h-3.5 text-rose-600" />
+            <span>2026 Direct Admissions</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-sky-400" />
-            <span>Direct Registrar Admission Letters</span>
+
+          {/* Big Headline */}
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 max-w-4xl mx-auto leading-[1.05]">
+            TAKE THE FIRST STEP TOWARDS YOUR DEGREE IN INDIA.
+          </h2>
+
+          {/* Subtitle */}
+          <p className="mt-6 text-base sm:text-lg text-slate-600 font-normal leading-relaxed max-w-2xl mx-auto">
+            Get your academic qualifications evaluated for free, secure your official bonafide acceptance letter, and receive 100% guided visa and airport arrival support.
+          </p>
+
+          {/* Buttons */}
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              onClick={onOpenApplication}
+              className="w-full sm:w-auto px-9 py-4 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-600 via-rose-600 to-blue-700 hover:from-red-500 hover:via-rose-500 hover:to-blue-600 shadow-xl shadow-red-600/25 transition-all hover:-translate-y-1 flex items-center justify-center gap-3 cursor-pointer"
+            >
+              <span>APPLY NOW FOR 2026</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+
+            <a
+              href={getWhatsAppLink('india', 'Hello Fresh Study India, I want to talk to an advisor regarding 2026 admissions.')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto px-8 py-4 rounded-2xl text-xs sm:text-sm font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition flex items-center justify-center gap-2.5"
+            >
+              <MessageCircle className="w-4 h-4 text-emerald-600" />
+              <span>CHAT ON WHATSAPP</span>
+            </a>
           </div>
-          <div className="flex items-center gap-2">
-            <Plane className="w-4 h-4 text-emerald-400" />
-            <span>Full India Airport Reception</span>
+
+          {/* Trust Guarantees */}
+          <div className="mt-12 pt-8 border-t border-slate-100 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs text-slate-600 font-medium">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-rose-600" />
+              <span>Official Bonafide Letters</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-blue-600" />
+              <span>Direct University Tuition Payments</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>Free Academic Assessment</span>
+            </div>
           </div>
+
         </div>
 
       </div>

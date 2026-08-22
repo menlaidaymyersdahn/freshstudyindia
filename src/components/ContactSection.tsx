@@ -1,398 +1,294 @@
 import React, { useState } from 'react';
 import { 
   Phone, 
+  MapPin, 
   MessageCircle, 
   Send, 
+  Sparkles, 
   CheckCircle2, 
-  MapPin, 
   Building2, 
-  Sparkles,
-  ArrowRight,
-  ShieldCheck,
-  Globe2
+  Globe2,
+  Mail,
+  Clock
 } from 'lucide-react';
-import { BRAND, getWhatsAppLink, DEFAULT_WHATSAPP_MESSAGE } from '../lib/constants';
-import { StudentEnquiry } from '../types';
+import { BRAND, getWhatsAppLink } from '../lib/constants';
 
 export const ContactSection: React.FC = () => {
-  const [formData, setFormData] = useState<StudentEnquiry>({
+  const [formData, setFormData] = useState({
     fullName: '',
-    country: 'Liberia',
+    email: '',
     phone: '',
-    studyField: 'Computer Science',
+    country: 'Liberia',
+    program: 'Computer Science & AI',
     message: ''
   });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.fullName || !formData.phone) return;
+    setIsSubmitted(true);
 
-    setIsSubmitting(true);
-
-    const countryCode = formData.country === 'Liberia' ? 'LR' : formData.country === 'Ghana' ? 'GH' : formData.country === 'Nigeria' ? 'NG' : 'INT';
-    const trackingRef = `IND-2026-${countryCode}-${Math.floor(1000 + Math.random() * 9000)}`;
-    const newId = `enquiry_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-
-    const enquiryApplication = {
-      id: newId,
-      trackingId: trackingRef,
-      fullName: formData.fullName.trim(),
-      phone: formData.phone.trim(),
-      email: '',
-      country: formData.country,
-      studyField: formData.studyField,
-      qualification: 'Pending Verification (Web Direct Enquiry)',
-      status: 'NEW',
-      documents: [],
-      notes: [
-        {
-          id: `note_${Date.now()}`,
-          text: formData.message ? `Student Inquiry Message: "${formData.message}"` : `Direct inquiry submitted from website homepage for ${formData.studyField}.`,
-          author: 'Website Contact Intake',
-          createdAt: new Date().toISOString()
-        }
-      ],
-      submittedAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    // 1. Try server POST
-    try {
-      await fetch('/api/applications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(enquiryApplication)
-      });
-    } catch {
-      // static host fallback
-    }
-
-    // 2. Save into persistent local storage for Admissions Portal
-    try {
-      const existing = JSON.parse(localStorage.getItem('fresh_study_submitted_applications') || '[]');
-      const filtered = existing.filter((item: any) => item.id !== enquiryApplication.id);
-      filtered.unshift(enquiryApplication);
-      localStorage.setItem('fresh_study_submitted_applications', JSON.stringify(filtered));
-      window.dispatchEvent(new CustomEvent('fresh_application_submitted'));
-    } catch {
-      // storage
-    }
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-    }, 400);
+    const message = `*NEW CONTACT INQUIRY - Fresh Study India*%0A%0A*Name:* ${encodeURIComponent(formData.fullName)}%0A*Email:* ${encodeURIComponent(formData.email)}%0A*Phone:* ${encodeURIComponent(formData.phone)}%0A*Country:* ${encodeURIComponent(formData.country)}%0A*Target Program:* ${encodeURIComponent(formData.program)}%0A*Message:* ${encodeURIComponent(formData.message || 'I would like more information on admissions.')}`;
+    
+    // Open in WhatsApp
+    window.open(`https://wa.me/${BRAND.contacts.india.phoneRaw}?text=${message}`, '_blank');
   };
 
-  const countries = [
-    'Liberia',
-    'Ghana',
-    'Nigeria',
-    'Kenya',
-    'Sierra Leone',
-    'Uganda',
-    'Tanzania',
-    'Rwanda',
-    'Zambia',
-    'Zimbabwe',
-    'Gambia',
-    'Other International'
-  ];
-
-  const studyFields = [
-    'Computer Science & IT',
-    'Business & Management (BBA/MBA)',
-    'Engineering & Technology (B.Tech)',
-    'Healthcare, Nursing & Pharmacy',
-    'Data Science & Analytics',
-    'Law & Legal Studies',
-    'Humanities, Media & Arts',
-    'Other Specialized Field'
-  ];
-
   return (
-    <section id="contact" className="py-24 sm:py-32 bg-white relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+    <section id="contact" className="py-24 sm:py-32 bg-[#FFFFFF] text-slate-900 relative overflow-hidden bg-grid-light">
+      
+      {/* Ambient background glows */}
+      <div className="absolute top-1/3 left-0 w-96 h-96 bg-red-400/5 blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 right-0 w-96 h-96 bg-blue-400/10 blur-[140px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
         
         {/* Section Header */}
         <div className="max-w-3xl mb-16 sm:mb-20">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-rose-700 text-xs font-bold uppercase tracking-wider mb-4">
-            <Phone className="w-3.5 h-3.5" />
-            <span>Direct Admissions Channels</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200 text-rose-700 text-xs font-bold uppercase tracking-wider mb-5">
+            <Phone className="w-3.5 h-3.5 text-rose-600" />
+            <span>Direct Admissions Advisory</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#060F1E] tracking-tight leading-tight">
-            LET'S TALK ABOUT YOUR FUTURE.
+
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.05]">
+            SPEAK WITH OUR COUNSELORS.
           </h2>
-          <p className="mt-4 text-base sm:text-lg text-slate-600 font-normal leading-relaxed">
-            Reach out directly via phone or WhatsApp, or fill out the short form below to receive personalized guidance from an advisor.
+
+          <p className="mt-5 text-base sm:text-lg text-slate-600 font-normal leading-relaxed">
+            Reach out directly to our Monrovia regional office or our India campus admissions team via phone, WhatsApp, or email.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        {/* 2-Column Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Left Column: Direct Phone & WhatsApp Cards */}
+          {/* Left Column: Direct Desk Contact Cards */}
           <div className="lg:col-span-5 space-y-6">
             
-            {/* India Contact Card (Royal Sapphire Blue) */}
-            <div className="bg-gradient-to-br from-[#060F1E] via-[#0B1E38] to-[#12233E] text-white rounded-3xl p-7 sm:p-8 shadow-xl border border-slate-800 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-blue-600/10 blur-[50px] pointer-events-none" />
-
-              <div className="flex items-center justify-between mb-4 relative z-10">
-                <span className="text-2xl">🇮🇳</span>
-                <span className="text-[11px] font-mono font-bold text-sky-300 uppercase tracking-wide px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/30">
-                  Headquarters
+            {/* India Desk */}
+            <div className="rounded-3xl bg-slate-50 border border-sky-100 p-6 sm:p-7 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🇮🇳</span>
+                  <div>
+                    <h3 className="text-base font-black text-slate-900 tracking-tight">
+                      India Admissions Desk
+                    </h3>
+                    <p className="text-xs font-mono text-slate-500">University Liaison & Arrival</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-mono font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded">
+                  HEADQUARTERS
                 </span>
               </div>
 
-              <h3 className="text-xl font-extrabold text-white tracking-tight relative z-10">
-                India Admissions Desk
-              </h3>
-              <p className="text-xs text-slate-300 mt-1 mb-6 relative z-10">
-                University liaison, visa document verification, and on-ground student arrivals.
-              </p>
+              <div className="space-y-2.5 text-xs text-slate-600">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200/80">
+                  <Phone className="w-4 h-4 text-blue-600 shrink-0" />
+                  <a href={`tel:${BRAND.contacts.india.phoneRaw}`} className="font-mono font-bold text-slate-900 hover:text-blue-700">
+                    {BRAND.contacts.india.phoneDisplay}
+                  </a>
+                </div>
 
-              <div className="text-2xl sm:text-3xl font-mono font-black text-sky-400 mb-6 relative z-10">
-                {BRAND.contacts.india.phoneDisplay}
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200/80">
+                  <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
+                  <span className="text-slate-700 font-medium">{BRAND.contacts.india.address}</span>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 relative z-10">
-                <a
-                  href={getWhatsAppLink('india')}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-3 px-4 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 transition shadow flex items-center justify-center gap-2"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>WhatsApp India</span>
-                </a>
-
-                <a
-                  href={`tel:${BRAND.contacts.india.phoneRaw}`}
-                  className="py-3 px-4 rounded-xl text-xs font-bold text-white bg-white/10 hover:bg-white/20 border border-white/15 transition flex items-center justify-center gap-2"
-                >
-                  <Phone className="w-4 h-4" />
-                  <span>Call India</span>
-                </a>
-              </div>
+              <a
+                href={getWhatsAppLink('india')}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold transition flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="w-4 h-4 text-emerald-600" />
+                <span>Chat with India Desk</span>
+              </a>
             </div>
 
-            {/* Liberia Contact Card (Crimson Ruby Red & Sapphire Accent) */}
-            <div className="bg-gradient-to-br from-[#060F1E] via-[#1A0B14] to-[#2A0F1E] text-white rounded-3xl p-7 sm:p-8 shadow-xl border border-red-950/50 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-red-600/10 blur-[50px] pointer-events-none" />
-
-              <div className="flex items-center justify-between mb-4 relative z-10">
-                <span className="text-2xl">🇱🇷</span>
-                <span className="text-[11px] font-mono font-bold text-rose-300 uppercase tracking-wide px-2.5 py-0.5 rounded-full bg-red-500/20 border border-red-500/30">
-                  West Africa Desk
+            {/* Liberia Desk */}
+            <div className="rounded-3xl bg-slate-50 border border-sky-100 p-6 sm:p-7 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🇱🇷</span>
+                  <div>
+                    <h3 className="text-base font-black text-slate-900 tracking-tight">
+                      Liberia & West Africa Desk
+                    </h3>
+                    <p className="text-xs font-mono text-slate-500">Student & Parent Consultations</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-mono font-bold text-rose-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded">
+                  REGIONAL DESK
                 </span>
               </div>
 
-              <h3 className="text-xl font-extrabold text-white tracking-tight relative z-10">
-                Liberia Admissions Desk
-              </h3>
-              <p className="text-xs text-slate-300 mt-1 mb-6 relative z-10">
-                Local in-person inquiries, WAEC / high school evaluations, and application guidance.
-              </p>
+              <div className="space-y-2.5 text-xs text-slate-600">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200/80">
+                  <Phone className="w-4 h-4 text-rose-600 shrink-0" />
+                  <a href={`tel:${BRAND.contacts.liberia.phoneRaw}`} className="font-mono font-bold text-slate-900 hover:text-rose-700">
+                    {BRAND.contacts.liberia.phoneDisplay}
+                  </a>
+                </div>
 
-              <div className="text-2xl sm:text-3xl font-mono font-black text-rose-400 mb-6 relative z-10">
-                {BRAND.contacts.liberia.phoneDisplay}
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200/80">
+                  <MapPin className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span className="text-slate-700 font-medium">{BRAND.contacts.liberia.address}</span>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 relative z-10">
-                <a
-                  href={getWhatsAppLink('liberia')}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-3 px-4 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 transition shadow flex items-center justify-center gap-2"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>WhatsApp Liberia</span>
-                </a>
-
-                <a
-                  href={`tel:${BRAND.contacts.liberia.phoneRaw}`}
-                  className="py-3 px-4 rounded-xl text-xs font-bold text-white bg-white/10 hover:bg-white/20 border border-white/15 transition flex items-center justify-center gap-2"
-                >
-                  <Phone className="w-4 h-4" />
-                  <span>Call Liberia</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Reassurance text */}
-            <div className="p-4 rounded-2xl bg-[#F8FAFD] border border-slate-200 text-xs text-slate-600 flex items-start gap-2.5">
-              <ShieldCheck className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-              <span>We do not require account creation or charge upfront fees to answer your initial questions.</span>
+              <a
+                href={getWhatsAppLink('liberia')}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold transition flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="w-4 h-4 text-emerald-600" />
+                <span>Chat with Liberia Desk</span>
+              </a>
             </div>
 
           </div>
 
-          {/* Right Column: Direct Contact Enquiry Form */}
-          <div className="lg:col-span-7">
-            <div className="bg-[#F8FAFD] rounded-3xl p-7 sm:p-10 border border-slate-200/90 shadow-sm">
-              
-              <div className="mb-8">
-                <h3 className="text-2xl font-black text-[#060F1E] tracking-tight">
-                  Send a Direct Enquiry
-                </h3>
-                <p className="text-sm text-slate-600 mt-1">
-                  Fill out this quick form and an advisor will contact you within 24 hours.
+          {/* Right Column: Direct Message Form */}
+          <div className="lg:col-span-7 rounded-3xl bg-white border border-sky-100 p-6 sm:p-9 shadow-lg">
+            
+            <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
+              <h3 className="text-lg font-black text-slate-900 tracking-tight">
+                Send Direct Admissions Inquiry
+              </h3>
+              <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">
+                Fast Response
+              </span>
+            </div>
+
+            {isSubmitted ? (
+              <div className="p-6 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-center space-y-3">
+                <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
+                <h4 className="text-base font-bold">Inquiry Sent to Admissions Desk</h4>
+                <p className="text-xs text-slate-600 leading-relaxed max-w-md mx-auto">
+                  Thank you. An admissions advisor has received your query and will follow up with you on WhatsApp and phone.
                 </p>
+                <button
+                  type="button"
+                  onClick={() => setIsSubmitted(false)}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold"
+                >
+                  Send Another Inquiry
+                </button>
               </div>
-
-              {isSubmitted ? (
-                <div className="bg-white rounded-2xl p-8 border border-emerald-200 text-center space-y-4 shadow-sm animate-in fade-in duration-300">
-                  <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="w-8 h-8" />
-                  </div>
-                  
-                  <h4 className="text-xl font-extrabold text-[#060F1E]">
-                    Enquiry Received!
-                  </h4>
-
-                  <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-                    Thank you, <strong className="text-slate-900">{formData.fullName}</strong>. Our admissions counselor will review your interest in <strong className="text-slate-900">{formData.studyField}</strong> and contact you at <strong className="text-slate-900">{formData.phone}</strong>.
-                  </p>
-
-                  <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <a
-                      href={getWhatsAppLink('india', `Hello Fresh Study India, I just submitted an enquiry for ${formData.fullName} (${formData.studyField}). Looking forward to connecting!`)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full sm:w-auto px-6 py-3.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 transition shadow flex items-center justify-center gap-2"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      <span>Chat Immediately on WhatsApp</span>
-                    </a>
-
-                    <button
-                      onClick={() => {
-                        setIsSubmitted(false);
-                        setFormData({
-                          fullName: '',
-                          country: 'Liberia',
-                          phone: '',
-                          studyField: 'Computer Science',
-                          message: ''
-                        });
-                      }}
-                      className="w-full sm:w-auto px-5 py-3.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition cursor-pointer"
-                    >
-                      Submit Another Enquiry
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  
-                  {/* Full Name */}
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                      Full Name <span className="text-rose-500">*</span>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      Full Name *
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Emmanuel Johnson"
+                      placeholder="e.g., Emmanuel Kollie"
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition"
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 transition placeholder:text-slate-400"
                     />
                   </div>
 
-                  {/* Two Column Row: Country & WhatsApp Phone */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    
-                    {/* Country */}
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Country <span className="text-rose-500">*</span>
-                      </label>
-                      <select
-                        value={formData.country}
-                        onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                        className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition"
-                      >
-                        {countries.map((c) => (
-                          <option key={c} value={c}>{c}</option>
-                        ))}
-                      </select>
-                    </div>
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      WhatsApp / Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="e.g., +231 88 942 5645"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 transition placeholder:text-slate-400"
+                    />
+                  </div>
+                </div>
 
-                    {/* Phone / WhatsApp */}
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        Phone / WhatsApp Number <span className="text-rose-500">*</span>
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        placeholder="e.g. +231 889425645"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition"
-                      />
-                    </div>
-
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="your.name@example.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 transition placeholder:text-slate-400"
+                    />
                   </div>
 
-                  {/* What do you want to study */}
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                      What do you want to study? <span className="text-rose-500">*</span>
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      Country of Residence
                     </label>
                     <select
-                      value={formData.studyField}
-                      onChange={(e) => setFormData({ ...formData, studyField: e.target.value })}
-                      className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition"
+                      value={formData.country}
+                      onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 transition cursor-pointer"
                     >
-                      {studyFields.map((f) => (
-                        <option key={f} value={f}>{f}</option>
-                      ))}
+                      <option value="Liberia">Liberia 🇱🇷</option>
+                      <option value="Sierra Leone">Sierra Leone 🇸🇱</option>
+                      <option value="Ghana">Ghana 🇬🇭</option>
+                      <option value="Nigeria">Nigeria 🇳🇬</option>
+                      <option value="Gambia">Gambia 🇬🇲</option>
+                      <option value="Guinea">Guinea 🇬🇳</option>
+                      <option value="Kenya">Kenya 🇰🇪</option>
+                      <option value="Other">Other Country</option>
                     </select>
                   </div>
+                </div>
 
-                  {/* Message */}
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                      Message / Questions (Optional)
-                    </label>
-                    <textarea
-                      rows={3}
-                      placeholder="Tell us about your previous education, questions about courses, or budget preferences..."
-                      value={formData.message}
-                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition resize-none"
-                    />
-                  </div>
-
-                  {/* Submit Button with Stylist Red/Blue Gradient */}
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-4 rounded-xl text-xs sm:text-sm font-extrabold uppercase tracking-wide text-white bg-gradient-to-r from-red-600 via-rose-600 to-[#060F1E] hover:from-red-500 hover:via-rose-500 hover:to-[#0B1E38] transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    Target Degree Stream
+                  </label>
+                  <select
+                    value={formData.program}
+                    onChange={(e) => setFormData({ ...formData, program: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 transition cursor-pointer"
                   >
-                    {isSubmitting ? (
-                      <span>Sending Your Enquiry...</span>
-                    ) : (
-                      <>
-                        <span>SEND ENQUIRY</span>
-                        <Send className="w-4 h-4 text-rose-200" />
-                      </>
-                    )}
-                  </button>
+                    <option value="Computer Science & AI">Computer Science & AI (B.Tech / BCA)</option>
+                    <option value="Nursing & Health Sciences">Nursing & Health Sciences (B.Sc Nursing / GNM)</option>
+                    <option value="Pharmacy">Pharmacy (B.Pharm / Pharm.D)</option>
+                    <option value="Engineering & Tech">Engineering (Mechanical / Civil / Robotics)</option>
+                    <option value="Business & MBA">Business Management (BBA / MBA)</option>
+                    <option value="Cyber Security">Cyber Security & Network Defense</option>
+                    <option value="Microbiology">Microbiology & Biotechnology</option>
+                  </select>
+                </div>
 
-                  <p className="text-[11px] text-center text-slate-500 pt-1">
-                    Your details remain private and are only used for official educational counseling.
-                  </p>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    Your Questions or Transcripts Summary
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Tell us about your WAEC/WASSCE grades or any questions regarding tuition, hostels, and visa."
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 transition placeholder:text-slate-400"
+                  />
+                </div>
 
-                </form>
-              )}
+                <button
+                  type="submit"
+                  className="w-full py-4 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-600 via-rose-600 to-blue-700 hover:from-red-500 hover:via-rose-500 hover:to-blue-600 shadow-md shadow-red-600/20 transition flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>SUBMIT INQUIRY TO ADMISSIONS DESK</span>
+                </button>
 
-            </div>
+              </form>
+            )}
+
           </div>
 
         </div>
