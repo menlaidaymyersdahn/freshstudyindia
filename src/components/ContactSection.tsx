@@ -8,7 +8,8 @@ import {
   Building2, 
   Sparkles,
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  Globe2
 } from 'lucide-react';
 import { BRAND, getWhatsAppLink, DEFAULT_WHATSAPP_MESSAGE } from '../lib/constants';
 import { StudentEnquiry } from '../types';
@@ -117,12 +118,12 @@ export const ContactSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
         
         {/* Section Header */}
-        <div className="max-w-3xl mb-16 sm:mb-20 text-center sm:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-200/70 text-sky-800 text-xs font-bold uppercase tracking-wider mb-4">
+        <div className="max-w-3xl mb-16 sm:mb-20">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-rose-700 text-xs font-bold uppercase tracking-wider mb-4">
             <Phone className="w-3.5 h-3.5" />
             <span>Direct Admissions Channels</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0B192C] tracking-tight leading-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#060F1E] tracking-tight leading-tight">
             LET'S TALK ABOUT YOUR FUTURE.
           </h2>
           <p className="mt-4 text-base sm:text-lg text-slate-600 font-normal leading-relaxed">
@@ -135,27 +136,29 @@ export const ContactSection: React.FC = () => {
           {/* Left Column: Direct Phone & WhatsApp Cards */}
           <div className="lg:col-span-5 space-y-6">
             
-            {/* India Contact Card */}
-            <div className="bg-gradient-to-br from-[#0B192C] to-[#132742] text-white rounded-3xl p-7 sm:p-8 shadow-xl border border-slate-800 relative overflow-hidden">
-              <div className="flex items-center justify-between mb-4">
+            {/* India Contact Card (Royal Sapphire Blue) */}
+            <div className="bg-gradient-to-br from-[#060F1E] via-[#0B1E38] to-[#12233E] text-white rounded-3xl p-7 sm:p-8 shadow-xl border border-slate-800 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-blue-600/10 blur-[50px] pointer-events-none" />
+
+              <div className="flex items-center justify-between mb-4 relative z-10">
                 <span className="text-2xl">🇮🇳</span>
-                <span className="text-[11px] font-mono font-bold text-sky-300 uppercase tracking-wide px-2.5 py-0.5 rounded-full bg-white/10">
+                <span className="text-[11px] font-mono font-bold text-sky-300 uppercase tracking-wide px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/30">
                   Headquarters
                 </span>
               </div>
 
-              <h3 className="text-xl font-extrabold text-white tracking-tight">
+              <h3 className="text-xl font-extrabold text-white tracking-tight relative z-10">
                 India Admissions Desk
               </h3>
-              <p className="text-xs text-slate-300 mt-1 mb-6">
+              <p className="text-xs text-slate-300 mt-1 mb-6 relative z-10">
                 University liaison, visa document verification, and on-ground student arrivals.
               </p>
 
-              <div className="text-2xl sm:text-3xl font-mono font-black text-sky-400 mb-6">
+              <div className="text-2xl sm:text-3xl font-mono font-black text-sky-400 mb-6 relative z-10">
                 {BRAND.contacts.india.phoneDisplay}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 relative z-10">
                 <a
                   href={getWhatsAppLink('india')}
                   target="_blank"
@@ -176,32 +179,34 @@ export const ContactSection: React.FC = () => {
               </div>
             </div>
 
-            {/* Liberia Contact Card */}
-            <div className="bg-gradient-to-br from-[#0B192C] to-[#132742] text-white rounded-3xl p-7 sm:p-8 shadow-xl border border-slate-800 relative overflow-hidden">
-              <div className="flex items-center justify-between mb-4">
+            {/* Liberia Contact Card (Crimson Ruby Red & Sapphire Accent) */}
+            <div className="bg-gradient-to-br from-[#060F1E] via-[#1A0B14] to-[#2A0F1E] text-white rounded-3xl p-7 sm:p-8 shadow-xl border border-red-950/50 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-40 h-40 bg-red-600/10 blur-[50px] pointer-events-none" />
+
+              <div className="flex items-center justify-between mb-4 relative z-10">
                 <span className="text-2xl">🇱🇷</span>
-                <span className="text-[11px] font-mono font-bold text-emerald-300 uppercase tracking-wide px-2.5 py-0.5 rounded-full bg-white/10">
+                <span className="text-[11px] font-mono font-bold text-rose-300 uppercase tracking-wide px-2.5 py-0.5 rounded-full bg-red-500/20 border border-red-500/30">
                   West Africa Desk
                 </span>
               </div>
 
-              <h3 className="text-xl font-extrabold text-white tracking-tight">
+              <h3 className="text-xl font-extrabold text-white tracking-tight relative z-10">
                 Liberia Admissions Desk
               </h3>
-              <p className="text-xs text-slate-300 mt-1 mb-6">
+              <p className="text-xs text-slate-300 mt-1 mb-6 relative z-10">
                 Local in-person inquiries, WAEC / high school evaluations, and application guidance.
               </p>
 
-              <div className="text-2xl sm:text-3xl font-mono font-black text-emerald-400 mb-6">
+              <div className="text-2xl sm:text-3xl font-mono font-black text-rose-400 mb-6 relative z-10">
                 {BRAND.contacts.liberia.phoneDisplay}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 relative z-10">
                 <a
                   href={getWhatsAppLink('liberia')}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-3 px-4 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 transition shadow flex items-center justify-center gap-2"
+                  className="py-3 px-4 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 transition shadow flex items-center justify-center gap-2"
                 >
                   <MessageCircle className="w-4 h-4" />
                   <span>WhatsApp Liberia</span>
@@ -218,8 +223,8 @@ export const ContactSection: React.FC = () => {
             </div>
 
             {/* Reassurance text */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-start gap-2.5">
-              <ShieldCheck className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-2xl bg-[#F8FAFD] border border-slate-200 text-xs text-slate-600 flex items-start gap-2.5">
+              <ShieldCheck className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               <span>We do not require account creation or charge upfront fees to answer your initial questions.</span>
             </div>
 
@@ -227,10 +232,10 @@ export const ContactSection: React.FC = () => {
 
           {/* Right Column: Direct Contact Enquiry Form */}
           <div className="lg:col-span-7">
-            <div className="bg-[#F8FAFC] rounded-3xl p-7 sm:p-10 border border-slate-200/90 shadow-sm">
+            <div className="bg-[#F8FAFD] rounded-3xl p-7 sm:p-10 border border-slate-200/90 shadow-sm">
               
               <div className="mb-8">
-                <h3 className="text-2xl font-black text-[#0B192C] tracking-tight">
+                <h3 className="text-2xl font-black text-[#060F1E] tracking-tight">
                   Send a Direct Enquiry
                 </h3>
                 <p className="text-sm text-slate-600 mt-1">
@@ -244,7 +249,7 @@ export const ContactSection: React.FC = () => {
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
                   
-                  <h4 className="text-xl font-extrabold text-[#0B192C]">
+                  <h4 className="text-xl font-extrabold text-[#060F1E]">
                     Enquiry Received!
                   </h4>
 
@@ -274,7 +279,7 @@ export const ContactSection: React.FC = () => {
                           message: ''
                         });
                       }}
-                      className="w-full sm:w-auto px-5 py-3.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition"
+                      className="w-full sm:w-auto px-5 py-3.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition cursor-pointer"
                     >
                       Submit Another Enquiry
                     </button>
@@ -294,7 +299,7 @@ export const ContactSection: React.FC = () => {
                       placeholder="e.g. Emmanuel Johnson"
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 focus:border-sky-600 focus:ring-2 focus:ring-sky-100 outline-none text-sm font-medium text-slate-900 transition"
+                      className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition"
                     />
                   </div>
 
@@ -309,7 +314,7 @@ export const ContactSection: React.FC = () => {
                       <select
                         value={formData.country}
                         onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                        className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 focus:border-sky-600 focus:ring-2 focus:ring-sky-100 outline-none text-sm font-medium text-slate-900 transition"
+                        className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition"
                       >
                         {countries.map((c) => (
                           <option key={c} value={c}>{c}</option>
@@ -328,7 +333,7 @@ export const ContactSection: React.FC = () => {
                         placeholder="e.g. +231 889425645"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 focus:border-sky-600 focus:ring-2 focus:ring-sky-100 outline-none text-sm font-medium text-slate-900 transition"
+                        className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition"
                       />
                     </div>
 
@@ -342,7 +347,7 @@ export const ContactSection: React.FC = () => {
                     <select
                       value={formData.studyField}
                       onChange={(e) => setFormData({ ...formData, studyField: e.target.value })}
-                      className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 focus:border-sky-600 focus:ring-2 focus:ring-sky-100 outline-none text-sm font-medium text-slate-900 transition"
+                      className="w-full px-4 py-3.5 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition"
                     >
                       {studyFields.map((f) => (
                         <option key={f} value={f}>{f}</option>
@@ -360,22 +365,22 @@ export const ContactSection: React.FC = () => {
                       placeholder="Tell us about your previous education, questions about courses, or budget preferences..."
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-sky-600 focus:ring-2 focus:ring-sky-100 outline-none text-sm font-medium text-slate-900 transition resize-none"
+                      className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition resize-none"
                     />
                   </div>
 
-                  {/* Submit Button */}
+                  {/* Submit Button with Stylist Red/Blue Gradient */}
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-4 rounded-xl text-xs sm:text-sm font-extrabold uppercase tracking-wide text-white bg-[#0B192C] hover:bg-[#1E2E48] transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+                    className="w-full py-4 rounded-xl text-xs sm:text-sm font-extrabold uppercase tracking-wide text-white bg-gradient-to-r from-red-600 via-rose-600 to-[#060F1E] hover:from-red-500 hover:via-rose-500 hover:to-[#0B1E38] transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
                   >
                     {isSubmitting ? (
                       <span>Sending Your Enquiry...</span>
                     ) : (
                       <>
                         <span>SEND ENQUIRY</span>
-                        <Send className="w-4 h-4 text-sky-400" />
+                        <Send className="w-4 h-4 text-rose-200" />
                       </>
                     )}
                   </button>

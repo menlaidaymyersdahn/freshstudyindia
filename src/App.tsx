@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
-import { FutureHeroBanner } from './components/FutureHeroBanner';
 import { TrustBar } from './components/TrustBar';
 import { JourneyTimeline } from './components/JourneyTimeline';
 import { ServicesGrid } from './components/ServicesGrid';
@@ -61,47 +60,42 @@ export function App() {
         {/* 1. Visually Powerful Hero Section */}
         <Hero onOpenApplication={() => handleOpenApplication()} />
 
-        {/* 2. Visual Convocation Feature Section: YOUR FUTURE STARTS HERE */}
-        <ScrollReveal>
-          <FutureHeroBanner onOpenApplication={() => handleOpenApplication()} />
-        </ScrollReveal>
-
-        {/* 3. Quick Trust Bar */}
+        {/* 2. Quick Trust Bar */}
         <ScrollReveal delay={50}>
           <TrustBar />
         </ScrollReveal>
 
-        {/* 4. The Journey (From Home to Campus) */}
+        {/* 3. The Journey (From Home to Campus) */}
         <ScrollReveal delay={50}>
           <JourneyTimeline onOpenApplication={(step) => handleOpenApplication(step ? `Stage: ${step}` : undefined)} />
         </ScrollReveal>
 
-        {/* 5. What We Actually Help With (4 Large Visual Services) */}
+        {/* 4. What We Actually Help With (4 Large Visual Services) */}
         <ScrollReveal delay={50}>
           <ServicesGrid onOpenApplication={(service) => handleOpenApplication(service)} />
         </ScrollReveal>
 
-        {/* 6. Why Fresh Study India (Deep Navy High-Contrast Section) */}
+        {/* 5. Why Fresh Study India (Deep Navy High-Contrast Section) */}
         <ScrollReveal delay={50}>
           <WhyUs onOpenApplication={() => handleOpenApplication()} />
         </ScrollReveal>
 
-        {/* 7. Africa -> India Route Section */}
+        {/* 6. Africa -> India Route Section */}
         <ScrollReveal delay={50}>
           <AfricaToIndia onOpenApplication={() => handleOpenApplication()} />
         </ScrollReveal>
 
-        {/* 8. Featured Study Options (Interactive Stream Picker) */}
+        {/* 7. Featured Study Options (Interactive Stream Picker) */}
         <ScrollReveal delay={50}>
           <StudyOptions onSelectOption={(field) => handleOpenApplication(field)} />
         </ScrollReveal>
 
-        {/* 9. The Big Call to Action */}
+        {/* 8. The Big Call to Action */}
         <ScrollReveal delay={50}>
           <BigCTA onOpenApplication={() => handleOpenApplication()} />
         </ScrollReveal>
 
-        {/* 10. Direct Contact & Enquiry Section */}
+        {/* 9. Direct Contact & Enquiry Section */}
         <ScrollReveal delay={50}>
           <ContactSection />
         </ScrollReveal>

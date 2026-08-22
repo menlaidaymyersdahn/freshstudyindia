@@ -2,30 +2,44 @@
 
 @layer base {
   :root {
-    --primary: #1677FF;
-    --secondary: #38BDF8;
-    --accent: #06B6D4;
-    --bg-main: #F5FAFF;
-    --card-bg: #FFFFFF;
-    --text-main: #102A43;
-    --text-muted: #52667A;
-    --border-light: #D9EAF7;
+    --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --primary-blue: #1D4ED8;
+    --sapphire: #2563EB;
+    --sky-glow: #38BDF8;
+    --crimson: #E11D48;
+    --ruby: #DC2626;
+    --amber-gold: #F59E0B;
+    --bg-dark: #060F1E;
+    --bg-card-dark: #0B192C;
+  }
+
+  html {
+    font-family: var(--font-body);
+    scroll-behavior: smooth;
   }
 
   body {
-    background-color: #F5FAFF;
-    color: #102A43;
+    background-color: #F8FAFD;
+    color: #0F172A;
+    font-family: var(--font-body);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.025em;
   }
 }
 
-/* Floating animation keyframes for educational visual elements */
+/* Luxury Stylist Glow & Animation Effects */
 @keyframes floatSlow {
   0%, 100% {
     transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-12px) rotate(3deg);
+    transform: translateY(-10px) rotate(2deg);
   }
 }
 
@@ -34,27 +48,38 @@
     transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(10px) rotate(-3deg);
+    transform: translateY(8px) rotate(-2deg);
   }
 }
 
-@keyframes floatGentle {
+@keyframes pulseGlowRed {
   0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
-@keyframes pulseGlow {
-  0%, 100% {
-    opacity: 0.5;
+    opacity: 0.4;
     transform: scale(1);
   }
   50% {
-    opacity: 0.85;
-    transform: scale(1.08);
+    opacity: 0.75;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes pulseGlowBlue {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes shimmerGlow {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 
@@ -66,32 +91,39 @@
   animation: floatReverse 8.5s ease-in-out infinite;
 }
 
-.animate-float-gentle {
-  animation: floatGentle 5s ease-in-out infinite;
+.animate-pulse-glow-red {
+  animation: pulseGlowRed 5s ease-in-out infinite;
 }
 
-.animate-pulse-glow {
-  animation: pulseGlow 6s ease-in-out infinite;
+.animate-pulse-glow-blue {
+  animation: pulseGlowBlue 6s ease-in-out infinite;
 }
 
-/* Ensure all input, select, textarea fields have high-contrast, dark readable text on light backgrounds */
+.shimmer-text {
+  background: linear-gradient(90deg, #FFFFFF 0%, #F87171 25%, #60A5FA 50%, #F87171 75%, #FFFFFF 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmerGlow 8s linear infinite;
+}
+
+/* High contrast inputs and text fields */
 input,
 textarea,
 select {
-  color: #102A43 !important; /* deep navy text */
-  -webkit-text-fill-color: #102A43 !important;
-  caret-color: #1677FF; /* primary education blue */
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  caret-color: #DC2626;
 }
 
-/* Explicit high-contrast placeholder styling */
 input::placeholder,
 textarea::placeholder {
-  color: #52667A !important; /* secondary text */
+  color: #64748B !important;
   opacity: 1 !important;
-  -webkit-text-fill-color: #52667A !important;
+  -webkit-text-fill-color: #64748B !important;
 }
 
-/* Fix browser autofill so background stays clean and text NEVER turns white */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -102,51 +134,38 @@ textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
-  -webkit-text-fill-color: #102A43 !important;
+  -webkit-text-fill-color: #0F172A !important;
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
   box-shadow: 0 0 0px 1000px #ffffff inset !important;
   transition: background-color 5000s ease-in-out 0s;
-  color: #102A43 !important;
+  color: #0F172A !important;
 }
 
-/* Fade In and Slide Up Keyframe Animations */
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Custom sleek scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+::-webkit-scrollbar-track {
+  background: #060F1E;
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 4px;
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-out forwards;
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
 }
 
-/* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   .animate-float-slow,
   .animate-float-reverse,
-  .animate-float-gentle,
-  .animate-pulse-glow,
-  .animate-fade-in-up,
-  .animate-fade-in {
+  .animate-pulse-glow-red,
+  .animate-pulse-glow-blue,
+  .shimmer-text {
     animation: none !important;
   }
 }
-

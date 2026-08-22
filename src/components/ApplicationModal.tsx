@@ -365,11 +365,11 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
           <div>
             {/* Header */}
             <div className="mb-6 space-y-1.5 pr-8">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-800 text-[11px] font-bold uppercase">
-                <GraduationCap className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-50 text-rose-800 border border-red-200/80 text-[11px] font-bold uppercase">
+                <GraduationCap className="w-3.5 h-3.5 text-rose-600" />
                 <span>Student Intake 2026</span>
               </div>
-              <h3 className="text-2xl font-black text-[#0B192C] tracking-tight">
+              <h3 className="text-2xl font-black text-[#060F1E] tracking-tight">
                 Start Your India Application
               </h3>
               <p className="text-xs text-slate-600">
@@ -391,7 +391,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                   placeholder="e.g. Emmanuel Sayon Johnson"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 focus:border-sky-600 focus:ring-2 focus:ring-sky-100 outline-none text-sm font-medium text-slate-900 transition"
+                  className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition"
                 />
               </div>
 
@@ -407,7 +407,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                     placeholder="e.g. +231 889425645"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 focus:border-sky-600 focus:ring-2 focus:ring-sky-100 outline-none text-sm font-medium text-slate-900 transition"
+                    className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition"
                   />
                 </div>
 
@@ -420,7 +420,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                     placeholder="student@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 focus:border-sky-600 focus:ring-2 focus:ring-sky-100 outline-none text-sm font-medium text-slate-900 transition"
+                    className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition"
                   />
                 </div>
               </div>
@@ -434,7 +434,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                   <select
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 focus:border-sky-600 focus:ring-2 focus:ring-sky-100 outline-none text-sm font-medium text-slate-900 transition"
+                    className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition"
                   >
                     {countries.map((c) => (
                       <option key={c} value={c}>{c}</option>
@@ -449,7 +449,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                   <select
                     value={studyField}
                     onChange={(e) => setStudyField(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 focus:border-sky-600 focus:ring-2 focus:ring-sky-100 outline-none text-sm font-medium text-slate-900 transition"
+                    className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition"
                   >
                     {studyFields.map((f) => (
                       <option key={f} value={f}>{f}</option>
@@ -466,7 +466,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                 <select
                   value={qualification}
                   onChange={(e) => setQualification(e.target.value)}
-                  className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 focus:border-sky-600 focus:ring-2 focus:ring-sky-100 outline-none text-sm font-medium text-slate-900 transition"
+                  className="w-full px-3.5 py-3 rounded-xl bg-white border border-slate-200 focus:border-red-600 focus:ring-2 focus:ring-red-100 outline-none text-sm font-medium text-slate-900 transition"
                 >
                   {qualifications.map((q) => (
                     <option key={q} value={q}>{q}</option>
@@ -511,8 +511,8 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                   onClick={() => fileInputRef.current?.click()}
                   className={`border-2 border-dashed rounded-2xl p-5 text-center transition-all cursor-pointer ${
                     isDragging 
-                      ? 'border-sky-600 bg-sky-50/80 scale-[1.01]' 
-                      : 'border-slate-300 hover:border-sky-400 bg-slate-50/60 hover:bg-slate-50'
+                      ? 'border-red-600 bg-rose-50/80 scale-[1.01]' 
+                      : 'border-slate-300 hover:border-red-400 bg-slate-50/60 hover:bg-slate-50'
                   }`}
                 >
                   <input
@@ -525,7 +525,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                   />
 
                   <div className="flex flex-col items-center justify-center gap-1.5">
-                    <div className="w-10 h-10 rounded-xl bg-sky-100/70 text-sky-700 flex items-center justify-center shadow-xs">
+                    <div className="w-10 h-10 rounded-xl bg-red-100/70 text-rose-700 flex items-center justify-center shadow-xs">
                       <UploadCloud className="w-5 h-5" />
                     </div>
                     <div>
@@ -533,7 +533,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                         Drag & drop your documents here
                       </p>
                       <p className="text-[11px] text-slate-500 mt-0.5">
-                        or <span className="text-sky-700 font-bold hover:underline">Choose Files</span>
+                        or <span className="text-rose-700 font-bold hover:underline">Choose Files</span>
                       </p>
                     </div>
                     <p className="text-[10px] font-mono text-slate-600 uppercase tracking-wider mt-0.5">
@@ -566,7 +566,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                           className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 text-xs hover:border-slate-300 transition"
                         >
                           <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                            <div className="w-7 h-7 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                            <div className="w-7 h-7 rounded-lg bg-red-100 text-rose-700 flex items-center justify-center shrink-0">
                               <FileText className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
@@ -574,7 +574,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                                 {doc.name}
                               </p>
                               <div className="flex items-center gap-2 text-[10px] text-slate-500 mt-0.5">
-                                <span className="font-bold text-sky-700 uppercase px-1.5 py-0.2 rounded bg-sky-50 border border-sky-200/60">
+                                <span className="font-bold text-rose-700 uppercase px-1.5 py-0.2 rounded bg-rose-50 border border-rose-200/60">
                                   {doc.type}
                                 </span>
                                 <span className="font-mono text-slate-600">{doc.formattedSize}</span>
@@ -608,14 +608,14 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-4 rounded-xl text-xs sm:text-sm font-extrabold uppercase tracking-wide text-white bg-[#0B192C] hover:bg-[#1E2E48] transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+                  className="w-full py-4 rounded-xl text-xs sm:text-sm font-extrabold uppercase tracking-wide text-white bg-gradient-to-r from-red-600 via-rose-600 to-[#060F1E] hover:from-red-500 hover:via-rose-500 hover:to-[#0B1E38] transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
                 >
                   {isSubmitting ? (
                     <span>Submitting Application Profile...</span>
                   ) : (
                     <>
                       <span>SUBMIT APPLICATION PROFILE</span>
-                      <ArrowRight className="w-4 h-4 text-sky-400" />
+                      <ArrowRight className="w-4 h-4 text-rose-200" />
                     </>
                   )}
                 </button>

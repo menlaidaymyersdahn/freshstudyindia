@@ -62,11 +62,11 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-11 h-11 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-red-600 via-rose-600 to-[#060F1E] text-white flex items-center justify-center shadow-md">
             <Share2 className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-xl font-extrabold text-[#0B192C]">Share Fresh Study India</h3>
+            <h3 className="text-xl font-extrabold text-[#060F1E]">Share Fresh Study India</h3>
             <p className="text-xs text-slate-500">
               Share with prospective students, parents, or sponsors
             </p>
@@ -77,18 +77,18 @@ export const ShareModal: React.FC<ShareModalProps> = ({
         <div className="mb-6 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 shadow-xs">
           <div className="p-2.5 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-[11px] font-mono text-slate-500">
             <span className="flex items-center gap-1.5 font-bold text-slate-700">
-              <Sparkles className="w-3.5 h-3.5 text-sky-600" />
+              <Sparkles className="w-3.5 h-3.5 text-rose-600" />
               Social Media OpenGraph Preview
             </span>
-            <span className="text-[10px] bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full font-semibold">
+            <span className="text-[10px] bg-red-50 text-rose-800 border border-red-200 px-2 py-0.5 rounded-full font-semibold">
               Live Card
             </span>
           </div>
 
           {/* Card Graphic */}
-          <div className="bg-[#0B192C] p-4 text-white relative">
+          <div className="bg-[#060F1E] p-4 text-white relative">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-rose-400">
                 Fresh Study India
               </span>
               <span className="text-[11px]">🇱🇷 ➡️ 🇮🇳</span>

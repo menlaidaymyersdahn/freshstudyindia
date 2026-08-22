@@ -1,20 +1,21 @@
 import React from 'react';
 import { 
   ArrowRight, 
-  PhoneCall, 
   CheckCircle2, 
   Sparkles, 
-  Building, 
   GraduationCap, 
   Plane,
   ShieldCheck,
   MessageCircle,
-  MapPin,
-  Award
+  FileCheck,
+  Clock,
+  Award,
+  Globe2,
+  Users2,
+  Flame,
+  Star
 } from 'lucide-react';
 import { BRAND, getWhatsAppLink } from '../lib/constants';
-import { IMAGES } from '../lib/images';
-import { ImageWithFallback } from './ImageWithFallback';
 
 interface HeroProps {
   onOpenApplication: () => void;
@@ -22,30 +23,21 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onOpenApplication }) => {
   return (
-    <section id="hero" className="relative pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-28 lg:pb-32 overflow-hidden bg-[#071322] text-white">
-      {/* 1. Large High-Resolution Convocation Background Photo with Sleek Deep-Navy Visual Tint */}
+    <section id="hero" className="relative pt-32 sm:pt-36 lg:pt-40 pb-20 sm:pb-28 lg:pb-32 overflow-hidden bg-[#050B14] text-white">
+      {/* Background Decorative Mesh & Stylist Radiant Atmosphere (Red & Blue Radiant Glows) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0">
-        <ImageWithFallback
-          src={IMAGES.convocation.src}
-          fallbackSrcs={[
-            IMAGES.convocation.webp,
-            IMAGES.convocation.publicUrl,
-            '/DSC_9367.jpeg',
-            IMAGES.convocation.png,
-            IMAGES.convocation.svg
-          ]}
-          alt={IMAGES.convocation.alt}
-          className="w-full h-full object-cover object-[center_28%] sm:object-[center_35%] md:object-center scale-105 opacity-60 sm:opacity-65 transition-transform duration-1000"
-          loading="eager"
-        />
-        {/* Optical Duotone & Legibility Scrims */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#071322]/95 via-[#071322]/85 to-[#071322]/70 sm:to-[#071322]/60" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#071322] via-transparent to-[#071322]/80" />
+        {/* Geometric Grid Background */}
+        <div className="absolute inset-0 bg-[radial-gradient(#1E293B_1px,transparent_1px)] [background-size:28px_28px] opacity-30" />
+        
+        {/* Stylist Luminous Blue & Red Glow Orbs */}
+        <div className="absolute top-1/4 left-1/5 w-[650px] h-[380px] bg-blue-600/18 blur-[150px] rounded-full animate-pulse-glow-blue" />
+        <div className="absolute bottom-10 right-1/6 w-[550px] h-[420px] bg-rose-600/18 blur-[160px] rounded-full animate-pulse-glow-red" />
+        <div className="absolute top-0 right-1/4 w-[450px] h-[320px] bg-indigo-600/15 blur-[130px] rounded-full" />
+        <div className="absolute top-2/3 left-1/10 w-[350px] h-[300px] bg-red-600/12 blur-[140px] rounded-full" />
+        
+        {/* Subtle Gradient Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050B14]/40 via-[#050B14]/70 to-[#050B14]" />
       </div>
-
-      {/* Atmospheric Accent Lighting */}
-      <div className="absolute top-1/4 left-1/4 w-[600px] h-[300px] bg-sky-500/20 blur-[140px] rounded-full pointer-events-none z-0" />
-      <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-emerald-500/15 blur-[120px] rounded-full pointer-events-none z-0" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
@@ -53,143 +45,178 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication }) => {
           {/* Left Column: Clear High-Impact Headline & Quick Actions */}
           <div className="lg:col-span-7 space-y-6 sm:space-y-8 text-center lg:text-left">
             
-            {/* Top Verified Badge */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg text-xs font-bold text-sky-200">
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+            {/* Top Verified Badge with Red & Blue Prestige Pill */}
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-gradient-to-r from-red-500/15 via-blue-500/15 to-rose-500/15 backdrop-blur-md border border-red-500/30 shadow-lg text-xs font-bold text-slate-200">
+              <span className="flex h-2.5 w-2.5 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
               </span>
-              <span>Official 2026 International Student Admissions Desk</span>
+              <span className="text-white font-extrabold tracking-wide uppercase">2026 International Student Admissions Desk</span>
+              <span className="hidden sm:inline-block text-rose-300 font-bold">• India 🇮🇳 & Liberia 🇱🇷</span>
             </div>
 
-            {/* Main Headline */}
-            <div className="space-y-3">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-[68px] font-black tracking-tight text-white leading-[1.05] drop-shadow-sm">
+            {/* Main Headline with Stylist Red & Blue Gradient */}
+            <div className="space-y-2">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-[68px] font-black tracking-tight text-white leading-[1.04]">
                 STUDY IN INDIA.
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-sky-200 to-emerald-300">
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-rose-300 via-blue-300 to-sky-400 drop-shadow-sm">
                   START YOUR NEXT CHAPTER.
                 </span>
               </h1>
             </div>
 
             {/* Supporting Text */}
-            <p className="text-base sm:text-lg lg:text-xl text-slate-200 font-normal leading-relaxed max-w-2xl mx-auto lg:mx-0 drop-shadow">
-              We guide students from Africa and around the world into accredited Indian universities — providing verified admissions, bonafide visa documents, and airport arrival reception.
+            <p className="text-base sm:text-lg lg:text-xl text-slate-300 font-normal leading-relaxed max-w-2xl mx-auto lg:mx-0">
+              We guide ambitious students from Africa and across the world into accredited Indian universities — delivering verified admissions, bonafide visa documents, and full airport arrival reception.
             </p>
 
-            {/* Action Buttons */}
+            {/* Action Buttons: Stylist Red & Blue CTAs */}
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <button
                 onClick={onOpenApplication}
-                className="w-full sm:w-auto px-8 py-4.5 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider text-[#071322] bg-white hover:bg-sky-50 shadow-2xl hover:shadow-sky-400/20 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
+                className="w-full sm:w-auto px-8 py-4.5 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-600 via-rose-600 to-blue-700 hover:from-red-500 hover:via-rose-500 hover:to-blue-600 shadow-2xl shadow-red-600/30 hover:shadow-red-500/40 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer group"
               >
                 <span>START YOUR APPLICATION</span>
-                <ArrowRight className="w-4 h-4 text-sky-600 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 text-rose-200 group-hover:translate-x-1 transition-transform" />
               </button>
 
               <a
                 href="#contact"
-                className="w-full sm:w-auto px-7 py-4.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-white/10 hover:bg-white/20 border border-white/25 backdrop-blur-md shadow-lg transition-all duration-200 flex items-center justify-center gap-2.5"
+                className="w-full sm:w-auto px-7 py-4.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-white/10 hover:bg-white/20 border border-white/25 hover:border-sky-400/40 backdrop-blur-md shadow-lg transition-all duration-200 flex items-center justify-center gap-2.5"
               >
-                <MessageCircle className="w-4 h-4 text-emerald-400" />
+                <MessageCircle className="w-4 h-4 text-sky-400" />
                 <span>TALK TO AN ADVISOR</span>
               </a>
             </div>
 
-            {/* Trust Points */}
+            {/* Trust Points with Red/Blue Accent Highlights */}
             <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-y-2.5 gap-x-6 text-xs text-slate-300">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span className="font-semibold text-white">Direct University Liaison</span>
+                <CheckCircle2 className="w-4 h-4 text-rose-400 shrink-0" />
+                <span className="font-bold text-white">Direct University Liaison</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
+                <span className="font-bold text-white">WAEC / WASSCE Accepted</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span className="font-semibold text-white">WAEC / WASSCE Accepted</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span className="font-semibold text-white">Airport Pickup & FRRO Assistance</span>
+                <span className="font-bold text-white">Airport Pickup & FRRO Assistance</span>
               </div>
             </div>
 
           </div>
 
-          {/* Right Column: Premium Real Graduate Showcase & Badges */}
+          {/* Right Column: Premium Admissions Hub Card (Stylist Red & Blue Glassmorphism UI) */}
           <div className="lg:col-span-5 relative mt-4 lg:mt-0">
             <div className="relative mx-auto max-w-md lg:max-w-none">
               
-              {/* Outer Glow & Glass Frame */}
-              <div className="relative rounded-3xl p-2.5 bg-gradient-to-b from-white/25 via-white/10 to-white/5 backdrop-blur-xl shadow-2xl border border-white/20">
+              {/* Outer Card Glass Frame with Red/Blue Border Glow */}
+              <div className="relative rounded-3xl p-6 sm:p-7 bg-gradient-to-b from-[#0B1E38]/90 via-[#081528]/95 to-[#050B14]/98 backdrop-blur-2xl shadow-2xl border border-white/20 shadow-blue-900/20 space-y-6">
                 
-                {/* Main Hero Image: Real Graduate Portrait */}
-                <div className="relative rounded-[22px] overflow-hidden bg-slate-900 aspect-[4/5] sm:aspect-[5/6] lg:aspect-[4/5] shadow-2xl group">
-                  <ImageWithFallback
-                    src={IMAGES.graduate.src}
-                    fallbackSrcs={[
-                      IMAGES.graduate.webp,
-                      IMAGES.graduate.publicUrl,
-                      '/DSC_9531.jpeg',
-                      IMAGES.graduate.png,
-                      IMAGES.graduate.svg
-                    ]}
-                    alt={IMAGES.graduate.alt}
-                    className="w-full h-full object-cover object-top transform group-hover:scale-103 transition-transform duration-700"
-                    loading="eager"
-                  />
-                  
-                  {/* Subtle Gradient for Bottom Details */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#071322] via-[#071322]/20 to-transparent pointer-events-none" />
-
-                  {/* Top Live Verification Chip */}
-                  <div className="absolute top-3.5 left-3.5 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#071322]/85 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold shadow-lg">
-                    <Award className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Real Student Success</span>
-                  </div>
-
-                  {/* Real Student Journey Highlight Card inside Image */}
-                  <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 p-4 rounded-2xl bg-[#071322]/95 backdrop-blur-md border border-white/20 text-white shadow-2xl">
-                    <div className="flex items-center justify-between gap-2 mb-1.5">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] font-black tracking-wide uppercase">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        Official Graduate
-                      </span>
-                      <span className="text-[11px] font-bold text-sky-300 flex items-center gap-1">
-                        <span>🇱🇷 Liberia</span>
-                        <span>→</span>
-                        <span>🇮🇳 India</span>
-                      </span>
+                {/* Header Row: Live Desk Status */}
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500/20 to-blue-500/20 border border-red-400/30 flex items-center justify-center text-rose-400">
+                      <GraduationCap className="w-5 h-5 text-rose-400" />
                     </div>
-                    <p className="text-sm font-black text-white">
-                      Myers • B.Sc Microbiology (Class of 2026)
-                    </p>
-                    <p className="text-[11px] text-slate-300 font-medium mt-0.5 line-clamp-1">
-                      Shri Rawatpura Sarkar University, Raipur, India
-                    </p>
+                    <div>
+                      <h3 className="text-sm font-black text-white">2026 Admissions Desk</h3>
+                      <p className="text-[11px] text-slate-400 font-semibold">India 🇮🇳 & West Africa 🇱🇷 Desk</p>
+                    </div>
+                  </div>
+
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/20 border border-red-400/40 text-rose-300 text-[10px] font-extrabold uppercase tracking-wider">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping" />
+                    Active Intake
+                  </span>
+                </div>
+
+                {/* 4-Step Express Progression with Stylist Color Coded Steps */}
+                <div className="space-y-3">
+                  <p className="text-xs font-black uppercase tracking-wider text-slate-400 font-mono">
+                    Streamlined Student Path
+                  </p>
+
+                  <div className="space-y-2.5">
+                    <div className="p-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 flex items-center gap-3 transition-colors">
+                      <div className="w-6 h-6 rounded-lg bg-blue-500/20 text-sky-300 font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                        1
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-bold text-white">Course & Budget Evaluation</p>
+                        <p className="text-[11px] text-slate-400 truncate">Eligibility check for WAEC / WASSCE / Degrees</p>
+                      </div>
+                      <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 flex items-center gap-3 transition-colors">
+                      <div className="w-6 h-6 rounded-lg bg-rose-500/20 text-rose-300 font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                        2
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-bold text-white">Direct Bonafide Admission Letter</p>
+                        <p className="text-[11px] text-slate-400 truncate">Official university registrar documentation for visa</p>
+                      </div>
+                      <FileCheck className="w-4 h-4 text-rose-400 shrink-0" />
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 flex items-center gap-3 transition-colors">
+                      <div className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                        3
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-bold text-white">Indian Student Visa Dossier</p>
+                        <p className="text-[11px] text-slate-400 truncate">Embassy checklist, affidavit & appointment review</p>
+                      </div>
+                      <Clock className="w-4 h-4 text-emerald-400 shrink-0" />
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 flex items-center gap-3 transition-colors">
+                      <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-300 font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                        4
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-bold text-white">Airport Reception & Campus Check-in</p>
+                        <p className="text-[11px] text-slate-400 truncate">Hostel settlement, SIM card & FRRO police registration</p>
+                      </div>
+                      <Plane className="w-4 h-4 text-amber-400 shrink-0" />
+                    </div>
                   </div>
                 </div>
 
-              </div>
+                {/* Popular Degree Badges */}
+                <div className="pt-1 border-t border-white/10 space-y-2">
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                    Available Degree Streams
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['Computer Science & AI', 'Nursing & Health', 'Pharmacy', 'Engineering', 'BBA / MBA', 'Cyber Security', 'Microbiology'].map((tag, idx) => (
+                      <span
+                        key={tag}
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors ${
+                          idx % 2 === 0
+                            ? 'bg-blue-500/10 text-sky-200 border-blue-400/20 hover:border-blue-400'
+                            : 'bg-rose-500/10 text-rose-200 border-rose-400/20 hover:border-rose-400'
+                        }`}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
 
-              {/* Floating Badge 1: Top Right */}
-              <div className="absolute -top-4 -right-3 sm:-right-5 bg-[#0B192C]/95 backdrop-blur-xl py-3 px-4 rounded-2xl shadow-2xl border border-sky-400/30 flex items-center gap-3 animate-float-gentle text-white">
-                <div className="w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-400">
-                  <GraduationCap className="w-5 h-5" />
+                {/* Card CTA Action */}
+                <div className="pt-2">
+                  <button
+                    onClick={onOpenApplication}
+                    className="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-blue-600 hover:from-red-500 hover:via-rose-500 hover:to-blue-500 text-white font-black text-xs uppercase tracking-wider transition shadow-xl hover:shadow-red-600/30 flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>Check University Eligibility</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
-                <div>
-                  <p className="text-[10px] font-bold text-sky-300 uppercase tracking-wider">Top Indian Campuses</p>
-                  <p className="text-xs font-extrabold text-white">NAAC A++ / A+ Accredited 🇮🇳</p>
-                </div>
-              </div>
 
-              {/* Floating Badge 2: Bottom Left */}
-              <div className="absolute -bottom-5 -left-3 sm:-left-5 bg-[#0B192C]/95 backdrop-blur-xl py-3 px-4 rounded-2xl shadow-2xl border border-emerald-400/30 flex items-center gap-3 animate-float-slow text-white">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-extrabold text-white">Full On-Ground Care</p>
-                  <p className="text-[10px] text-slate-300 font-medium">India 🇮🇳 & Liberia 🇱🇷 Support</p>
-                </div>
               </div>
 
             </div>

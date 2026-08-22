@@ -13,11 +13,11 @@ export const FloatingWhatsApp: React.FC = () => {
           <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-              <p className="text-xs font-bold text-[#0B192C]">Admissions Advisors Online</p>
+              <p className="text-xs font-bold text-[#060F1E]">Admissions Advisors Online</p>
             </div>
             <button 
               onClick={() => setIsOpen(false)}
-              className="text-slate-400 hover:text-slate-600 p-1"
+              className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -36,9 +36,9 @@ export const FloatingWhatsApp: React.FC = () => {
               className="p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200/80 hover:border-emerald-200 transition flex items-center justify-between group"
             >
               <div className="flex items-center gap-2.5">
-                <span className="text-lg">🇮🇳</span>
+                <span className="text-lg inline-block transition-all duration-300 group-hover:scale-125 group-hover:animate-pulse select-none origin-center">🇮🇳</span>
                 <div>
-                  <p className="text-xs font-bold text-[#0B192C] group-hover:text-emerald-800">India Desk</p>
+                  <p className="text-xs font-bold text-[#060F1E] group-hover:text-emerald-800">India Desk</p>
                   <p className="text-[10px] text-slate-500 font-mono">{BRAND.contacts.india.phoneDisplay}</p>
                 </div>
               </div>
@@ -53,9 +53,9 @@ export const FloatingWhatsApp: React.FC = () => {
               className="p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200/80 hover:border-emerald-200 transition flex items-center justify-between group"
             >
               <div className="flex items-center gap-2.5">
-                <span className="text-lg">🇱🇷</span>
+                <span className="text-lg inline-block transition-all duration-300 group-hover:scale-125 group-hover:animate-pulse select-none origin-center">🇱🇷</span>
                 <div>
-                  <p className="text-xs font-bold text-[#0B192C] group-hover:text-emerald-800">Liberia Desk</p>
+                  <p className="text-xs font-bold text-[#060F1E] group-hover:text-emerald-800">Liberia Desk</p>
                   <p className="text-[10px] text-slate-500 font-mono">{BRAND.contacts.liberia.phoneDisplay}</p>
                 </div>
               </div>

@@ -2,170 +2,226 @@ import React, { useState } from 'react';
 import { 
   Laptop, 
   Briefcase, 
-  Cpu, 
   Stethoscope, 
+  Cog, 
   Database, 
-  Sparkles, 
+  Scale, 
+  Palette, 
+  GraduationCap, 
   ArrowRight, 
-  CheckCircle2,
-  MessageCircle
+  CheckCircle2, 
+  Sparkles,
+  MessageCircle,
+  HelpCircle
 } from 'lucide-react';
-import { STUDY_OPTIONS, getWhatsAppLink } from '../lib/constants';
-import { StudyField } from '../types';
+import { BRAND, getWhatsAppLink } from '../lib/constants';
 
 interface StudyOptionsProps {
-  onSelectOption: (fieldTitle: string) => void;
+  onOpenApplication: (presetField?: string) => void;
 }
 
-export const StudyOptions: React.FC<StudyOptionsProps> = ({ onSelectOption }) => {
-  const [selectedField, setSelectedField] = useState<StudyField>('COMPUTER SCIENCE');
+export const StudyOptions: React.FC<StudyOptionsProps> = ({ onOpenApplication }) => {
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const getIcon = (id: StudyField) => {
-    switch (id) {
-      case 'COMPUTER SCIENCE':
-        return Laptop;
-      case 'BUSINESS':
-        return Briefcase;
-      case 'ENGINEERING':
-        return Cpu;
-      case 'HEALTHCARE':
-        return Stethoscope;
-      case 'DATA & TECHNOLOGY':
-        return Database;
-      case 'OTHER':
-      default:
-        return Sparkles;
+  const programs = [
+    {
+      id: 'cs',
+      category: 'tech',
+      title: 'Computer Science & AI',
+      degrees: 'B.Tech / BCA / MCA / M.Tech',
+      duration: '3 - 4 Years',
+      badge: 'High Global Demand',
+      badgeColor: 'bg-blue-50 text-blue-800 border-blue-200',
+      icon: <Laptop className="w-5 h-5 text-sky-600" />,
+      desc: 'Software development, artificial intelligence, machine learning, cloud computing, cybersecurity, and full-stack engineering.',
+      careers: ['Software Engineer', 'Cloud Architect', 'Cybersecurity Analyst', 'AI Developer']
+    },
+    {
+      id: 'business',
+      category: 'business',
+      title: 'Business & Management',
+      degrees: 'BBA / MBA / B.Com',
+      duration: '2 - 3 Years',
+      badge: 'Leadership Track',
+      badgeColor: 'bg-rose-50 text-rose-800 border-rose-200',
+      icon: <Briefcase className="w-5 h-5 text-rose-600" />,
+      desc: 'International business, marketing, finance, human resource management, supply chain, and entrepreneurship.',
+      careers: ['Business Analyst', 'Financial Manager', 'Marketing Director', 'Operations Lead']
+    },
+    {
+      id: 'health',
+      category: 'health',
+      title: 'Healthcare & Allied Sciences',
+      degrees: 'B.Pharm / B.Sc Nursing / M.Pharm',
+      duration: '4 - 4.5 Years',
+      badge: 'Clinical Practice',
+      badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      icon: <Stethoscope className="w-5 h-5 text-emerald-600" />,
+      desc: 'Pharmacy, nursing, medical laboratory technology, physiotherapy, radiology, and public health systems.',
+      careers: ['Registered Pharmacist', 'Healthcare Administrator', 'Clinical Nurse', 'Medical Lab Director']
+    },
+    {
+      id: 'eng',
+      category: 'tech',
+      title: 'Engineering & Technology',
+      degrees: 'B.Tech / M.Tech / Diploma',
+      duration: '3 - 4 Years',
+      badge: 'Core Industry',
+      badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+      icon: <Cog className="w-5 h-5 text-indigo-600" />,
+      desc: 'Civil engineering, mechanical, electrical and electronics, robotics, renewable energy, and aerospace technology.',
+      careers: ['Civil Project Engineer', 'Robotics Specialist', 'Electrical Designer', 'Quality Assurance']
+    },
+    {
+      id: 'data',
+      category: 'tech',
+      title: 'Data Science & Analytics',
+      degrees: 'B.Sc Data Science / M.Sc / MCA',
+      duration: '2 - 3 Years',
+      badge: 'Fast Emerging',
+      badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+      icon: <Database className="w-5 h-5 text-amber-600" />,
+      desc: 'Big data architecture, predictive statistical modeling, business intelligence, data engineering, and Python analytics.',
+      careers: ['Data Scientist', 'BI Developer', 'Data Architect', 'Analytics Consultant']
+    },
+    {
+      id: 'law',
+      category: 'law',
+      title: 'Law & International Legal Studies',
+      degrees: 'BA LLB / BBA LLB / LLM',
+      duration: '1 - 5 Years',
+      badge: 'Corporate & Global Law',
+      badgeColor: 'bg-purple-50 text-purple-800 border-purple-200',
+      icon: <Scale className="w-5 h-5 text-purple-600" />,
+      desc: 'Corporate law, human rights, international trade law, cyber law, commercial arbitration, and constitutional jurisprudence.',
+      careers: ['Legal Advisor', 'Compliance Officer', 'Corporate Counsel', 'Arbitration Specialist']
     }
-  };
+  ];
 
-  const currentOption = STUDY_OPTIONS.find(opt => opt.id === selectedField) || STUDY_OPTIONS[0];
+  const filteredPrograms = selectedCategory === 'all' 
+    ? programs 
+    : programs.filter(p => p.category === selectedCategory);
 
   return (
-    <section id="study-options" className="py-24 sm:py-32 bg-[#F8FAFC] border-t border-slate-200/80">
+    <section id="study-options" className="py-24 sm:py-32 bg-white relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
         
         {/* Section Header */}
-        <div className="max-w-3xl mb-14 sm:mb-16 text-center sm:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-800 text-xs font-bold uppercase tracking-wider mb-4 shadow-xs">
-            <span>Academic Streams</span>
+        <div className="max-w-3xl mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold uppercase tracking-wider mb-4">
+            <GraduationCap className="w-3.5 h-3.5" />
+            <span>Academic Programs</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0B192C] tracking-tight leading-tight">
-            WHAT DO YOU WANT TO STUDY?
+
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#060F1E] tracking-tight leading-tight">
+            EXPLORE STUDY OPTIONS IN INDIA.
           </h2>
+
           <p className="mt-4 text-base sm:text-lg text-slate-600 font-normal leading-relaxed">
-            Select your discipline to see popular program options and speak with an advisor about suitable universities in India.
+            Select your preferred field to view popular undergraduate and postgraduate degree tracks across accredited Indian universities.
           </p>
         </div>
 
-        {/* Large Selectable Options Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-8">
-          {STUDY_OPTIONS.map((opt) => {
-            const Icon = getIcon(opt.id);
-            const isSelected = selectedField === opt.id;
-
-            return (
-              <button
-                key={opt.id}
-                onClick={() => setSelectedField(opt.id)}
-                className={`p-5 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between h-36 cursor-pointer ${
-                  isSelected
-                    ? 'bg-[#0B192C] text-white border-[#0B192C] shadow-lg scale-102 -translate-y-1'
-                    : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200 shadow-xs hover:border-slate-300'
-                }`}
-              >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  isSelected ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-700'
-                }`}>
-                  <Icon className="w-5 h-5" />
-                </div>
-
-                <div>
-                  <h3 className={`text-xs sm:text-sm font-extrabold tracking-tight uppercase leading-snug ${
-                    isSelected ? 'text-white' : 'text-[#0B192C]'
-                  }`}>
-                    {opt.id}
-                  </h3>
-                </div>
-              </button>
-            );
-          })}
+        {/* Filter Tabs with Stylist Active Blue/Red States */}
+        <div className="flex flex-wrap gap-2.5 mb-12">
+          {[
+            { id: 'all', label: 'All Programs' },
+            { id: 'tech', label: 'Technology & Engineering' },
+            { id: 'business', label: 'Business & Management' },
+            { id: 'health', label: 'Healthcare & Nursing' },
+            { id: 'law', label: 'Law & Governance' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setSelectedCategory(tab.id)}
+              className={`px-4 py-2.5 rounded-xl text-xs font-bold tracking-wide uppercase transition-all duration-200 cursor-pointer ${
+                selectedCategory === tab.id
+                  ? 'bg-gradient-to-r from-red-600 via-rose-600 to-[#060F1E] text-white shadow-md'
+                  : 'bg-[#F8FAFD] hover:bg-slate-200/80 text-slate-700 border border-slate-200/90'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* Selected Option Interactive Detail & Advisor Panel */}
-        <div className="bg-white rounded-3xl p-7 sm:p-10 border border-slate-200/90 shadow-xl transition-all duration-300">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            
-            {/* Left Content */}
-            <div className="lg:col-span-7 space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 text-sky-800 text-xs font-bold uppercase">
-                <span>Selected Field</span>
-              </div>
+        {/* Programs Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredPrograms.map((prog) => (
+            <div
+              key={prog.id}
+              className="bg-[#F8FAFD] rounded-3xl p-7 border border-slate-200/90 hover:border-red-300 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+            >
+              <div>
+                {/* Header with Icon and Badge */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+                    {prog.icon}
+                  </div>
 
-              <h3 className="text-2xl sm:text-3xl font-black text-[#0B192C] tracking-tight">
-                Looking for a course in {currentOption.title}?
-              </h3>
-
-              <p className="text-base sm:text-lg text-slate-600 font-medium leading-relaxed">
-                Talk to our advisor and we'll help you explore suitable options in India.
-              </p>
-
-              <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-1.5">
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Popular Specializations</p>
-                  <ul className="text-xs text-slate-700 space-y-1 font-medium">
-                    {currentOption.popularSpecializations.map((spec, i) => (
-                      <li key={i} className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                        <span>{spec}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <span className={`text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full border ${prog.badgeColor}`}>
+                    {prog.badge}
+                  </span>
                 </div>
 
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-1.5">
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Typical Degree Levels</p>
-                  <p className="text-xs text-slate-700 font-semibold">{currentOption.degreeTypes.join(' • ')}</p>
-                  <p className="text-[11px] text-slate-500 pt-1">Standard Duration: {currentOption.duration}</p>
-                </div>
-              </div>
-            </div>
+                {/* Title */}
+                <h3 className="text-lg font-black text-[#060F1E] tracking-tight mb-1">
+                  {prog.title}
+                </h3>
 
-            {/* Right Action Box */}
-            <div className="lg:col-span-5 bg-[#0B192C] text-white rounded-2xl p-6 sm:p-8 space-y-4 shadow-md flex flex-col justify-between">
-              <div className="space-y-2">
-                <span className="text-xs font-mono font-bold text-sky-400 uppercase tracking-wider">
-                  Direct Guidance
-                </span>
-                <h4 className="text-lg sm:text-xl font-extrabold text-white">
-                  Discuss your {currentOption.title} options
-                </h4>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  Our counselors will match your academic records with eligible colleges offering {currentOption.title} in India.
+                {/* Degree & Duration */}
+                <div className="flex items-center gap-2 text-xs font-mono font-bold text-rose-600 mb-3">
+                  <span>{prog.degrees}</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="text-slate-500">{prog.duration}</span>
+                </div>
+
+                {/* Description */}
+                <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                  {prog.desc}
                 </p>
+
+                {/* Career Outcomes */}
+                <div className="pt-3 border-t border-slate-200/80 mb-6">
+                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    Key Career Outcomes:
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {prog.careers.map((career, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[10px] font-semibold text-slate-700"
+                      >
+                        {career}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-2.5 pt-2">
+              {/* Action Button */}
+              <div className="pt-2 border-t border-slate-200 flex items-center justify-between gap-2">
                 <button
-                  onClick={() => onSelectOption(currentOption.title)}
-                  className="w-full py-3.5 px-5 rounded-xl text-xs font-extrabold uppercase tracking-wide text-white bg-sky-500 hover:bg-sky-400 transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  onClick={() => onOpenApplication(prog.title)}
+                  className="flex-1 py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-[#060F1E] hover:bg-red-600 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
                 >
-                  <span>DISCUSS MY OPTIONS</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span>Apply for {prog.title.split(' ')[0]}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
 
                 <a
-                  href={getWhatsAppLink('india', `Hello Fresh Study India, I am looking for course options in ${currentOption.title}. Please guide me on suitable universities.`)}
+                  href={getWhatsAppLink('india', `Hello, I want to learn about university options for ${prog.title} in India.`)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3 px-5 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition flex items-center justify-center gap-2"
+                  className="p-3 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition"
+                  title="Ask on WhatsApp"
                 >
-                  <MessageCircle className="w-4 h-4 text-emerald-400" />
-                  <span>WhatsApp About {currentOption.title}</span>
+                  <MessageCircle className="w-4 h-4" />
                 </a>
               </div>
-            </div>
 
-          </div>
+            </div>
+          ))}
         </div>
 
       </div>
