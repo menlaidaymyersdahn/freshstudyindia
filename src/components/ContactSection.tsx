@@ -1,303 +1,197 @@
 import React, { useState } from 'react';
 import { 
+  Mail, 
   Phone, 
-  MapPin, 
   MessageCircle, 
   Send, 
   CheckCircle2, 
   Building2, 
-  Globe2, 
-  Mail, 
-  Clock, 
-  ArrowRight,
-  AlertCircle
+  ShieldCheck,
+  Copy,
+  Check,
+  ExternalLink,
+  Sparkles
 } from 'lucide-react';
-import { BRAND, getWhatsAppLink } from '../lib/constants';
+import { BRAND, getWhatsAppLink, EMAIL_DIRECTORY } from '../lib/constants';
 
 interface ContactSectionProps {
   onNavigateHome?: () => void;
+  onOpenApplication?: () => void;
 }
 
-export const ContactSection: React.FC<ContactSectionProps> = ({ onNavigateHome }) => {
+export const ContactSection: React.FC<ContactSectionProps> = ({
+  onNavigateHome,
+  onOpenApplication
+}) => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
-    country: 'Liberia',
-    program: 'Computer Science & Information Technology',
+    country: '',
+    studyLevel: 'Undergraduate',
+    preferredCourse: '',
     preferredUniversity: '',
     message: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
+
+  const handleCopyEmail = (email: string) => {
+    navigator.clipboard.writeText(email);
+    setCopiedEmail(email);
+    setTimeout(() => setCopiedEmail(null), 2500);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage('');
-
-    if (!formData.fullName.trim()) {
-      setErrorMessage('Please enter your full name.');
-      return;
-    }
-    if (!formData.email.trim() && !formData.phone.trim()) {
-      setErrorMessage('Please provide at least an email address or WhatsApp/phone number.');
-      return;
-    }
-
     setIsSubmitting(true);
-
-    // Format WhatsApp message payload
-    const textLines = [
-      `*NEW ADMISSIONS ENQUIRY - Myers Global Pathways*`,
-      ``,
-      `*Full Name:* ${formData.fullName.trim()}`,
-      `*Email:* ${formData.email.trim() || 'Not provided'}`,
-      `*WhatsApp/Phone:* ${formData.phone.trim() || 'Not provided'}`,
-      `*Country of Residence:* ${formData.country}`,
-      `*Program / Field of Interest:* ${formData.program}`,
-      formData.preferredUniversity.trim() ? `*Preferred University:* ${formData.preferredUniversity.trim()}` : null,
-      formData.message.trim() ? `*Message / Background:* ${formData.message.trim()}` : null,
-      ``,
-      `_Sent via official website enquiry form_`
-    ].filter(Boolean);
-
-    const fullMessage = encodeURIComponent(textLines.join('\n'));
-
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
-
-      // Open WhatsApp directly to official India admissions desk
-      window.open(`https://wa.me/${BRAND.contacts.india.phoneRaw}?text=${fullMessage}`, '_blank');
-    }, 600);
+    }, 1000);
   };
 
   return (
-    <div className="pt-32 pb-24 bg-[#FAFCFF] min-h-screen">
+    <section 
+      id="contact"
+      className="py-24 sm:py-32 bg-[#FAFAF8] text-[#0A1120] min-h-screen"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         
-        {/* Page Header */}
-        <div className="space-y-4 max-w-3xl">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-            {onNavigateHome ? (
-              <button 
-                onClick={onNavigateHome}
-                className="hover:text-blue-700 transition cursor-pointer"
-              >
-                Home
-              </button>
-            ) : (
-              <span>Home</span>
-            )}
-            <span>/</span>
-            <span className="text-blue-700">Contact & Inquiries</span>
+        {/* Section Header */}
+        <div className="max-w-3xl space-y-4">
+          <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#D99B26]">
+            <span>Official Communications</span>
+            <span className="w-8 h-[1px] bg-[#D99B26]" />
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-xs font-semibold text-blue-800">
-            <Mail className="w-3.5 h-3.5" />
-            <span>Admissions & Support Desks</span>
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight">
-            Connect with Our Admissions Advisory Team
-          </h1>
+          <h2 
+            id="contact-heading"
+            className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight leading-[1.12]"
+          >
+            Let's Start Your Journey
+          </h2>
 
           <p className="text-base sm:text-lg text-slate-600 font-normal leading-relaxed">
-            Have questions about university eligibility, courses, tuition fees, student visas, or arrival in India? Reach out directly through our official desks or send an inquiry below.
+            Reach out directly to our admissions desks, institutional collaboration team, or student welfare advisors. We respond promptly to prospective students, families, and academic partners worldwide.
           </p>
         </div>
 
-        {/* 2-Column Responsive Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        {/* Split-Screen Main Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
-          {/* Left Column: Official Contact Methods & Desks */}
-          <div className="lg:col-span-5 space-y-6">
+          {/* Left Column: Direct WhatsApp & Official Email Directory */}
+          <div className="lg:col-span-6 space-y-8">
             
-            {/* Official Email Channels Box */}
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Official Email Channels
-              </h3>
-
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-semibold text-slate-500 uppercase block">Admissions Department</span>
-                    <a 
-                      href={`mailto:${BRAND.emails.admissions}`}
-                      className="text-sm font-bold text-slate-900 hover:text-blue-700 transition"
-                    >
-                      {BRAND.emails.admissions}
-                    </a>
-                  </div>
+            {/* WhatsApp Priority Support Card */}
+            <div className="p-8 rounded-3xl bg-slate-950 text-white border border-slate-800 space-y-6 shadow-xl relative overflow-hidden">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <span>Direct WhatsApp Admissions Desk</span>
                 </div>
+                <h3 className="text-2xl font-bold text-white">
+                  Chat With Myers Global Pathways
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+                  Connect with a dedicated student counselor via WhatsApp for immediate questions regarding course eligibility, fees, and the 2026 intake.
+                </p>
+              </div>
 
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-semibold text-slate-500 uppercase block">General Information & Inquiries</span>
-                    <a 
-                      href={`mailto:${BRAND.emails.info}`}
-                      className="text-sm font-bold text-slate-900 hover:text-blue-700 transition"
-                    >
-                      {BRAND.emails.info}
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-semibold text-slate-500 uppercase block">Applications & Document Verification</span>
-                    <a 
-                      href={`mailto:${BRAND.emails.applications}`}
-                      className="text-sm font-bold text-slate-900 hover:text-blue-700 transition"
-                    >
-                      {BRAND.emails.applications}
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-semibold text-slate-500 uppercase block">Student Support & Arrival Assistance</span>
-                    <a 
-                      href={`mailto:${BRAND.emails.support}`}
-                      className="text-sm font-bold text-slate-900 hover:text-blue-700 transition"
-                    >
-                      {BRAND.emails.support}
-                    </a>
-                  </div>
-                </div>
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <a
+                  id="contact-wa-primary-btn"
+                  href={getWhatsAppLink('india', 'Hello Myers Global Pathways, I would like to consult with an admissions advisor regarding studying in India.')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-3.5 rounded-full text-xs font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
+                >
+                  <MessageCircle className="w-4 h-4 text-slate-950" />
+                  <span>Chat on WhatsApp (+91 9201330946)</span>
+                </a>
               </div>
             </div>
 
-            {/* India Desk Card */}
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-4">
+            {/* Complete Official Email Directory (All 9 Verified Emails) */}
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">🇮🇳</span>
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">India Admissions Headquarters</h3>
-                    <p className="text-[11px] text-slate-500">University Liaison & Student Arrival</p>
-                  </div>
-                </div>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-100">
-                  Headquarters
-                </span>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900">
+                  Official Email Directory
+                </h3>
+                <span className="text-xs font-mono text-slate-400">9 Active Inboxes</span>
               </div>
 
-              <div className="space-y-2 text-xs text-slate-600">
-                <div className="flex items-center gap-2.5">
-                  <Phone className="w-4 h-4 text-blue-700 shrink-0" />
-                  <a href={`tel:${BRAND.contacts.india.phoneRaw}`} className="font-semibold text-slate-900 hover:text-blue-700">
-                    {BRAND.contacts.india.phoneDisplay}
-                  </a>
-                </div>
+              <div className="bg-white border border-slate-200/80 rounded-3xl p-6 divide-y divide-slate-100 shadow-sm">
+                {EMAIL_DIRECTORY.map((item) => {
+                  const isCopied = copiedEmail === item.email;
+                  return (
+                    <div 
+                      key={item.email}
+                      className="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between gap-4 group"
+                    >
+                      <div className="truncate">
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                          {item.department}
+                        </p>
+                        <a
+                          href={`mailto:${item.email}`}
+                          className="text-xs sm:text-sm font-bold text-slate-900 hover:text-[#D99B26] transition-colors truncate block"
+                        >
+                          {item.email}
+                        </a>
+                      </div>
 
-                <div className="flex items-center gap-2.5">
-                  <Clock className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span>{BRAND.contacts.india.hours}</span>
-                </div>
-
-                <div className="flex items-center gap-2.5">
-                  <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span>{BRAND.contacts.india.address}</span>
-                </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          onClick={() => handleCopyEmail(item.email)}
+                          className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                          title="Copy Email Address"
+                        >
+                          {isCopied ? (
+                            <Check className="w-4 h-4 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-4 h-4" />
+                          )}
+                        </button>
+                        <a
+                          href={`mailto:${item.email}`}
+                          className="p-2 rounded-xl text-slate-400 hover:text-[#D99B26] hover:bg-amber-50 transition-colors"
+                          title="Send Email"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-
-              <a
-                href={getWhatsAppLink('india')}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-2xs"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>Chat on WhatsApp ({BRAND.contacts.india.phoneDisplay})</span>
-              </a>
-            </div>
-
-            {/* Liberia & West Africa Desk Card */}
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">🇱🇷</span>
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">Liberia & West Africa Desk</h3>
-                    <p className="text-[11px] text-slate-500">Student & Parent Consultations</p>
-                  </div>
-                </div>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
-                  Regional Desk
-                </span>
-              </div>
-
-              <div className="space-y-2 text-xs text-slate-600">
-                <div className="flex items-center gap-2.5">
-                  <Phone className="w-4 h-4 text-blue-700 shrink-0" />
-                  <a href={`tel:${BRAND.contacts.liberia.phoneRaw}`} className="font-semibold text-slate-900 hover:text-blue-700">
-                    {BRAND.contacts.liberia.phoneDisplay}
-                  </a>
-                </div>
-
-                <div className="flex items-center gap-2.5">
-                  <Clock className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span>{BRAND.contacts.liberia.hours}</span>
-                </div>
-
-                <div className="flex items-center gap-2.5">
-                  <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span>{BRAND.contacts.liberia.address}</span>
-                </div>
-              </div>
-
-              <a
-                href={getWhatsAppLink('liberia')}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-2xs"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>Chat on WhatsApp ({BRAND.contacts.liberia.phoneDisplay})</span>
-              </a>
             </div>
 
           </div>
 
-          {/* Right Column: Direct Admissions Inquiry Form */}
-          <div className="lg:col-span-7">
-            <div className="p-8 sm:p-10 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-6">
+          {/* Right Column: Interactive Professional Enquiry Form */}
+          <div className="lg:col-span-6">
+            <div className="bg-white border border-slate-200/80 rounded-3xl p-8 sm:p-10 shadow-xl space-y-6">
               
-              <div className="space-y-2">
-                <h3 className="text-xl font-bold text-slate-900">
-                  Submit an Admissions Enquiry
+              <div>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-950">
+                  Send an Academic Enquiry
                 </h3>
-                <p className="text-xs text-slate-600">
-                  Fill in your details to receive customized university options, fee structure breakdowns, and eligibility verification.
+                <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                  Fill out the details below, and our admissions team will review your requirements and reach out directly.
                 </p>
               </div>
 
               {isSubmitted ? (
-                <div className="p-6 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-3 text-emerald-900">
-                  <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm">
-                    <CheckCircle2 className="w-5 h-5" />
-                    <span>Enquiry Submitted Successfully</span>
+                <div className="p-8 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-4">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-6 h-6" />
                   </div>
-                  <p className="text-xs text-emerald-800 leading-relaxed">
-                    Thank you! Your information has been forwarded to our admissions desk. If WhatsApp did not open automatically, you can message us directly at <strong>{BRAND.contacts.india.phoneDisplay}</strong>.
+                  <h4 className="text-lg font-bold text-emerald-950">Enquiry Received Successfully</h4>
+                  <p className="text-xs sm:text-sm text-emerald-800 leading-relaxed">
+                    Thank you, <strong>{formData.fullName}</strong>. Your academic enquiry has been dispatched to <code>admissions@myersglobalpathways.com</code>. An advisor will contact you within 24 business hours.
                   </p>
                   <button
                     onClick={() => {
@@ -306,141 +200,158 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onNavigateHome }
                         fullName: '',
                         email: '',
                         phone: '',
-                        country: 'Liberia',
-                        program: 'Computer Science & Information Technology',
+                        country: '',
+                        studyLevel: 'Undergraduate',
+                        preferredCourse: '',
                         preferredUniversity: '',
                         message: ''
                       });
                     }}
-                    className="text-xs font-bold text-emerald-700 hover:underline pt-2 inline-block cursor-pointer"
+                    className="px-6 py-2.5 rounded-full text-xs font-bold text-emerald-900 bg-emerald-200/70 hover:bg-emerald-200 cursor-pointer"
                   >
                     Submit Another Enquiry
                   </button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  {errorMessage && (
-                    <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 flex items-center gap-2 text-red-700 text-xs font-medium">
-                      <AlertCircle className="w-4 h-4 shrink-0" />
-                      <span>{errorMessage}</span>
-                    </div>
-                  )}
-
                   {/* Full Name */}
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                      Full Legal Name <span className="text-red-500">*</span>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      Full Name *
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="e.g. John K. Myers"
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white"
+                      placeholder="e.g. Samuel K. Johnson"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                     />
                   </div>
 
-                  {/* Email and Phone Grid */}
+                  {/* Dual row: Email & Phone */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                        Email Address
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Email Address *
                       </label>
                       <input
                         type="email"
-                        placeholder="john@example.com"
+                        required
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white"
+                        placeholder="you@domain.com"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                        WhatsApp / Phone Number
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        WhatsApp Number *
                       </label>
                       <input
                         type="tel"
-                        placeholder="+231..."
+                        required
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white"
+                        placeholder="+231 ... / +234 ..."
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                       />
                     </div>
                   </div>
 
-                  {/* Country & Program */}
+                  {/* Dual row: Country & Study Level */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                        Country of Residence
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Your Country of Residence *
                       </label>
-                      <select
+                      <input
+                        type="text"
+                        required
                         value={formData.country}
                         onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white"
-                      >
-                        <option value="Liberia">Liberia (🇱🇷)</option>
-                        <option value="Ghana">Ghana (🇬🇭)</option>
-                        <option value="Nigeria">Nigeria (🇳🇬)</option>
-                        <option value="Sierra Leone">Sierra Leone (🇸🇱)</option>
-                        <option value="Kenya">Kenya (🇰🇪)</option>
-                        <option value="Uganda">Uganda (🇺🇬)</option>
-                        <option value="Tanzania">Tanzania (🇹🇿)</option>
-                        <option value="Rwanda">Rwanda (🇷🇼)</option>
-                        <option value="Other">Other Country</option>
-                      </select>
+                        placeholder="e.g. Liberia, Ghana, Nigeria..."
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                      />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                        Desired Study Discipline
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Study Level *
                       </label>
                       <select
-                        value={formData.program}
-                        onChange={(e) => setFormData({ ...formData, program: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white"
+                        value={formData.studyLevel}
+                        onChange={(e) => setFormData({ ...formData, studyLevel: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 bg-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                       >
-                        <option value="Computer Science & Information Technology">Computer Science / IT (BCA, B.Tech, MCA)</option>
-                        <option value="Business & Management">Business & Management (BBA, MBA)</option>
-                        <option value="Engineering & Technology">Engineering (Mechanical, Civil, Electrical)</option>
-                        <option value="Healthcare & Pharmacy">Healthcare, Pharmacy & Nursing</option>
-                        <option value="Data Science & Applied Technologies">Data Science & AI</option>
-                        <option value="Humanities & Law">Law, Media & Humanities</option>
-                        <option value="Other">Other Discipline</option>
+                        <option value="Undergraduate">Undergraduate (Bachelors)</option>
+                        <option value="Postgraduate">Postgraduate (Masters)</option>
+                        <option value="Doctoral">Doctorate (Ph.D.)</option>
+                        <option value="Diploma">Diploma / Professional Certificate</option>
                       </select>
+                    </div>
+                  </div>
+
+                  {/* Dual row: Preferred Course & University */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Preferred Course
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.preferredCourse}
+                        onChange={(e) => setFormData({ ...formData, preferredCourse: e.target.value })}
+                        placeholder="e.g. B.Tech Computer Science, MBA"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-amber-500"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Preferred University (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.preferredUniversity}
+                        onChange={(e) => setFormData({ ...formData, preferredUniversity: e.target.value })}
+                        placeholder="e.g. Top Rated / Location Preference"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-amber-500"
+                      />
                     </div>
                   </div>
 
                   {/* Message */}
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                      Academic Background & Questions
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      Message / Academic Background
                     </label>
                     <textarea
                       rows={3}
-                      placeholder="Mention your highest qualification (e.g., WASSCE / High School Diploma / Bachelor's) and any specific questions..."
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white"
+                      placeholder="Mention your high school result, graduation year, or specific questions..."
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
                   {/* Submit Button */}
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-blue-700 hover:bg-blue-800 transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                    >
-                      <Send className="w-3.5 h-3.5" />
-                      <span>{isSubmitting ? 'Submitting Enquiry...' : 'Submit Admissions Enquiry'}</span>
-                    </button>
-                    <p className="text-[11px] text-slate-500 text-center mt-2">
-                      Your enquiry is forwarded directly to our admissions desk with immediate WhatsApp receipt.
-                    </p>
-                  </div>
+                  <button
+                    id="contact-submit-btn"
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full py-4 rounded-full text-xs font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 to-[#D99B26] hover:from-amber-300 hover:to-amber-500 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <span>Submitting Enquiry...</span>
+                    ) : (
+                      <>
+                        <span>Send Enquiry</span>
+                        <Send className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
                 </form>
               )}
 
@@ -450,6 +361,6 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onNavigateHome }
         </div>
 
       </div>
-    </div>
+    </section>
   );
 };

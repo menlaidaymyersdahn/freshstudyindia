@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { ApplicationStatus, StudentApplicationProfile, ApplicationDocument, CounselorNote } from '../types';
 import { getWhatsAppLink } from '../lib/constants';
+import { BrandEmblem } from './BrandLogo';
 
 interface AdmissionsPortalProps {
   isOpen: boolean;
@@ -643,14 +644,14 @@ export const AdmissionsPortal: React.FC<AdmissionsPortalProps> = ({ isOpen, onCl
         
         {/* Top Navigation Bar */}
         <header className="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/70 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center shadow-xs">
-              <ShieldCheck className="w-6 h-6" />
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-slate-900 border border-slate-700 p-1 flex items-center justify-center shadow-xs">
+              <BrandEmblem className="w-8 h-8" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-black text-white tracking-tight">
-                  Myers Global Pathway Admissions Portal
+                  Myers Global Pathways Admissions Portal
                 </h2>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono font-bold uppercase tracking-wider">
                   Live Vault
@@ -696,8 +697,8 @@ export const AdmissionsPortal: React.FC<AdmissionsPortalProps> = ({ isOpen, onCl
           /* Counselors Passcode Login Screen */
           <div className="flex-1 flex items-center justify-center p-6 bg-slate-950/40">
             <div className="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl text-center space-y-6">
-              <div className="w-16 h-16 rounded-2xl bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center justify-center mx-auto shadow-inner">
-                <Lock className="w-8 h-8" />
+              <div className="w-20 h-20 rounded-2xl bg-slate-950 border border-slate-800 p-2 flex items-center justify-center mx-auto shadow-inner">
+                <BrandEmblem className="w-14 h-14" />
               </div>
 
               <div className="space-y-2">

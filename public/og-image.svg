@@ -1,20 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0B192C"/>
-      <stop offset="60%" stop-color="#0F243E"/>
-      <stop offset="100%" stop-color="#07111E"/>
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="60%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#020617"/>
     </linearGradient>
-    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#38BDF8"/>
-      <stop offset="100%" stop-color="#0EA5E9"/>
-    </linearGradient>
-    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="rgba(255,255,255,0.12)"/>
-      <stop offset="100%" stop-color="rgba(255,255,255,0.03)"/>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D99B26"/>
     </linearGradient>
     <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="40" result="blur" />
+      <feGaussianBlur stdDeviation="50" result="blur" />
     </filter>
   </defs>
 
@@ -22,99 +18,64 @@
   <rect width="1200" height="630" fill="url(#bg)"/>
 
   <!-- Ambient Glows -->
-  <circle cx="1050" cy="150" r="280" fill="#0284C7" opacity="0.25" filter="url(#glow)"/>
-  <circle cx="200" cy="500" r="220" fill="#0EA5E9" opacity="0.15" filter="url(#glow)"/>
-  <circle cx="900" cy="520" r="180" fill="#10B981" opacity="0.12" filter="url(#glow)"/>
-
-  <!-- Grid lines subtle -->
-  <g opacity="0.06" stroke="#ffffff" stroke-width="1">
-    <line x1="0" y1="105" x2="1200" y2="105" />
-    <line x1="0" y1="210" x2="1200" y2="210" />
-    <line x1="0" y1="315" x2="1200" y2="315" />
-    <line x1="0" y1="420" x2="1200" y2="420" />
-    <line x1="0" y1="525" x2="1200" y2="525" />
-    <line x1="240" y1="0" x2="240" y2="630" />
-    <line x1="480" y1="0" x2="480" y2="630" />
-    <line x1="720" y1="0" x2="720" y2="630" />
-    <line x1="960" y1="0" x2="960" y2="630" />
-  </g>
+  <circle cx="1050" cy="150" r="300" fill="#1D4ED8" opacity="0.2" filter="url(#glow)"/>
+  <circle cx="200" cy="500" r="220" fill="#D99B26" opacity="0.12" filter="url(#glow)"/>
 
   <!-- Left Content Container -->
-  <g transform="translate(90, 80)">
+  <g transform="translate(100, 90)">
     <!-- Top Pill / Badge -->
-    <rect width="420" height="42" rx="21" fill="url(#badgeGrad)" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1.5"/>
-    <circle cx="24" cy="21" r="6" fill="#38BDF8"/>
-    <text x="42" y="27" fill="#E2E8F0" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" letter-spacing="0.5">
-      INTERNATIONAL ADMISSIONS CONSULTANCY
+    <rect width="440" height="42" rx="21" fill="rgba(255,255,255,0.06)" stroke="rgba(217, 155, 38, 0.4)" stroke-width="1.5"/>
+    <circle cx="24" cy="21" r="6" fill="#D99B26"/>
+    <text x="42" y="27" fill="#E2E8F0" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="700" letter-spacing="1">
+      2026 / 2027 INTERNATIONAL ADMISSIONS
     </text>
 
     <!-- Main Title -->
-    <text x="0" y="130" fill="#FFFFFF" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="56" font-weight="900" letter-spacing="-1">
-      STUDY IN INDIA.
+    <text x="0" y="140" fill="#FFFFFF" font-family="system-ui, -apple-system, sans-serif" font-size="58" font-weight="900" letter-spacing="-1">
+      YOUR PATHWAY TO
     </text>
-    <text x="0" y="195" fill="url(#skyGrad)" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="56" font-weight="900" letter-spacing="-1">
-      START YOUR NEXT CHAPTER.
+    <text x="0" y="210" fill="url(#goldGrad)" font-family="system-ui, -apple-system, sans-serif" font-size="58" font-weight="900" letter-spacing="-1">
+      STUDY IN INDIA
     </text>
 
     <!-- Brand Subtitle -->
-    <text x="0" y="260" fill="#94A3B8" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="500">
-      Fresh Study India · Dedicated guidance for international students
-    </text>
-    <text x="0" y="295" fill="#CBD5E1" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="400">
-      From university admission and student visas to accommodation &amp; airport arrival.
+    <text x="0" y="280" fill="#94A3B8" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="400">
+      Accredited Degrees • Visa Guidance • Admission Support • Arrival Care
     </text>
 
-    <!-- Feature highlights badges -->
-    <g transform="translate(0, 350)">
-      <!-- Badge 1: Universities -->
-      <rect x="0" y="0" width="220" height="52" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-      <text x="20" y="32" fill="#FFFFFF" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700">🏛️ Top Universities</text>
+    <!-- Trust Stats Pill Grid -->
+    <g transform="translate(0, 330)">
+      <rect width="210" height="74" rx="16" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>
+      <text x="24" y="34" fill="#FFFFFF" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="800">50+ Degrees</text>
+      <text x="24" y="56" fill="#94A3B8" font-family="system-ui, -apple-system, sans-serif" font-size="13">B.Tech, MBA, Allied Health</text>
 
-      <!-- Badge 2: Visa Support -->
-      <rect x="235" y="0" width="200" height="52" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-      <text x="255" y="32" fill="#FFFFFF" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700">🛂 Visa Guidance</text>
+      <g transform="translate(230, 0)">
+        <rect width="210" height="74" rx="16" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>
+        <text x="24" y="34" fill="#D99B26" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="800">100% Verified</text>
+        <text x="24" y="56" fill="#94A3B8" font-family="system-ui, -apple-system, sans-serif" font-size="13">UGC & AICTE Accredited</text>
+      </g>
 
-      <!-- Badge 3: Arrival & Campus -->
-      <rect x="450" y="0" width="220" height="52" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-      <text x="470" y="32" fill="#FFFFFF" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700">🛬 Arrival &amp; Campus</text>
-    </g>
-
-    <!-- Corridor Badges -->
-    <g transform="translate(0, 435)">
-      <text x="0" y="20" fill="#38BDF8" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="800" letter-spacing="1">
-        WEST AFRICA 🇱🇷 ➡️ INDIA 🇮🇳 ADMISSIONS DESKS &amp; WHATSAPP SUPPORT
-      </text>
+      <g transform="translate(460, 0)">
+        <rect width="210" height="74" rx="16" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>
+        <text x="24" y="34" fill="#60A5FA" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="800">Direct Support</text>
+        <text x="24" y="56" fill="#94A3B8" font-family="system-ui, -apple-system, sans-serif" font-size="13">India & Liberia Desks</text>
+      </g>
     </g>
   </g>
 
-  <!-- Right Visual / Shield Emblem Card -->
-  <g transform="translate(860, 110)">
-    <rect width="250" height="380" rx="24" fill="rgba(255,255,255,0.05)" stroke="rgba(56, 189, 248, 0.3)" stroke-width="2"/>
+  <!-- Right Side Brand Logo Emblem Card -->
+  <g transform="translate(850, 165)">
+    <rect width="250" height="300" rx="32" fill="#FFFFFF" filter="drop-shadow(0 20px 30px rgba(0,0,0,0.5))"/>
     
-    <!-- Top Cap Icon -->
-    <circle cx="125" cy="90" r="50" fill="#0284C7" fill-opacity="0.2"/>
-    <circle cx="125" cy="90" r="36" fill="#38BDF8"/>
-    <!-- Graduation cap shape -->
-    <polygon points="125,72 155,85 125,98 95,85" fill="#0B192C"/>
-    <polygon points="125,98 145,90 145,103 125,111 105,103 105,90" fill="#0B192C"/>
+    <!-- Emblem -->
+    <g transform="translate(25, 20) scale(1.0)">
+      <path d="M 28 95 C 36 56, 64 36, 100 36 C 136 36, 164 56, 172 95 L 138 95 C 133 74, 119 62, 100 62 C 81 62, 67 74, 62 95 Z" fill="#111827" />
+      <path d="M 62 95 C 66 79, 81 69, 100 69 C 119 69, 134 79, 138 95 Z" fill="#FFFFFF" />
+      <path d="M 40 105 C 46 138, 70 164, 100 164 C 130 164, 154 138, 160 105 L 186 105 C 178 126, 154 154, 126 163 C 110 168, 90 168, 74 163 C 50 152, 42 130, 40 105 Z" fill="#D99B26" />
+    </g>
 
-    <text x="125" y="180" text-anchor="middle" fill="#FFFFFF" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="800">
-      FRESH STUDY
-    </text>
-    <text x="125" y="205" text-anchor="middle" fill="#38BDF8" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="800">
-      INDIA
-    </text>
-
-    <line x1="40" y1="230" x2="210" y2="230" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-
-    <text x="125" y="265" text-anchor="middle" fill="#E2E8F0" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="600">
-      100% Accredited
-    </text>
-    <text x="125" y="295" text-anchor="middle" fill="#E2E8F0" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="600">
-      Personalized Mentorship
-    </text>
-    <text x="125" y="325" text-anchor="middle" fill="#10B981" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700">
-      WhatsApp Direct Desk
-    </text>
+    <!-- Text inside card -->
+    <text x="125" y="235" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="24" fill="#111827" letter-spacing="2">MYERS</text>
+    <text x="125" y="260" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="14" fill="#D99B26" letter-spacing="2">GLOBAL PATHWAYS</text>
   </g>
 </svg>

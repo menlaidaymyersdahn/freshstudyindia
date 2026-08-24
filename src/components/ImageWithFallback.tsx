@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 interface ImageWithFallbackProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
+  fallbackSrc?: string;
   fallbackSrcs?: string[];
   alt: string;
   className?: string;
@@ -10,6 +11,7 @@ interface ImageWithFallbackProps extends React.ImgHTMLAttributes<HTMLImageElemen
 
 export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   src,
+  fallbackSrc,
   fallbackSrcs = [],
   alt,
   className = '',
@@ -19,11 +21,16 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   const [currentSrcIndex, setCurrentSrcIndex] = useState(-1);
   const [hasError, setHasError] = useState(false);
 
-  const allSources = [src, ...fallbackSrcs];
+  // Combine primary src, optional fallbackSrc, and optional fallbackSrcs array
+  const candidateFallbacks = [
+    ...(fallbackSrc ? [fallbackSrc] : []),
+    ...fallbackSrcs
+  ];
+  const allSources = Array.from(new Set([src, ...candidateFallbacks].filter(Boolean)));
   const activeSrc = currentSrcIndex === -1 ? src : allSources[currentSrcIndex] || src;
 
   const handleError = () => {
-    const nextIndex = currentSrcIndex + 1;
+    const nextIndex = (currentSrcIndex === -1 ? 0 : currentSrcIndex) + 1;
     if (nextIndex < allSources.length) {
       setCurrentSrcIndex(nextIndex);
     } else {
@@ -32,7 +39,7 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   };
 
   if (hasError) {
-    // Elegant fallback container if all image sources fail
+    // Fallback container if all image sources fail
     return (
       <div className={`bg-slate-900 flex items-center justify-center text-slate-500 ${className}`}>
         <span className="text-xs font-mono">{alt}</span>

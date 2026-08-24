@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { BRAND, getWhatsAppLink } from '../lib/constants';
 import { ApplicationDocument, StudentApplicationProfile } from '../types';
+import { BrandEmblem } from './BrandLogo';
 
 interface ApplicationModalProps {
   isOpen: boolean;
@@ -362,17 +363,21 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
         ) : (
           <div>
             {/* Header */}
-            <div className="mb-6 space-y-1.5 pr-8">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-100 text-[11px] font-semibold">
-                <GraduationCap className="w-3.5 h-3.5" />
-                <span>2026 Admissions Desk</span>
+            <div className="mb-6 flex items-start gap-3.5 pr-8">
+              <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-center p-1.5 shrink-0 shadow-2xs">
+                <BrandEmblem className="w-9 h-9" />
               </div>
-              <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                Start Your Application
-              </h3>
-              <p className="text-xs text-slate-600">
-                Submit your details to receive personalized university shortlist and admissions guidance.
-              </p>
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-100 text-[11px] font-semibold">
+                  <span>Myers Global Pathways Admissions</span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+                  Start Your Application
+                </h3>
+                <p className="text-xs text-slate-600">
+                  Submit your details to receive personalized university shortlist and admissions guidance.
+                </p>
+              </div>
             </div>
 
             {/* Application Form */}

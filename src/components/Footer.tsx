@@ -1,217 +1,155 @@
 import React from 'react';
 import { 
-  GraduationCap, 
+  ArrowRight, 
   MessageCircle, 
-  Lock,
-  Share2
+  Mail, 
+  ShieldCheck, 
+  ChevronRight,
+  Globe2
 } from 'lucide-react';
-import { BRAND, getWhatsAppLink } from '../lib/constants';
+import { BRAND, getWhatsAppLink, EMAIL_DIRECTORY } from '../lib/constants';
 import { NavTab } from '../types';
+import { BrandLogo } from './BrandLogo';
 
 interface FooterProps {
-  onNavigate?: (tab: NavTab) => void;
-  onOpenPrivacy?: () => void;
-  onOpenApplication?: () => void;
-  onOpenShare?: () => void;
+  onNavigate: (tab: NavTab) => void;
+  onOpenApplication: () => void;
   onOpenPortal?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ 
-  onNavigate,
-  onOpenPrivacy, 
+  onNavigate, 
   onOpenApplication,
-  onOpenShare,
   onOpenPortal
 }) => {
-  const handleNavClick = (tab: NavTab) => {
-    if (onNavigate) {
-      onNavigate(tab);
-    }
-  };
+  const quickLinks: { id: NavTab; label: string }[] = [
+    { id: 'home', label: 'Home' },
+    { id: 'study-in-india', label: 'Study in India' },
+    { id: 'services', label: 'Services' },
+    { id: 'universities', label: 'Universities' },
+    { id: 'about', label: 'About' },
+    { id: 'contact', label: 'Contact' },
+  ];
 
   return (
-    <footer className="bg-slate-950 text-white pt-20 pb-12 border-t border-slate-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer 
+      id="main-footer"
+      className="bg-[#030710] text-white border-t border-slate-900 pt-20 pb-12 overflow-hidden"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         
-        {/* Main 4-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-slate-800/80">
+        {/* Top Tier: Brand, Tagline, Quick Nav, and Official WhatsApp */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
           
-          {/* Col 1: Brand Info */}
-          <div className="lg:col-span-4 space-y-4">
-            <button 
-              onClick={() => handleNavClick('home')}
-              className="flex items-center gap-3 text-left cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-xl bg-blue-700 flex items-center justify-center text-white shadow-xs">
-                <GraduationCap className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold tracking-tight text-white">
-                Myers Global <span className="text-blue-400">Pathways</span>
-              </span>
-            </button>
+          {/* Brand Col */}
+          <div className="lg:col-span-5 space-y-6">
+            <BrandLogo size="lg" variant="horizontal" theme="light" showTagline={false} />
 
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm">
-              A professional international education consultancy assisting students worldwide with university selection, admissions guidance, documentation, and the journey to studying in India.
+            <p className="text-sm text-slate-400 font-serif italic text-amber-200/90 text-lg">
+              "{BRAND.tagline}"
             </p>
 
-            <div className="pt-2 flex items-center gap-3">
+            <p className="text-xs sm:text-sm text-slate-400 max-w-sm leading-relaxed">
+              Myers Global Pathways is an international education consultancy dedicated to guiding students worldwide into accredited universities across India.
+            </p>
+
+            {/* Direct WhatsApp Action */}
+            <div className="pt-2">
               <a
+                id="footer-wa-btn"
                 href={getWhatsAppLink('india')}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 transition-colors shadow-lg shadow-emerald-500/20"
               >
-                <MessageCircle className="w-4 h-4" />
-                <span>WhatsApp Admissions</span>
+                <MessageCircle className="w-4 h-4 text-slate-950" />
+                <span>Chat on WhatsApp (+91 9201330946)</span>
               </a>
-
-              {onOpenShare && (
-                <button
-                  onClick={onOpenShare}
-                  className="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition cursor-pointer"
-                  title="Share Website"
-                >
-                  <Share2 className="w-4 h-4" />
-                </button>
-              )}
             </div>
           </div>
 
-          {/* Col 2: Quick Navigation */}
-          <div className="lg:col-span-2 space-y-3">
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-300">
-              Navigation
-            </p>
-            <ul className="space-y-2 text-xs text-slate-400">
-              <li>
-                <button onClick={() => handleNavClick('home')} className="hover:text-white transition cursor-pointer">
-                  Home
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleNavClick('study-in-india')} className="hover:text-white transition cursor-pointer">
-                  Study in India
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleNavClick('services')} className="hover:text-white transition cursor-pointer">
-                  Services
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleNavClick('programs')} className="hover:text-white transition cursor-pointer">
-                  Programs
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleNavClick('why-us')} className="hover:text-white transition cursor-pointer">
-                  Why Us
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleNavClick('process')} className="hover:text-white transition cursor-pointer">
-                  Application Process
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleNavClick('contact')} className="hover:text-white transition cursor-pointer">
-                  Contact
-                </button>
-              </li>
+          {/* Quick Links */}
+          <div className="lg:col-span-3 space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-amber-400">
+              Quick Links
+            </h4>
+            <ul className="space-y-2.5">
+              {quickLinks.map((link) => (
+                <li key={link.id}>
+                  <button
+                    onClick={() => onNavigate(link.id)}
+                    className="text-xs sm:text-sm text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 group"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-amber-400 transition-colors" />
+                    <span>{link.label}</span>
+                  </button>
+                </li>
+              ))}
+              {onOpenPortal && (
+                <li>
+                  <button
+                    onClick={onOpenPortal}
+                    className="text-xs sm:text-sm text-amber-400 hover:text-amber-300 font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Track Application Status</span>
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
 
-          {/* Col 3: Official Emails */}
-          <div className="lg:col-span-3 space-y-3">
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-300">
-              Official Email Inquiries
-            </p>
-            <ul className="space-y-2.5 text-xs text-slate-400">
-              <li>
-                <span className="text-[10px] text-slate-500 block uppercase">Admissions Desk</span>
-                <a href={`mailto:${BRAND.emails.admissions}`} className="text-slate-300 hover:text-blue-400 transition">
-                  {BRAND.emails.admissions}
+          {/* Official Inboxes Overview */}
+          <div className="lg:col-span-4 space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-amber-400">
+              Official Email Directory
+            </h4>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center justify-between border-b border-slate-900 pb-1.5">
+                <span className="text-slate-400">General Enquiries</span>
+                <a href="mailto:info@myersglobalpathways.com" className="text-slate-200 hover:text-amber-400 font-mono">
+                  info@myersglobalpathways.com
                 </a>
-              </li>
-              <li>
-                <span className="text-[10px] text-slate-500 block uppercase">General Information</span>
-                <a href={`mailto:${BRAND.emails.info}`} className="text-slate-300 hover:text-blue-400 transition">
-                  {BRAND.emails.info}
-                </a>
-              </li>
-              <li>
-                <span className="text-[10px] text-slate-500 block uppercase">Applications & Verification</span>
-                <a href={`mailto:${BRAND.emails.applications}`} className="text-slate-300 hover:text-blue-400 transition">
-                  {BRAND.emails.applications}
-                </a>
-              </li>
-              <li>
-                <span className="text-[10px] text-slate-500 block uppercase">Student Support</span>
-                <a href={`mailto:${BRAND.emails.support}`} className="text-slate-300 hover:text-blue-400 transition">
-                  {BRAND.emails.support}
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Col 4: Official Locations & WhatsApp */}
-          <div className="lg:col-span-3 space-y-3">
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-300">
-              Official Contact Desks
-            </p>
-            <div className="space-y-3 text-xs text-slate-400">
-              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                <p className="font-bold text-white text-[11px]">🇮🇳 India Admissions HQ</p>
-                <a href={`tel:${BRAND.contacts.india.phoneRaw}`} className="font-semibold text-blue-400 block hover:underline">
-                  {BRAND.contacts.india.phoneDisplay}
-                </a>
-                <p className="text-[11px] text-slate-500">{BRAND.contacts.india.address}</p>
               </div>
-
-              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                <p className="font-bold text-white text-[11px]">🇱🇷 Liberia & West Africa Desk</p>
-                <a href={`tel:${BRAND.contacts.liberia.phoneRaw}`} className="font-semibold text-blue-400 block hover:underline">
-                  {BRAND.contacts.liberia.phoneDisplay}
+              <div className="flex items-center justify-between border-b border-slate-900 pb-1.5">
+                <span className="text-slate-400">Admissions Desk</span>
+                <a href="mailto:admissions@myersglobalpathways.com" className="text-slate-200 hover:text-amber-400 font-mono">
+                  admissions@myersglobalpathways.com
                 </a>
-                <p className="text-[11px] text-slate-500">{BRAND.contacts.liberia.address}</p>
+              </div>
+              <div className="flex items-center justify-between border-b border-slate-900 pb-1.5">
+                <span className="text-slate-400">Applications</span>
+                <a href="mailto:applications@myersglobalpathways.com" className="text-slate-200 hover:text-amber-400 font-mono">
+                  applications@myersglobalpathways.com
+                </a>
+              </div>
+              <div className="flex items-center justify-between border-b border-slate-900 pb-1.5">
+                <span className="text-slate-400">Student Support</span>
+                <a href="mailto:support@myersglobalpathways.com" className="text-slate-200 hover:text-amber-400 font-mono">
+                  support@myersglobalpathways.com
+                </a>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Institutional Collab</span>
+                <a href="mailto:partnerships@myersglobalpathways.com" className="text-slate-200 hover:text-amber-400 font-mono">
+                  partnerships@myersglobalpathways.com
+                </a>
               </div>
             </div>
           </div>
 
         </div>
 
-        {/* Bottom Strip: Copyright & Legal */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <div className="flex flex-wrap items-center gap-3">
-            <span>© 2026 Myers Global Pathways. All rights reserved.</span>
-            {onOpenPrivacy && (
-              <>
-                <span>•</span>
-                <button
-                  onClick={onOpenPrivacy}
-                  className="hover:text-slate-300 transition underline cursor-pointer"
-                >
-                  Privacy Policy & Terms
-                </button>
-              </>
-            )}
-            {onOpenPortal && (
-              <>
-                <span>•</span>
-                <button
-                  onClick={onOpenPortal}
-                  className="hover:text-blue-400 transition flex items-center gap-1 cursor-pointer"
-                >
-                  <Lock className="w-3 h-3 text-blue-400" />
-                  <span>Counselor Portal</span>
-                </button>
-              </>
-            )}
-          </div>
-
-          <p className="text-[11px] text-slate-500 text-center md:text-right">
-            Official Higher Education Admissions Advisory & International Student Support
+        {/* Bottom Tier: Copyright & Compliance */}
+        <div className="pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <p>
+            © 2026 Myers Global Pathways. All Rights Reserved.
           </p>
+          <div className="flex items-center gap-6">
+            <span>Direct University Admissions Advisory</span>
+            <span>•</span>
+            <span>UGC & NAAC Verified Guidance</span>
+          </div>
         </div>
 
       </div>

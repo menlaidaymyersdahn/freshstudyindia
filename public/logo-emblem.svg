@@ -1,6 +1,7 @@
 <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="200" height="200" rx="44" fill="#FFFFFF"/>
+  <!-- Top Arc (Black / Charcoal) -->
   <path d="M 28 95 C 36 56, 64 36, 100 36 C 136 36, 164 56, 172 95 L 138 95 C 133 74, 119 62, 100 62 C 81 62, 67 74, 62 95 Z" fill="#111827" />
   <path d="M 62 95 C 66 79, 81 69, 100 69 C 119 69, 134 79, 138 95 Z" fill="#FFFFFF" />
+  <!-- Bottom Arc (Amber / Gold) -->
   <path d="M 40 105 C 46 138, 70 164, 100 164 C 130 164, 154 138, 160 105 L 186 105 C 178 126, 154 154, 126 163 C 110 168, 90 168, 74 163 C 50 152, 42 130, 40 105 Z" fill="#D99B26" />
 </svg>

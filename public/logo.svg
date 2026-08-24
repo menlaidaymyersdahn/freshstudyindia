@@ -1,0 +1,16 @@
+<svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="500" height="500" fill="#FFFFFF"/>
+  
+  <!-- Emblem centered -->
+  <g transform="translate(150, 70) scale(1.0)">
+    <!-- Top Arc (Black) -->
+    <path d="M 28 95 C 36 56, 64 36, 100 36 C 136 36, 164 56, 172 95 L 138 95 C 133 74, 119 62, 100 62 C 81 62, 67 74, 62 95 Z" fill="#111827" />
+    <path d="M 62 95 C 66 79, 81 69, 100 69 C 119 69, 134 79, 138 95 Z" fill="#FFFFFF" />
+    <!-- Bottom Arc (Gold) -->
+    <path d="M 40 105 C 46 138, 70 164, 100 164 C 130 164, 154 138, 160 105 L 186 105 C 178 126, 154 154, 126 163 C 110 168, 90 168, 74 163 C 50 152, 42 130, 40 105 Z" fill="#D99B26" />
+  </g>
+
+  <!-- Typography matching exact uploaded logo -->
+  <text x="250" y="325" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="42" fill="#111827" letter-spacing="4">MYERS</text>
+  <text x="250" y="365" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="24" fill="#111827" letter-spacing="3">GLOBAL PATHWAYS</text>
+</svg>

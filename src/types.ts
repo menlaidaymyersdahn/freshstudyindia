@@ -2,10 +2,12 @@ export type NavTab =
   | 'home'
   | 'study-in-india'
   | 'services'
+  | 'universities'
+  | 'about'
+  | 'contact'
   | 'programs'
   | 'why-us'
-  | 'process'
-  | 'contact';
+  | 'process';
 
 export type StudyField = 
   | 'COMPUTER SCIENCE'

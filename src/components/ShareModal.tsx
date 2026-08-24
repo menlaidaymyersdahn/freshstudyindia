@@ -10,6 +10,7 @@ import {
   Globe
 } from 'lucide-react';
 import { BRAND } from '../lib/constants';
+import { BrandEmblem, BrandLogo } from './BrandLogo';
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -29,7 +30,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   if (!isOpen) return null;
 
   const shareUrl = typeof window !== 'undefined' ? window.location.href : 'https://myersglobalpathway.com';
-  const shareTitle = customTitle || 'Myers Global Pathway — Study in India International Admissions';
+  const shareTitle = customTitle || 'Myers Global Pathways — Study in India International Admissions';
   const shareDesc = customDesc || 'Direct admissions, university placement, student visa guidance, and arrival support for international students studying in India.';
 
   const handleCopyLink = () => {
@@ -43,7 +44,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
   const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`;
   const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
-  const emailShareUrl = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(`Hi,\n\nI wanted to share Myers Global Pathway with you for studying at accredited universities in India:\n\n${shareDesc}\n\nVisit: ${shareUrl}`)}`;
+  const emailShareUrl = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(`Hi,\n\nI wanted to share Myers Global Pathways with you for studying at accredited universities in India:\n\n${shareDesc}\n\nVisit: ${shareUrl}`)}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200">
@@ -61,12 +62,12 @@ export const ShareModal: React.FC<ShareModalProps> = ({
         </button>
 
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-red-600 via-rose-600 to-[#060F1E] text-white flex items-center justify-center shadow-md">
-            <Share2 className="w-5 h-5" />
+        <div className="flex items-center gap-3.5 mb-6">
+          <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 p-1 flex items-center justify-center shadow-xs">
+            <BrandEmblem className="w-9 h-9" />
           </div>
           <div>
-            <h3 className="text-xl font-extrabold text-[#060F1E]">Share Myers Global Pathway</h3>
+            <h3 className="text-xl font-extrabold text-slate-900">Share Myers Global Pathways</h3>
             <p className="text-xs text-slate-500">
               Share with prospective students, parents, or sponsors
             </p>
@@ -77,19 +78,19 @@ export const ShareModal: React.FC<ShareModalProps> = ({
         <div className="mb-6 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 shadow-xs">
           <div className="p-2.5 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-[11px] font-mono text-slate-500">
             <span className="flex items-center gap-1.5 font-bold text-slate-700">
-              <Sparkles className="w-3.5 h-3.5 text-rose-600" />
+              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
               Social Media OpenGraph Preview
             </span>
-            <span className="text-[10px] bg-red-50 text-rose-800 border border-red-200 px-2 py-0.5 rounded-full font-semibold">
+            <span className="text-[10px] bg-blue-50 text-blue-800 border border-blue-200 px-2 py-0.5 rounded-full font-semibold">
               Live Card
             </span>
           </div>
 
           {/* Card Graphic */}
-          <div className="bg-[#060F1E] p-4 text-white relative">
+          <div className="bg-slate-950 p-4 text-white relative">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-rose-400">
-                Myers Global Pathway
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                Myers Global Pathways
               </span>
               <span className="text-[11px]">🇱🇷 ➡️ 🇮🇳</span>
             </div>

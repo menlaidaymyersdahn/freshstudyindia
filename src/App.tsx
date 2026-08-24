@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { HomeView } from './components/HomeView';
-import { StudyInIndia } from './components/StudyInIndia';
+import { StudyInIndiaSection } from './components/StudyInIndiaSection';
 import { ServicesSection } from './components/ServicesSection';
-import { StudyPrograms } from './components/StudyPrograms';
-import { WhyUs } from './components/WhyUs';
-import { ApplicationProcess } from './components/ApplicationProcess';
+import { ApplicationJourney } from './components/ApplicationJourney';
+import { AboutSection } from './components/AboutSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { ApplicationModal } from './components/ApplicationModal';
-import { PrivacyModal } from './components/PrivacyModal';
-import { ShareModal } from './components/ShareModal';
 import { AdmissionsPortal } from './components/AdmissionsPortal';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { useDynamicSEO } from './hooks/useDynamicSEO';
@@ -20,8 +17,6 @@ export function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
   const [presetStudyField, setPresetStudyField] = useState<string | undefined>(undefined);
-  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isAdmissionsPortalOpen, setIsAdmissionsPortalOpen] = useState(false);
 
   // Sync activeTab with URL hash on initial load and on popstate/hashchange
@@ -32,7 +27,9 @@ export function App() {
         'home', 
         'study-in-india', 
         'services', 
+        'universities', 
         'programs', 
+        'about', 
         'why-us', 
         'process', 
         'contact'
@@ -62,12 +59,14 @@ export function App() {
     if (presetStudyField) return `Study ${presetStudyField} in India | Myers Global Pathways`;
     switch (activeTab) {
       case 'study-in-india': return 'Study in India Guide | Myers Global Pathways';
-      case 'services': return 'Our 8 Advisory Services | Myers Global Pathways';
-      case 'programs': return 'Degree Programs in India | Myers Global Pathways';
-      case 'why-us': return 'Why Choose Us | Myers Global Pathways';
-      case 'process': return '8-Step Application Process | Myers Global Pathways';
+      case 'services': return 'Our Advisory Services | Myers Global Pathways';
+      case 'universities':
+      case 'programs': return 'Academic Programs & Universities | Myers Global Pathways';
+      case 'about':
+      case 'why-us': return 'About Myers Global Pathways | International Admissions Advisory';
+      case 'process': return 'Application Journey | Myers Global Pathways';
       case 'contact': return 'Contact Admissions Desks | Myers Global Pathways';
-      default: return 'Myers Global Pathways | International Admissions Advisory for India';
+      default: return 'Myers Global Pathways | Your Pathway to Global Education';
     }
   };
 
@@ -88,13 +87,12 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFCFF] text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#FAFAF8] text-slate-900 font-sans antialiased selection:bg-amber-400 selection:text-slate-950 flex flex-col justify-between">
       {/* 1. Header & Navigation */}
       <Navbar 
         activeTab={activeTab}
         onNavigate={handleNavigate}
         onOpenApplication={() => handleOpenApplication()} 
-        onOpenShare={() => setIsShareModalOpen(true)}
         onOpenPortal={() => setIsAdmissionsPortalOpen(true)}
       />
 
@@ -108,57 +106,68 @@ export function App() {
         )}
 
         {activeTab === 'study-in-india' && (
-          <StudyInIndia 
-            onOpenApplication={() => handleOpenApplication()}
-            onNavigateHome={() => handleNavigate('home')}
-          />
+          <div className="pt-20">
+            <StudyInIndiaSection 
+              onOpenApplication={(field) => handleOpenApplication(field)}
+              onNavigateHome={() => handleNavigate('home')}
+            />
+          </div>
         )}
 
         {activeTab === 'services' && (
-          <ServicesSection 
-            onOpenApplication={(service) => handleOpenApplication(service)}
-            onNavigateHome={() => handleNavigate('home')}
-          />
+          <div className="pt-20">
+            <ServicesSection 
+              onOpenApplication={(service) => handleOpenApplication(service)}
+              onNavigateHome={() => handleNavigate('home')}
+            />
+          </div>
         )}
 
-        {activeTab === 'programs' && (
-          <StudyPrograms 
-            onSelectProgram={(program) => handleOpenApplication(program)}
-            onNavigateHome={() => handleNavigate('home')}
-          />
+        {(activeTab === 'universities' || activeTab === 'programs') && (
+          <div className="pt-20">
+            <StudyInIndiaSection 
+              onOpenApplication={(program) => handleOpenApplication(program)}
+              onNavigateHome={() => handleNavigate('home')}
+            />
+          </div>
         )}
 
-        {activeTab === 'why-us' && (
-          <WhyUs 
-            onOpenApplication={() => handleOpenApplication()}
-            onNavigateHome={() => handleNavigate('home')}
-          />
+        {(activeTab === 'about' || activeTab === 'why-us') && (
+          <div className="pt-20">
+            <AboutSection 
+              onOpenApplication={() => handleOpenApplication()}
+              onNavigateHome={() => handleNavigate('home')}
+            />
+          </div>
         )}
 
         {activeTab === 'process' && (
-          <ApplicationProcess 
-            onOpenApplication={(step) => handleOpenApplication(step)}
-            onNavigateHome={() => handleNavigate('home')}
-          />
+          <div className="pt-20">
+            <ApplicationJourney 
+              onOpenApplication={(step) => handleOpenApplication(step)}
+              onNavigateHome={() => handleNavigate('home')}
+            />
+          </div>
         )}
 
         {activeTab === 'contact' && (
-          <ContactSection 
-            onNavigateHome={() => handleNavigate('home')}
-          />
+          <div className="pt-20">
+            <ContactSection 
+              onNavigateHome={() => handleNavigate('home')}
+              onOpenApplication={() => handleOpenApplication()}
+            />
+          </div>
         )}
       </main>
 
       {/* 3. Footer */}
       <Footer 
         onNavigate={handleNavigate}
-        onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
         onOpenApplication={() => handleOpenApplication()}
-        onOpenShare={() => setIsShareModalOpen(true)}
         onOpenPortal={() => setIsAdmissionsPortalOpen(true)}
       />
 
-      {/* Modals & Overlays */}
+      {/* Modals & Interactive Overlays */}
       <ApplicationModal
         isOpen={isAppModalOpen}
         onClose={handleCloseApplication}
@@ -168,17 +177,6 @@ export function App() {
       <AdmissionsPortal
         isOpen={isAdmissionsPortalOpen}
         onClose={() => setIsAdmissionsPortalOpen(false)}
-      />
-
-      <PrivacyModal
-        isOpen={isPrivacyModalOpen}
-        onClose={() => setIsPrivacyModalOpen(false)}
-      />
-
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        customTitle={presetStudyField ? `Study ${presetStudyField} in India with Myers Global Pathways` : undefined}
       />
 
       <FloatingWhatsApp />

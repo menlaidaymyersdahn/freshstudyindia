@@ -29,5 +29,14 @@ export const IMAGES = {
     svg: graduateSvg,
     publicUrl: '/DSC_9531.jpg',
     alt: 'Myers Dahn - Liberian Student & Microbiology Graduate in India'
+  },
+  students: {
+    src: convocationJpg,
+    jpeg: convocationJpeg,
+    webp: convocationWebp,
+    png: convocationPng,
+    svg: convocationSvg,
+    publicUrl: '/DSC_9367.jpg',
+    alt: 'International students receiving admissions counseling and academic guidance'
   }
 };
