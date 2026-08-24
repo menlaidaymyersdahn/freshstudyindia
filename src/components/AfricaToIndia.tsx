@@ -86,7 +86,7 @@ export const AfricaToIndia: React.FC<AfricaToIndiaProps> = ({ onOpenApplication 
 
             <div className="pt-2">
               <a
-                href={getWhatsAppLink('liberia', 'Hello Fresh Study India Monrovia desk, I want to arrange a consultation regarding studying in India.')}
+                href={getWhatsAppLink('liberia', 'Hello Myers Global Pathway Monrovia desk, I want to arrange a consultation regarding studying in India.')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-3 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition flex items-center justify-center gap-2"

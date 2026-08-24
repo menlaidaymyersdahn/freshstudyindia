@@ -20,7 +20,7 @@ const NODES: CityNode[] = [
     lat: 6.3005,
     lng: -10.7969,
     type: 'origin',
-    description: 'Myers Global Pathway West Africa Hub & In-Person Verification Desk',
+    description: 'Myers Global Pathway West Africa Hub & In-Person Document Verification Desk',
     badge: 'Regional Desk',
     color: '#EF4444' // Red
   },
@@ -45,16 +45,6 @@ const NODES: CityNode[] = [
     color: '#10B981'
   },
   {
-    name: 'Nairobi',
-    country: 'Kenya 🇰🇪',
-    lat: -1.2921,
-    lng: 36.8219,
-    type: 'origin',
-    description: 'East Africa Student Advisory & Pre-Departure Desk',
-    badge: 'East Africa',
-    color: '#8B5CF6'
-  },
-  {
     name: 'Freetown',
     country: 'Sierra Leone 🇸🇱',
     lat: 8.484,
@@ -65,67 +55,47 @@ const NODES: CityNode[] = [
     color: '#06B6D4'
   },
   {
-    name: 'Delhi NCR',
+    name: 'Nairobi',
+    country: 'Kenya 🇰🇪',
+    lat: -1.2921,
+    lng: 36.8219,
+    type: 'origin',
+    description: 'East Africa Student Advisory & Pre-Departure Desk',
+    badge: 'East Africa',
+    color: '#8B5CF6'
+  },
+  {
+    name: 'India Admissions Desk',
     country: 'India 🇮🇳',
     lat: 28.6139,
     lng: 77.2090,
     type: 'destination',
-    description: 'Premier Engineering, AI, Medical & Management Universities Hub',
-    badge: 'Capital Education Hub',
+    description: 'Accredited Higher Education Admissions, Bonafide Letters & Embassy Visa Documentation Hub',
+    badge: 'Admissions Hub',
     color: '#3B82F6' // Blue
   },
   {
-    name: 'Bengaluru',
-    country: 'India 🇮🇳',
-    lat: 12.9716,
-    lng: 77.5946,
-    type: 'destination',
-    description: 'Silicon Valley of Asia — Top CS, IT, Biotech & Health Sciences',
-    badge: 'Tech & Science Capital',
-    color: '#2563EB'
-  },
-  {
-    name: 'Chennai',
+    name: 'Student Arrival & Reception Center',
     country: 'India 🇮🇳',
     lat: 13.0827,
     lng: 80.2707,
     type: 'destination',
-    description: 'Leading Engineering, Automobile & Medical Super-Campuses',
-    badge: 'Medical & Engineering',
-    color: '#1D4ED8'
-  },
-  {
-    name: 'Punjab / Chandigarh',
-    country: 'India 🇮🇳',
-    lat: 30.7333,
-    lng: 76.7794,
-    type: 'destination',
-    description: 'Mega International Campuses, Pharmacy, Agriculture & Nursing',
-    badge: 'Global Campuses',
-    color: '#4F46E5'
-  },
-  {
-    name: 'Pune',
-    country: 'India 🇮🇳',
-    lat: 18.5204,
-    lng: 73.8567,
-    type: 'destination',
-    description: 'Oxford of the East — Premier Business, Arts & Law Faculties',
-    badge: 'Oxford of the East',
-    color: '#6366F1'
+    description: 'Airport Meet & Greet, Campus Transfer, Hostel Check-In & FRRO Police Clearance Support',
+    badge: 'Arrival & Support',
+    color: '#2563EB'
   }
 ];
 
 // Flight Routes connecting Origins to Indian Destination Hubs
 const FLIGHT_ROUTES = [
-  { from: 'Monrovia', to: 'Delhi NCR' },
-  { from: 'Monrovia', to: 'Bengaluru' },
-  { from: 'Accra', to: 'Delhi NCR' },
-  { from: 'Accra', to: 'Chennai' },
-  { from: 'Lagos', to: 'Punjab / Chandigarh' },
-  { from: 'Lagos', to: 'Bengaluru' },
-  { from: 'Nairobi', to: 'Pune' },
-  { from: 'Freetown', to: 'Delhi NCR' }
+  { from: 'Monrovia', to: 'India Admissions Desk' },
+  { from: 'Monrovia', to: 'Student Arrival & Reception Center' },
+  { from: 'Accra', to: 'India Admissions Desk' },
+  { from: 'Accra', to: 'Student Arrival & Reception Center' },
+  { from: 'Lagos', to: 'India Admissions Desk' },
+  { from: 'Lagos', to: 'Student Arrival & Reception Center' },
+  { from: 'Freetown', to: 'India Admissions Desk' },
+  { from: 'Nairobi', to: 'India Admissions Desk' }
 ];
 
 // Helper: convert Lat/Lng to 3D Sphere Vector3

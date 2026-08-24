@@ -48,7 +48,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     { label: 'Study in India', href: '#study-in-india' },
     { label: 'Courses', href: '#study-options' },
     { label: 'How It Works', href: '#journey' },
-    { label: 'Eligibility', href: '#eligibility-checker' },
     { label: 'Contact', href: '#contact' },
   ];
 

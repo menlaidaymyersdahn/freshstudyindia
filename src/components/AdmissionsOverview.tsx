@@ -175,7 +175,7 @@ export const AdmissionsOverview: React.FC<AdmissionsOverviewProps> = ({ onOpenAp
                 onClick={onOpenApplication}
                 className="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-600 to-blue-700 hover:from-red-500 hover:to-blue-600 transition flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-red-600/20"
               >
-                <span>APPLY WITH FRESH STUDY INDIA</span>
+                <span>APPLY WITH MYERS GLOBAL PATHWAY</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>

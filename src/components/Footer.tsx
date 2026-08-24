@@ -87,7 +87,7 @@ export const Footer: React.FC<FooterProps> = ({
               <li><a href="#study-in-india" className="hover:text-rose-600 transition">Why Study in India</a></li>
               <li><a href="#study-options" className="hover:text-rose-600 transition">Degree Programs</a></li>
               <li><a href="#journey" className="hover:text-rose-600 transition">How It Works</a></li>
-              <li><a href="#eligibility-checker" className="hover:text-rose-600 transition">Eligibility Checker</a></li>
+              <li><a href="#interactive-3d-pathway" className="hover:text-rose-600 transition">3D Pathway</a></li>
               <li><a href="#contact" className="hover:text-rose-600 transition">Contact Desk</a></li>
             </ul>
           </div>

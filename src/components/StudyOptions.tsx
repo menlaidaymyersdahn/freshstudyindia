@@ -11,20 +11,17 @@ import {
   Sparkles, 
   GraduationCap, 
   CheckCircle2, 
-  MessageCircle,
-  Compass
+  MessageCircle
 } from 'lucide-react';
 import { getWhatsAppLink } from '../lib/constants';
 import { TiltCard3D } from './TiltCard3D';
 
 interface StudyOptionsProps {
   onSelectOption: (programTitle: string) => void;
-  onOpenEligibilityWithCourse?: (courseName: string) => void;
 }
 
 export const StudyOptions: React.FC<StudyOptionsProps> = ({ 
-  onSelectOption,
-  onOpenEligibilityWithCourse 
+  onSelectOption
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
 
@@ -125,18 +122,6 @@ export const StudyOptions: React.FC<StudyOptionsProps> = ({
   const filtered = selectedFilter === 'all' 
     ? programs 
     : programs.filter(p => p.category === selectedFilter);
-
-  const handleEligibilityClick = (courseTitle: string) => {
-    if (onOpenEligibilityWithCourse) {
-      onOpenEligibilityWithCourse(courseTitle);
-    }
-    const el = document.getElementById('eligibility-checker');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      onSelectOption(courseTitle);
-    }
-  };
 
   return (
     <section id="study-options" className="py-24 sm:py-32 bg-[#FFFFFF] text-slate-900 relative overflow-hidden bg-grid-light">
@@ -252,14 +237,6 @@ export const StudyOptions: React.FC<StudyOptionsProps> = ({
                   >
                     <span>Apply Now</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                  </button>
-
-                  <button
-                    onClick={() => handleEligibilityClick(prog.title)}
-                    title="Check Eligibility"
-                    className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition cursor-pointer"
-                  >
-                    <Compass className="w-4 h-4 text-blue-600" />
                   </button>
 
                   <a

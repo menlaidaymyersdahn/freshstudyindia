@@ -6,7 +6,6 @@ import { Pathway3DShowcase } from './components/Pathway3DShowcase';
 import { AdmissionsOverview } from './components/AdmissionsOverview';
 import { JourneyTimeline } from './components/JourneyTimeline';
 import { StudyOptions } from './components/StudyOptions';
-import { EligibilityChecker } from './components/EligibilityChecker';
 import { ServicesGrid } from './components/ServicesGrid';
 import { WhyUs } from './components/WhyUs';
 import { AfricaToIndia } from './components/AfricaToIndia';
@@ -27,7 +26,6 @@ export function App() {
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isAdmissionsPortalOpen, setIsAdmissionsPortalOpen] = useState(false);
-  const [activeCourseForEligibility, setActiveCourseForEligibility] = useState<string>('Computer Science & AI');
 
   // Dynamic OpenGraph and Meta Description tags
   useDynamicSEO({
@@ -50,10 +48,6 @@ export function App() {
     setPresetStudyField(undefined);
   };
 
-  const handleOpenEligibilityWithCourse = (courseName: string) => {
-    setActiveCourseForEligibility(courseName);
-  };
-
   return (
     <div className="min-h-screen bg-[#F4F7FB] text-slate-900 selection:bg-red-600 selection:text-white font-sans antialiased">
       {/* Top Fixed Header & Navigation */}
@@ -73,7 +67,7 @@ export function App() {
           <TrustBar />
         </ScrollReveal>
 
-        {/* 3. Interactive 3D Pathway Globe & University Hubs */}
+        {/* 3. Interactive 3D Pathway Globe & Student Corridors */}
         <ScrollReveal delay={50}>
           <Pathway3DShowcase onOpenApplication={(preset) => handleOpenApplication(preset)} />
         </ScrollReveal>
@@ -83,24 +77,15 @@ export function App() {
           <AdmissionsOverview onOpenApplication={() => handleOpenApplication()} />
         </ScrollReveal>
 
-        {/* 4. The Connected Visual Journey (4 Interactive Steps) */}
+        {/* 5. The Connected Visual Journey (4 Interactive Steps) */}
         <ScrollReveal delay={50}>
           <JourneyTimeline onOpenApplication={(step) => handleOpenApplication(step ? `Stage: ${step}` : undefined)} />
         </ScrollReveal>
 
-        {/* 5. Featured Degree Streams (Interactive Hover Cards) */}
+        {/* 6. Featured Degree Streams (Interactive Hover Cards) */}
         <ScrollReveal delay={50}>
           <StudyOptions 
             onSelectOption={(field) => handleOpenApplication(field)}
-            onOpenEligibilityWithCourse={handleOpenEligibilityWithCourse}
-          />
-        </ScrollReveal>
-
-        {/* 6. Dedicated University Eligibility Calculator / Form */}
-        <ScrollReveal delay={50}>
-          <EligibilityChecker 
-            initialCourse={activeCourseForEligibility}
-            onOpenApplication={() => handleOpenApplication()}
           />
         </ScrollReveal>
 
@@ -169,5 +154,4 @@ export function App() {
     </div>
   );
 }
-
 export default App;
