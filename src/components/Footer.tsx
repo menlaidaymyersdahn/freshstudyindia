@@ -1,19 +1,15 @@
 import React from 'react';
 import { 
   GraduationCap, 
-  ArrowRight, 
   MessageCircle, 
-  Phone, 
-  Mail, 
-  MapPin, 
-  ShieldCheck, 
   Lock,
-  Globe2,
   Share2
 } from 'lucide-react';
 import { BRAND, getWhatsAppLink } from '../lib/constants';
+import { NavTab } from '../types';
 
 interface FooterProps {
+  onNavigate?: (tab: NavTab) => void;
   onOpenPrivacy?: () => void;
   onOpenApplication?: () => void;
   onOpenShare?: () => void;
@@ -21,11 +17,18 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ 
+  onNavigate,
   onOpenPrivacy, 
   onOpenApplication,
   onOpenShare,
   onOpenPortal
 }) => {
+  const handleNavClick = (tab: NavTab) => {
+    if (onNavigate) {
+      onNavigate(tab);
+    }
+  };
+
   return (
     <footer className="bg-slate-950 text-white pt-20 pb-12 border-t border-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -35,14 +38,17 @@ export const Footer: React.FC<FooterProps> = ({
           
           {/* Col 1: Brand Info */}
           <div className="lg:col-span-4 space-y-4">
-            <div className="flex items-center gap-3">
+            <button 
+              onClick={() => handleNavClick('home')}
+              className="flex items-center gap-3 text-left cursor-pointer"
+            >
               <div className="w-10 h-10 rounded-xl bg-blue-700 flex items-center justify-center text-white shadow-xs">
                 <GraduationCap className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold tracking-tight text-white">
                 Myers Global <span className="text-blue-400">Pathways</span>
               </span>
-            </div>
+            </button>
 
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm">
               A professional international education consultancy assisting students worldwide with university selection, admissions guidance, documentation, and the journey to studying in India.
@@ -71,18 +77,47 @@ export const Footer: React.FC<FooterProps> = ({
             </div>
           </div>
 
-          {/* Col 2: Quick Links */}
+          {/* Col 2: Quick Navigation */}
           <div className="lg:col-span-2 space-y-3">
             <p className="text-xs font-bold uppercase tracking-wider text-slate-300">
-              Quick Links
+              Navigation
             </p>
             <ul className="space-y-2 text-xs text-slate-400">
-              <li><a href="#hero" className="hover:text-white transition">Home</a></li>
-              <li><a href="#study-in-india" className="hover:text-white transition">Study in India</a></li>
-              <li><a href="#services" className="hover:text-white transition">Services</a></li>
-              <li><a href="#programs" className="hover:text-white transition">Programs</a></li>
-              <li><a href="#why-us" className="hover:text-white transition">About Us</a></li>
-              <li><a href="#contact" className="hover:text-white transition">Contact</a></li>
+              <li>
+                <button onClick={() => handleNavClick('home')} className="hover:text-white transition cursor-pointer">
+                  Home
+                </button>
+              </li>
+              <li>
+                <button onClick={() => handleNavClick('study-in-india')} className="hover:text-white transition cursor-pointer">
+                  Study in India
+                </button>
+              </li>
+              <li>
+                <button onClick={() => handleNavClick('services')} className="hover:text-white transition cursor-pointer">
+                  Services
+                </button>
+              </li>
+              <li>
+                <button onClick={() => handleNavClick('programs')} className="hover:text-white transition cursor-pointer">
+                  Programs
+                </button>
+              </li>
+              <li>
+                <button onClick={() => handleNavClick('why-us')} className="hover:text-white transition cursor-pointer">
+                  Why Us
+                </button>
+              </li>
+              <li>
+                <button onClick={() => handleNavClick('process')} className="hover:text-white transition cursor-pointer">
+                  Application Process
+                </button>
+              </li>
+              <li>
+                <button onClick={() => handleNavClick('contact')} className="hover:text-white transition cursor-pointer">
+                  Contact
+                </button>
+              </li>
             </ul>
           </div>
 

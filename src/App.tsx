@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
+import { HomeView } from './components/HomeView';
 import { StudyInIndia } from './components/StudyInIndia';
 import { ServicesSection } from './components/ServicesSection';
 import { StudyPrograms } from './components/StudyPrograms';
@@ -14,22 +14,66 @@ import { ShareModal } from './components/ShareModal';
 import { AdmissionsPortal } from './components/AdmissionsPortal';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { useDynamicSEO } from './hooks/useDynamicSEO';
+import { NavTab } from './types';
 
 export function App() {
+  const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
   const [presetStudyField, setPresetStudyField] = useState<string | undefined>(undefined);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isAdmissionsPortalOpen, setIsAdmissionsPortalOpen] = useState(false);
 
+  // Sync activeTab with URL hash on initial load and on popstate/hashchange
+  useEffect(() => {
+    const parseHash = (): NavTab => {
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      const validTabs: NavTab[] = [
+        'home', 
+        'study-in-india', 
+        'services', 
+        'programs', 
+        'why-us', 
+        'process', 
+        'contact'
+      ];
+      return validTabs.includes(hash as NavTab) ? (hash as NavTab) : 'home';
+    };
+
+    setActiveTab(parseHash());
+
+    const handleHashChange = () => {
+      setActiveTab(parseHash());
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const handleNavigate = (tab: NavTab) => {
+    setActiveTab(tab);
+    window.location.hash = tab;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Dynamic OpenGraph and Meta Description tags
+  const getPageTitle = () => {
+    if (presetStudyField) return `Study ${presetStudyField} in India | Myers Global Pathways`;
+    switch (activeTab) {
+      case 'study-in-india': return 'Study in India Guide | Myers Global Pathways';
+      case 'services': return 'Our 8 Advisory Services | Myers Global Pathways';
+      case 'programs': return 'Degree Programs in India | Myers Global Pathways';
+      case 'why-us': return 'Why Choose Us | Myers Global Pathways';
+      case 'process': return '8-Step Application Process | Myers Global Pathways';
+      case 'contact': return 'Contact Admissions Desks | Myers Global Pathways';
+      default: return 'Myers Global Pathways | International Admissions Advisory for India';
+    }
+  };
+
   useDynamicSEO({
-    title: presetStudyField 
-      ? `Study ${presetStudyField} in India | Myers Global Pathways`
-      : 'Myers Global Pathways | International Admissions Advisory for India',
-    description: presetStudyField
-      ? `Explore accredited Indian universities for ${presetStudyField}. Complete admissions, document verification, visa guidance, and arrival support.`
-      : 'Myers Global Pathways assists international students with university selection, admissions guidance, documentation, and the journey to studying in India.',
+    title: getPageTitle(),
+    description: 'Myers Global Pathways assists international students with university selection, admissions guidance, documentation, and the journey to studying in India.',
     image: '/og-image.svg'
   });
 
@@ -44,47 +88,77 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFCFF] text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-[#FAFCFF] text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white flex flex-col justify-between">
       {/* 1. Header & Navigation */}
       <Navbar 
+        activeTab={activeTab}
+        onNavigate={handleNavigate}
         onOpenApplication={() => handleOpenApplication()} 
         onOpenShare={() => setIsShareModalOpen(true)}
         onOpenPortal={() => setIsAdmissionsPortalOpen(true)}
       />
 
-      {/* Main Content Flow */}
-      <main className="overflow-hidden">
-        {/* 2. Hero Section */}
-        <Hero onOpenApplication={() => handleOpenApplication()} />
+      {/* 2. Main Tab View Routing */}
+      <main className="flex-1">
+        {activeTab === 'home' && (
+          <HomeView 
+            onOpenApplication={(field) => handleOpenApplication(field)}
+            onNavigate={handleNavigate}
+          />
+        )}
 
-        {/* 3. Why Study in India */}
-        <StudyInIndia onOpenApplication={() => handleOpenApplication()} />
+        {activeTab === 'study-in-india' && (
+          <StudyInIndia 
+            onOpenApplication={() => handleOpenApplication()}
+            onNavigateHome={() => handleNavigate('home')}
+          />
+        )}
 
-        {/* 4. Services (Clean Editorial Layout) */}
-        <ServicesSection onOpenApplication={(service) => handleOpenApplication(service)} />
+        {activeTab === 'services' && (
+          <ServicesSection 
+            onOpenApplication={(service) => handleOpenApplication(service)}
+            onNavigateHome={() => handleNavigate('home')}
+          />
+        )}
 
-        {/* 5. Degree Programs (Scalable Academic Opportunities) */}
-        <StudyPrograms onSelectProgram={(program) => handleOpenApplication(program)} />
+        {activeTab === 'programs' && (
+          <StudyPrograms 
+            onSelectProgram={(program) => handleOpenApplication(program)}
+            onNavigateHome={() => handleNavigate('home')}
+          />
+        )}
 
-        {/* 6. Why Us (Trustworthy, Zero-Falsehood Guidance) */}
-        <WhyUs onOpenApplication={() => handleOpenApplication()} />
+        {activeTab === 'why-us' && (
+          <WhyUs 
+            onOpenApplication={() => handleOpenApplication()}
+            onNavigateHome={() => handleNavigate('home')}
+          />
+        )}
 
-        {/* 7. Application Process (8-Step Linear Pathway) */}
-        <ApplicationProcess onOpenApplication={(step) => handleOpenApplication(step)} />
+        {activeTab === 'process' && (
+          <ApplicationProcess 
+            onOpenApplication={(step) => handleOpenApplication(step)}
+            onNavigateHome={() => handleNavigate('home')}
+          />
+        )}
 
-        {/* 8. Contact Section (Official Emails, WhatsApp & Form) */}
-        <ContactSection />
+        {activeTab === 'contact' && (
+          <ContactSection 
+            onNavigateHome={() => handleNavigate('home')}
+          />
+        )}
       </main>
 
-      {/* 9. Footer */}
+      {/* 3. Footer */}
       <Footer 
+        onNavigate={handleNavigate}
         onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
         onOpenApplication={() => handleOpenApplication()}
         onOpenShare={() => setIsShareModalOpen(true)}
         onOpenPortal={() => setIsAdmissionsPortalOpen(true)}
       />
 
-      {/* Modals & Utilities */}
+      {/* Modals & Overlays */}
       <ApplicationModal
         isOpen={isAppModalOpen}
         onClose={handleCloseApplication}
