@@ -1,6 +1,6 @@
 {
-  "name": "Myers Global Pathway",
-  "description": "Premium international student recruitment and education pathway consultancy helping students from Africa and worldwide study in India.",
+  "name": "Myers Global Pathways",
+  "description": "Professional international education consultancy assisting students with university selection, admissions guidance, documentation, and the journey to studying in India.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

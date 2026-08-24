@@ -7,10 +7,9 @@ import {
   Mail, 
   MapPin, 
   ShieldCheck, 
-  Heart,
-  Share2,
   Lock,
-  Globe2
+  Globe2,
+  Share2
 } from 'lucide-react';
 import { BRAND, getWhatsAppLink } from '../lib/constants';
 
@@ -28,30 +27,25 @@ export const Footer: React.FC<FooterProps> = ({
   onOpenPortal
 }) => {
   return (
-    <footer className="bg-[#EBF3FC] text-slate-900 border-t border-sky-200/80 pt-16 pb-12 relative overflow-hidden">
-      
-      {/* Subtle Background Glow */}
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-400/10 blur-[150px] pointer-events-none" />
-      <div className="absolute top-0 left-0 w-96 h-96 bg-red-400/5 blur-[150px] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 relative z-10">
+    <footer className="bg-slate-950 text-white pt-20 pb-12 border-t border-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Top 4-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-14 border-b border-sky-200">
+        {/* Main 4-Column Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-slate-800/80">
           
           {/* Col 1: Brand Info */}
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-blue-700 border border-white/40 flex items-center justify-center text-white shadow-xs">
+              <div className="w-10 h-10 rounded-xl bg-blue-700 flex items-center justify-center text-white shadow-xs">
                 <GraduationCap className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-black tracking-tight text-slate-900">
-                Myers Global <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-rose-600 to-blue-600">Pathway</span>
+              <span className="text-xl font-bold tracking-tight text-white">
+                Myers Global <span className="text-blue-400">Pathways</span>
               </span>
             </div>
 
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-              Official international student admissions desk connecting ambitious students from Africa and around the globe with accredited Indian universities. Direct bonafide letters, visa dossiers, and airport arrival support.
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm">
+              A professional international education consultancy assisting students worldwide with university selection, admissions guidance, documentation, and the journey to studying in India.
             </p>
 
             <div className="pt-2 flex items-center gap-3">
@@ -59,16 +53,16 @@ export const Footer: React.FC<FooterProps> = ({
                 href={getWhatsAppLink('india')}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3.5 py-2 rounded-xl bg-emerald-100/80 hover:bg-emerald-200 text-emerald-800 border border-emerald-300 text-xs font-bold transition flex items-center gap-1.5"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition"
               >
-                <MessageCircle className="w-4 h-4 text-emerald-700" />
+                <MessageCircle className="w-4 h-4" />
                 <span>WhatsApp Admissions</span>
               </a>
 
               {onOpenShare && (
                 <button
                   onClick={onOpenShare}
-                  className="p-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 transition cursor-pointer"
+                  className="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition cursor-pointer"
                   title="Share Website"
                 >
                   <Share2 className="w-4 h-4" />
@@ -79,87 +73,110 @@ export const Footer: React.FC<FooterProps> = ({
 
           {/* Col 2: Quick Links */}
           <div className="lg:col-span-2 space-y-3">
-            <p className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900">
-              Navigation
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-300">
+              Quick Links
             </p>
-            <ul className="space-y-2 text-xs text-slate-600">
-              <li><a href="#hero" className="hover:text-rose-600 transition">Home Desk</a></li>
-              <li><a href="#study-in-india" className="hover:text-rose-600 transition">Why Study in India</a></li>
-              <li><a href="#study-options" className="hover:text-rose-600 transition">Degree Programs</a></li>
-              <li><a href="#journey" className="hover:text-rose-600 transition">How It Works</a></li>
-              <li><a href="#interactive-3d-pathway" className="hover:text-rose-600 transition">3D Pathway</a></li>
-              <li><a href="#contact" className="hover:text-rose-600 transition">Contact Desk</a></li>
+            <ul className="space-y-2 text-xs text-slate-400">
+              <li><a href="#hero" className="hover:text-white transition">Home</a></li>
+              <li><a href="#study-in-india" className="hover:text-white transition">Study in India</a></li>
+              <li><a href="#services" className="hover:text-white transition">Services</a></li>
+              <li><a href="#programs" className="hover:text-white transition">Programs</a></li>
+              <li><a href="#why-us" className="hover:text-white transition">About Us</a></li>
+              <li><a href="#contact" className="hover:text-white transition">Contact</a></li>
             </ul>
           </div>
 
-          {/* Col 3: Degree Streams */}
+          {/* Col 3: Official Emails */}
           <div className="lg:col-span-3 space-y-3">
-            <p className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900">
-              Accredited Streams
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-300">
+              Official Email Inquiries
             </p>
-            <ul className="space-y-2 text-xs text-slate-600">
-              <li>Computer Science & Artificial Intelligence</li>
-              <li>B.Sc Nursing & Health Sciences</li>
-              <li>Pharmacy (B.Pharm / Pharm.D)</li>
-              <li>Engineering (Robotics, Mechanical, Civil)</li>
-              <li>Business Management (BBA / MBA)</li>
-              <li>Cyber Security & Network Defense</li>
-              <li>Microbiology & Biotechnology</li>
+            <ul className="space-y-2.5 text-xs text-slate-400">
+              <li>
+                <span className="text-[10px] text-slate-500 block uppercase">Admissions Desk</span>
+                <a href={`mailto:${BRAND.emails.admissions}`} className="text-slate-300 hover:text-blue-400 transition">
+                  {BRAND.emails.admissions}
+                </a>
+              </li>
+              <li>
+                <span className="text-[10px] text-slate-500 block uppercase">General Information</span>
+                <a href={`mailto:${BRAND.emails.info}`} className="text-slate-300 hover:text-blue-400 transition">
+                  {BRAND.emails.info}
+                </a>
+              </li>
+              <li>
+                <span className="text-[10px] text-slate-500 block uppercase">Applications & Verification</span>
+                <a href={`mailto:${BRAND.emails.applications}`} className="text-slate-300 hover:text-blue-400 transition">
+                  {BRAND.emails.applications}
+                </a>
+              </li>
+              <li>
+                <span className="text-[10px] text-slate-500 block uppercase">Student Support</span>
+                <a href={`mailto:${BRAND.emails.support}`} className="text-slate-300 hover:text-blue-400 transition">
+                  {BRAND.emails.support}
+                </a>
+              </li>
             </ul>
           </div>
 
-          {/* Col 4: Dual Desks Contact */}
+          {/* Col 4: Official Locations & WhatsApp */}
           <div className="lg:col-span-3 space-y-3">
-            <p className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900">
-              Direct Contact Desks
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-300">
+              Official Contact Desks
             </p>
-            <div className="space-y-2.5 text-xs text-slate-600">
-              <div className="p-2.5 rounded-xl bg-white border border-sky-200">
-                <p className="font-bold text-slate-900">🇮🇳 India Admissions HQ</p>
-                <a href={`tel:${BRAND.contacts.india.phoneRaw}`} className="font-mono text-blue-700 font-bold block mt-0.5">
+            <div className="space-y-3 text-xs text-slate-400">
+              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                <p className="font-bold text-white text-[11px]">🇮🇳 India Admissions HQ</p>
+                <a href={`tel:${BRAND.contacts.india.phoneRaw}`} className="font-semibold text-blue-400 block hover:underline">
                   {BRAND.contacts.india.phoneDisplay}
                 </a>
+                <p className="text-[11px] text-slate-500">{BRAND.contacts.india.address}</p>
               </div>
 
-              <div className="p-2.5 rounded-xl bg-white border border-sky-200">
-                <p className="font-bold text-slate-900">🇱🇷 Monrovia, Liberia Desk</p>
-                <a href={`tel:${BRAND.contacts.liberia.phoneRaw}`} className="font-mono text-rose-700 font-bold block mt-0.5">
+              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                <p className="font-bold text-white text-[11px]">🇱🇷 Liberia & West Africa Desk</p>
+                <a href={`tel:${BRAND.contacts.liberia.phoneRaw}`} className="font-semibold text-blue-400 block hover:underline">
                   {BRAND.contacts.liberia.phoneDisplay}
                 </a>
+                <p className="text-[11px] text-slate-500">{BRAND.contacts.liberia.address}</p>
               </div>
             </div>
           </div>
 
         </div>
 
-        {/* Bottom Disclaimer & Copyright */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600">
+        {/* Bottom Strip: Copyright & Legal */}
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div className="flex flex-wrap items-center gap-3">
-            <span>© {new Date().getFullYear()} Myers Global Pathway. All rights reserved.</span>
-            <span>•</span>
-            <button
-              onClick={onOpenPrivacy}
-              className="text-slate-600 hover:text-slate-900 transition underline cursor-pointer"
-            >
-              Privacy Policy & Terms
-            </button>
+            <span>© 2026 Myers Global Pathways. All rights reserved.</span>
+            {onOpenPrivacy && (
+              <>
+                <span>•</span>
+                <button
+                  onClick={onOpenPrivacy}
+                  className="hover:text-slate-300 transition underline cursor-pointer"
+                >
+                  Privacy Policy & Terms
+                </button>
+              </>
+            )}
             {onOpenPortal && (
               <>
                 <span>•</span>
                 <button
                   onClick={onOpenPortal}
-                  className="text-slate-600 hover:text-rose-600 transition flex items-center gap-1 cursor-pointer"
+                  className="hover:text-blue-400 transition flex items-center gap-1 cursor-pointer"
                 >
-                  <Lock className="w-3 h-3 text-rose-600" />
+                  <Lock className="w-3 h-3 text-blue-400" />
                   <span>Counselor Portal</span>
                 </button>
               </>
             )}
           </div>
 
-          <div className="text-slate-500 text-[11px] text-center md:text-right">
-            <span>Accredited Indian University Admissions & Visa Support Advisory</span>
-          </div>
+          <p className="text-[11px] text-slate-500 text-center md:text-right">
+            Official Higher Education Admissions Advisory & International Student Support
+          </p>
         </div>
 
       </div>

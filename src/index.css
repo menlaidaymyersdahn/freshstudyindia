@@ -2,16 +2,8 @@
 
 @layer base {
   :root {
-    --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --primary-blue: #1D4ED8;
-    --sapphire: #2563EB;
-    --sky-glow: #38BDF8;
-    --crimson: #E11D48;
-    --ruby: #DC2626;
-    --amber-gold: #F59E0B;
-    --bg-light: #F4F7FB;
-    --bg-card-light: #FFFFFF;
   }
 
   html {
@@ -20,10 +12,9 @@
   }
 
   body {
-    background-color: #F4F7FB;
+    background-color: #FAFCFF;
     color: #0F172A;
     font-family: var(--font-body);
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
@@ -34,169 +25,21 @@
   }
 }
 
-/* Luxury Marquee Animation */
-@keyframes marquee {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes marqueeReverse {
-  0% {
-    transform: translateX(-50%);
-  }
-  100% {
-    transform: translateX(0%);
-  }
-}
-
-.animate-marquee {
-  display: flex;
-  width: max-content;
-  animation: marquee 35s linear infinite;
-}
-
-.animate-marquee:hover {
-  animation-play-state: paused;
-}
-
-.animate-marquee-fast {
-  display: flex;
-  width: max-content;
-  animation: marquee 22s linear infinite;
-}
-
-/* Radar & Pulse Keyframes */
-@keyframes pulseRadar {
-  0% {
-    transform: scale(0.95);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(1.4);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-}
-
-@keyframes floatGentle {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.animate-radar {
-  animation: pulseRadar 3s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-}
-
-.animate-float-gentle {
-  animation: floatGentle 5s ease-in-out infinite;
-}
-
-.animate-gradient-shift {
-  background-size: 200% 200%;
-  animation: gradientShift 8s ease infinite;
-}
-
-/* Light Blue / White Grid Background Pattern */
-.bg-grid-pattern {
-  background-image: radial-gradient(rgba(37, 99, 235, 0.08) 1px, transparent 1px);
-  background-size: 32px 32px;
-}
-
-.bg-grid-dense {
-  background-image: linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-.bg-grid-light {
-  background-image: linear-gradient(to right, rgba(37, 99, 235, 0.04) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-/* Shimmer & Text Highlights */
-.shimmer-headline {
-  background: linear-gradient(
-    90deg,
-    #060F1E 0%,
-    #060F1E 20%,
-    #DC2626 40%,
-    #2563EB 60%,
-    #060F1E 80%,
-    #060F1E 100%
-  );
-  background-size: 250% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shimmerGlow 6s linear infinite;
-}
-
-@keyframes shimmerGlow {
-  0% {
-    background-position: 250% 0;
-  }
-  100% {
-    background-position: -250% 0;
-  }
-}
-
-/* Inputs styling */
-input,
-textarea,
-select {
-  caret-color: #DC2626;
-}
-
-/* Clean Custom Scrollbar */
+/* Custom Clean Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #F8FAFC;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #CBD5E1;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94A3B8;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-marquee,
-  .animate-marquee-fast,
-  .animate-radar,
-  .animate-float-gentle,
-  .animate-gradient-shift,
-  .shimmer-headline {
-    animation: none !important;
-  }
 }
