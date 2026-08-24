@@ -26,7 +26,7 @@ export const PrivacyModal: React.FC<PrivacyModalProps> = ({ isOpen, onClose }) =
             </div>
             <div>
               <h3 className="text-xl font-bold text-[#0B192C]">Privacy & Data Policy</h3>
-              <p className="text-xs text-slate-500">Fresh Study India International Education Services</p>
+              <p className="text-xs text-slate-500">Myers Global Pathway International Education Services</p>
             </div>
           </div>
 

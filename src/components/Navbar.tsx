@@ -44,9 +44,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const navLinks = [
     { label: 'Home', href: '#hero' },
+    { label: '3D Pathway', href: '#interactive-3d-pathway' },
     { label: 'Study in India', href: '#study-in-india' },
     { label: 'Courses', href: '#study-options' },
-    { label: 'Gallery', href: '#gallery' },
+    { label: 'How It Works', href: '#journey' },
     { label: 'Eligibility', href: '#eligibility-checker' },
     { label: 'Contact', href: '#contact' },
   ];
@@ -107,7 +108,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
             <div className="flex flex-col">
               <span className="text-base sm:text-lg font-black tracking-tight text-slate-900 flex items-center gap-1.5">
-                Fresh Study <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-rose-600 to-blue-600">India</span>
+                Myers Global <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-rose-600 to-blue-600">Pathway</span>
               </span>
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-700 transition-colors">
                 International Admissions Advisory

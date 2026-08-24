@@ -28,7 +28,7 @@ export const ContactSection: React.FC = () => {
     e.preventDefault();
     setIsSubmitted(true);
 
-    const message = `*NEW CONTACT INQUIRY - Fresh Study India*%0A%0A*Name:* ${encodeURIComponent(formData.fullName)}%0A*Email:* ${encodeURIComponent(formData.email)}%0A*Phone:* ${encodeURIComponent(formData.phone)}%0A*Country:* ${encodeURIComponent(formData.country)}%0A*Target Program:* ${encodeURIComponent(formData.program)}%0A*Message:* ${encodeURIComponent(formData.message || 'I would like more information on admissions.')}`;
+    const message = `*NEW CONTACT INQUIRY - Myers Global Pathway*%0A%0A*Name:* ${encodeURIComponent(formData.fullName)}%0A*Email:* ${encodeURIComponent(formData.email)}%0A*Phone:* ${encodeURIComponent(formData.phone)}%0A*Country:* ${encodeURIComponent(formData.country)}%0A*Target Program:* ${encodeURIComponent(formData.program)}%0A*Message:* ${encodeURIComponent(formData.message || 'I would like more information on admissions.')}`;
     
     // Open in WhatsApp
     window.open(`https://wa.me/${BRAND.contacts.india.phoneRaw}?text=${message}`, '_blank');

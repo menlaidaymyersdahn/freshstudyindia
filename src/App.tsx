@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { TrustBar } from './components/TrustBar';
+import { Pathway3DShowcase } from './components/Pathway3DShowcase';
 import { AdmissionsOverview } from './components/AdmissionsOverview';
 import { JourneyTimeline } from './components/JourneyTimeline';
 import { StudyOptions } from './components/StudyOptions';
@@ -9,7 +10,6 @@ import { EligibilityChecker } from './components/EligibilityChecker';
 import { ServicesGrid } from './components/ServicesGrid';
 import { WhyUs } from './components/WhyUs';
 import { AfricaToIndia } from './components/AfricaToIndia';
-import { PhotoGallery } from './components/PhotoGallery';
 import { BigCTA } from './components/BigCTA';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
@@ -32,10 +32,10 @@ export function App() {
   // Dynamic OpenGraph and Meta Description tags
   useDynamicSEO({
     title: presetStudyField 
-      ? `Study ${presetStudyField} in India | Fresh Study India Admissions`
-      : 'Fresh Study India | 2026 International Student Admissions Desk',
+      ? `Study ${presetStudyField} in India | Myers Global Pathway Admissions`
+      : 'Myers Global Pathway | 2026 International Student Admissions Desk',
     description: presetStudyField
-      ? `Explore top accredited Indian universities for ${presetStudyField}. Complete admissions, bonafide visa filing, and arrival support with Fresh Study India.`
+      ? `Explore top accredited Indian universities for ${presetStudyField}. Complete admissions, bonafide visa filing, and arrival support with Myers Global Pathway.`
       : 'We guide ambitious students from Africa and across the world into accredited Indian universities, providing verified admissions, bonafide visa documentation, and full airport arrival support.',
     image: '/og-image.svg'
   });
@@ -73,7 +73,12 @@ export function App() {
           <TrustBar />
         </ScrollReveal>
 
-        {/* 3. Start Your Next Chapter & Admissions Overview */}
+        {/* 3. Interactive 3D Pathway Globe & University Hubs */}
+        <ScrollReveal delay={50}>
+          <Pathway3DShowcase onOpenApplication={(preset) => handleOpenApplication(preset)} />
+        </ScrollReveal>
+
+        {/* 4. Start Your Next Chapter & Admissions Overview */}
         <ScrollReveal delay={50}>
           <AdmissionsOverview onOpenApplication={() => handleOpenApplication()} />
         </ScrollReveal>
@@ -109,12 +114,7 @@ export function App() {
           <AfricaToIndia onOpenApplication={() => handleOpenApplication()} />
         </ScrollReveal>
 
-        {/* 9. Live Campus & Student Photo Gallery (Permanent Community Gallery) */}
-        <ScrollReveal delay={50}>
-          <PhotoGallery onOpenApplication={() => handleOpenApplication()} />
-        </ScrollReveal>
-
-        {/* 10. Why Fresh Study India (Zero False Promises) */}
+        {/* 9. Why Myers Global Pathway (Zero False Promises) */}
         <ScrollReveal delay={50}>
           <WhyUs onOpenApplication={() => handleOpenApplication()} />
         </ScrollReveal>
@@ -161,7 +161,7 @@ export function App() {
       <ShareModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
-        customTitle={presetStudyField ? `Study ${presetStudyField} in India with Fresh Study India` : undefined}
+        customTitle={presetStudyField ? `Study ${presetStudyField} in India with Myers Global Pathway` : undefined}
       />
 
       {/* Floating Direct WhatsApp Access */}

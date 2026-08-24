@@ -46,7 +46,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <GraduationCap className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-black tracking-tight text-slate-900">
-                Fresh Study <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-rose-600 to-blue-600">India</span>
+                Myers Global <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-rose-600 to-blue-600">Pathway</span>
               </span>
             </div>
 
@@ -86,7 +86,6 @@ export const Footer: React.FC<FooterProps> = ({
               <li><a href="#hero" className="hover:text-rose-600 transition">Home Desk</a></li>
               <li><a href="#study-in-india" className="hover:text-rose-600 transition">Why Study in India</a></li>
               <li><a href="#study-options" className="hover:text-rose-600 transition">Degree Programs</a></li>
-              <li><a href="#gallery" className="hover:text-rose-600 transition">Campus Photo Gallery</a></li>
               <li><a href="#journey" className="hover:text-rose-600 transition">How It Works</a></li>
               <li><a href="#eligibility-checker" className="hover:text-rose-600 transition">Eligibility Checker</a></li>
               <li><a href="#contact" className="hover:text-rose-600 transition">Contact Desk</a></li>
@@ -136,7 +135,7 @@ export const Footer: React.FC<FooterProps> = ({
         {/* Bottom Disclaimer & Copyright */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600">
           <div className="flex flex-wrap items-center gap-3">
-            <span>© {new Date().getFullYear()} Fresh Study India. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} Myers Global Pathway. All rights reserved.</span>
             <span>•</span>
             <button
               onClick={onOpenPrivacy}

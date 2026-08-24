@@ -344,7 +344,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
 
             <div className="pt-3 flex flex-col gap-2.5">
               <a
-                href={getWhatsAppLink('india', `Hello Fresh Study India, I have submitted my application profile for ${fullName} (${studyField}, ${country}) with ${uploadedFiles.length} document(s). Reference: ${submittedAppId || 'FSI-APP'}.`)}
+                href={getWhatsAppLink('india', `Hello Myers Global Pathway, I have submitted my application profile for ${fullName} (${studyField}, ${country}) with ${uploadedFiles.length} document(s). Reference: ${submittedAppId || 'MGP-APP'}.`)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-4 rounded-xl text-xs font-extrabold uppercase tracking-wide text-white bg-emerald-600 hover:bg-emerald-500 transition shadow flex items-center justify-center gap-2"

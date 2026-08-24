@@ -28,8 +28,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
   if (!isOpen) return null;
 
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : 'https://freshstudyindia.com';
-  const shareTitle = customTitle || 'Fresh Study India — Study in India International Admissions';
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : 'https://myersglobalpathway.com';
+  const shareTitle = customTitle || 'Myers Global Pathway — Study in India International Admissions';
   const shareDesc = customDesc || 'Direct admissions, university placement, student visa guidance, and arrival support for international students studying in India.';
 
   const handleCopyLink = () => {
@@ -43,7 +43,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
   const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`;
   const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
-  const emailShareUrl = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(`Hi,\n\nI wanted to share Fresh Study India with you for studying at accredited universities in India:\n\n${shareDesc}\n\nVisit: ${shareUrl}`)}`;
+  const emailShareUrl = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(`Hi,\n\nI wanted to share Myers Global Pathway with you for studying at accredited universities in India:\n\n${shareDesc}\n\nVisit: ${shareUrl}`)}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200">
@@ -66,7 +66,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
             <Share2 className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-xl font-extrabold text-[#060F1E]">Share Fresh Study India</h3>
+            <h3 className="text-xl font-extrabold text-[#060F1E]">Share Myers Global Pathway</h3>
             <p className="text-xs text-slate-500">
               Share with prospective students, parents, or sponsors
             </p>
@@ -89,7 +89,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           <div className="bg-[#060F1E] p-4 text-white relative">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-rose-400">
-                Fresh Study India
+                Myers Global Pathway
               </span>
               <span className="text-[11px]">🇱🇷 ➡️ 🇮🇳</span>
             </div>
@@ -101,7 +101,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
             </p>
             <div className="mt-3 flex items-center gap-2 text-[10px] text-sky-300/80 font-mono">
               <Globe className="w-3 h-3" />
-              <span>freshstudyindia.com</span>
+              <span>myersglobalpathway.com</span>
             </div>
           </div>
         </div>

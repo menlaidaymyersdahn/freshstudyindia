@@ -237,7 +237,7 @@ export const JourneyTimeline: React.FC<JourneyTimelineProps> = ({ onOpenApplicat
                   </button>
 
                   <a
-                    href={getWhatsAppLink('india', `Hello Fresh Study India, I want to ask about Stage ${current.stepNumber}: ${current.title}.`)}
+                    href={getWhatsAppLink('india', `Hello Myers Global Pathway, I want to ask about Stage ${current.stepNumber}: ${current.title}.`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-5 py-3.5 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition flex items-center gap-2"
@@ -271,7 +271,7 @@ export const JourneyTimeline: React.FC<JourneyTimelineProps> = ({ onOpenApplicat
 
                     <div className="p-3.5 rounded-xl bg-white border border-slate-200/80 shadow-xs">
                       <p className="font-bold text-slate-900 mb-1">Direct Bank Transactions</p>
-                      <p>Fresh Study India never collects your tuition. You pay directly into the verified Indian University account.</p>
+                      <p>Myers Global Pathway never collects your tuition. You pay directly into the verified Indian University account.</p>
                     </div>
                   </div>
 

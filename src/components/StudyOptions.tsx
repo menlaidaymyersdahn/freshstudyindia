@@ -15,6 +15,7 @@ import {
   Compass
 } from 'lucide-react';
 import { getWhatsAppLink } from '../lib/constants';
+import { TiltCard3D } from './TiltCard3D';
 
 interface StudyOptionsProps {
   onSelectOption: (programTitle: string) => void;
@@ -188,91 +189,92 @@ export const StudyOptions: React.FC<StudyOptionsProps> = ({
         {/* Dynamic Interactive Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
           {filtered.map((prog) => (
-            <div
-              key={prog.id}
-              className="group relative rounded-3xl bg-white hover:bg-slate-50/50 border border-sky-100 hover:border-sky-300 p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 shadow-[0_10px_30px_rgba(15,23,42,0.04)] hover:shadow-xl flex flex-col justify-between overflow-hidden"
-            >
-              {/* Subtle top inner gradient on hover */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${prog.accentGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
+            <TiltCard3D key={prog.id} maxTilt={8} perspective={1000} className="h-full">
+              <div
+                className="group relative rounded-3xl bg-white hover:bg-slate-50/50 border border-sky-100 hover:border-sky-300 p-7 sm:p-8 transition-all duration-300 shadow-[0_10px_30px_rgba(15,23,42,0.04)] hover:shadow-2xl flex flex-col justify-between overflow-hidden h-full"
+              >
+                {/* Subtle top inner gradient on hover */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${prog.accentGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
 
-              <div className="relative z-10">
-                
-                {/* Header: Icon & Badge */}
-                <div className="flex items-center justify-between mb-5">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-center group-hover:scale-110 group-hover:border-slate-300 transition-all duration-300 shadow-2xs">
-                    {prog.icon}
+                <div className="relative z-10">
+                  
+                  {/* Header: Icon & Badge */}
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-center group-hover:scale-110 group-hover:border-slate-300 transition-all duration-300 shadow-2xs">
+                      {prog.icon}
+                    </div>
+
+                    <span className={`text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full border ${prog.badgeClass}`}>
+                      {prog.badge}
+                    </span>
                   </div>
 
-                  <span className={`text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full border ${prog.badgeClass}`}>
-                    {prog.badge}
-                  </span>
-                </div>
+                  {/* Title & Degrees */}
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight group-hover:text-blue-900 transition-all duration-200">
+                    {prog.title}
+                  </h3>
 
-                {/* Title & Degrees */}
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight group-hover:text-blue-900 transition-all duration-200">
-                  {prog.title}
-                </h3>
+                  <div className="flex items-center gap-2 text-xs font-mono font-bold text-rose-600 mt-1 mb-4">
+                    <span>{prog.degrees}</span>
+                    <span className="text-slate-300">•</span>
+                    <span className="text-slate-500">{prog.duration}</span>
+                  </div>
 
-                <div className="flex items-center gap-2 text-xs font-mono font-bold text-rose-600 mt-1 mb-4">
-                  <span>{prog.degrees}</span>
-                  <span className="text-slate-300">•</span>
-                  <span className="text-slate-500">{prog.duration}</span>
-                </div>
-
-                {/* Description */}
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6 font-normal">
-                  {prog.desc}
-                </p>
-
-                {/* Key Careers Tag List */}
-                <div className="pt-4 border-t border-slate-100 mb-6">
-                  <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 mb-2.5">
-                    Career Outcomes:
+                  {/* Description */}
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6 font-normal">
+                    {prog.desc}
                   </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {prog.careers.map((career, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-1 rounded-lg bg-slate-100 text-[10px] font-semibold text-slate-700 border border-slate-200/60"
-                      >
-                        {career}
-                      </span>
-                    ))}
+
+                  {/* Key Careers Tag List */}
+                  <div className="pt-4 border-t border-slate-100 mb-6">
+                    <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 mb-2.5">
+                      Career Outcomes:
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {prog.careers.map((career, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-1 rounded-lg bg-slate-100 text-[10px] font-semibold text-slate-700 border border-slate-200/60"
+                        >
+                          {career}
+                        </span>
+                      ))}
+                    </div>
                   </div>
+
+                </div>
+
+                {/* Bottom Buttons */}
+                <div className="relative z-10 pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <button
+                    onClick={() => onSelectOption(prog.title)}
+                    className="flex-1 py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-600 to-blue-700 hover:from-red-500 hover:to-blue-600 transition flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-red-600/20"
+                  >
+                    <span>Apply Now</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+
+                  <button
+                    onClick={() => handleEligibilityClick(prog.title)}
+                    title="Check Eligibility"
+                    className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition cursor-pointer"
+                  >
+                    <Compass className="w-4 h-4 text-blue-600" />
+                  </button>
+
+                  <a
+                    href={getWhatsAppLink('india', `Hello Myers Global Pathway, I want to learn more about the ${prog.title} degree in India.`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 transition"
+                    title="WhatsApp Questions"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                  </a>
                 </div>
 
               </div>
-
-              {/* Bottom Buttons */}
-              <div className="relative z-10 pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-                <button
-                  onClick={() => onSelectOption(prog.title)}
-                  className="flex-1 py-3 px-4 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-600 to-blue-700 hover:from-red-500 hover:to-blue-600 transition flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-red-600/20"
-                >
-                  <span>Apply Now</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </button>
-
-                <button
-                  onClick={() => handleEligibilityClick(prog.title)}
-                  title="Check Eligibility"
-                  className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition cursor-pointer"
-                >
-                  <Compass className="w-4 h-4 text-blue-600" />
-                </button>
-
-                <a
-                  href={getWhatsAppLink('india', `Hello Fresh Study India, I want to learn more about the ${prog.title} degree in India.`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 transition"
-                  title="WhatsApp Questions"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                </a>
-              </div>
-
-            </div>
+            </TiltCard3D>
           ))}
         </div>
 

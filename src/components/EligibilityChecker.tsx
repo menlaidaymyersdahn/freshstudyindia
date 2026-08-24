@@ -270,7 +270,7 @@ export const EligibilityChecker: React.FC<EligibilityCheckerProps> = ({
                   </button>
 
                   <a
-                    href={getWhatsAppLink('india', `Hello Fresh Study India, I ran the eligibility checker for ${selectedCourse} with my ${selectedQualification.toUpperCase()} qualification. I would like to review my documents.`)}
+                    href={getWhatsAppLink('india', `Hello Myers Global Pathway, I ran the eligibility checker for ${selectedCourse} with my ${selectedQualification.toUpperCase()} qualification. I would like to review my documents.`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full py-3 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition flex items-center justify-center gap-2"

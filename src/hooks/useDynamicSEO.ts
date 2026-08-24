@@ -10,11 +10,11 @@ interface SEOProps {
 }
 
 export function useDynamicSEO({
-  title = 'Fresh Study India | Study in India — International Admissions & Student Advisory',
+  title = 'Myers Global Pathway | Study in India — International Admissions & Student Advisory',
   description = 'Helping students from Africa and around the world study in India. Dedicated guidance for university admissions, student visas, accommodation, and airport arrival assistance.',
-  keywords = 'Study in India, International Student Admissions India, African Students in India, Study in India Liberia Desk, Indian University Admissions, India Student Visa Guidance, Computer Science Engineering India, MBA in India for International Students, Fresh Study India',
+  keywords = 'Myers Global Pathway, Study in India, International Student Admissions India, African Students in India, Study in India Liberia Desk, Indian University Admissions, India Student Visa Guidance, Computer Science Engineering India, MBA in India for International Students',
   image = '/og-image.svg',
-  url = typeof window !== 'undefined' ? window.location.href : 'https://freshstudyindia.com',
+  url = typeof window !== 'undefined' ? window.location.href : 'https://myersglobalpathway.com',
   type = 'website'
 }: SEOProps = {}) {
   useEffect(() => {
@@ -42,7 +42,7 @@ export function useDynamicSEO({
     setMetaTag('property', 'og:description', description);
     setMetaTag('property', 'og:type', type);
     setMetaTag('property', 'og:url', url);
-    setMetaTag('property', 'og:site_name', 'Fresh Study India');
+    setMetaTag('property', 'og:site_name', 'Myers Global Pathway');
 
     // Ensure absolute image URL if available
     const resolvedImage = image.startsWith('http') 

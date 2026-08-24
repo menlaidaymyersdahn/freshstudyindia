@@ -65,7 +65,7 @@ export const WhyUs: React.FC<WhyUsProps> = ({ onOpenApplication }) => {
           </h2>
 
           <p className="mt-5 text-base sm:text-lg text-slate-600 font-normal leading-relaxed">
-            International education is an important investment for you and your family. Here is how Fresh Study India guarantees transparency and integrity.
+            International education is an important investment for you and your family. Here is how Myers Global Pathway guarantees transparency and integrity.
           </p>
         </div>
 
@@ -74,7 +74,7 @@ export const WhyUs: React.FC<WhyUsProps> = ({ onOpenApplication }) => {
           
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 pb-4 border-b border-slate-100 text-xs font-mono font-bold uppercase text-slate-500">
             <div className="md:col-span-4">Admission Pillar</div>
-            <div className="md:col-span-4 text-emerald-700">Fresh Study India Standard</div>
+            <div className="md:col-span-4 text-emerald-700">Myers Global Pathway Standard</div>
             <div className="md:col-span-4 text-rose-700">Unverified Agents</div>
           </div>
 
@@ -92,7 +92,7 @@ export const WhyUs: React.FC<WhyUsProps> = ({ onOpenApplication }) => {
                   <span className="text-sm font-extrabold text-slate-900">{item.feature}</span>
                 </div>
 
-                {/* Fresh Study India (Positive) */}
+                {/* Myers Global Pathway (Positive) */}
                 <div className="md:col-span-4 flex items-start gap-2.5 p-3 rounded-xl bg-emerald-50/70 border border-emerald-200/60">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-emerald-950 font-medium leading-relaxed">

@@ -1,7 +1,7 @@
 import { StudyOptionDetail } from '../types';
 
 export const BRAND = {
-  name: 'Fresh Study India',
+  name: 'Myers Global Pathway',
   tagline: 'Your Journey. Your Degree. Your Future.',
   mission: 'We help you get from your home country to your university in India.',
   contacts: {
@@ -26,7 +26,7 @@ export const BRAND = {
   }
 };
 
-export const DEFAULT_WHATSAPP_MESSAGE = 'Hello Fresh Study India, I am interested in studying in India. I would like to speak with an advisor.';
+export const DEFAULT_WHATSAPP_MESSAGE = 'Hello Myers Global Pathway, I am interested in studying in India. I would like to speak with an advisor.';
 
 export const getWhatsAppLink = (
   country: 'india' | 'liberia' = 'india',

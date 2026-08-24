@@ -14,6 +14,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import { getWhatsAppLink } from '../lib/constants';
+import { TiltCard3D } from './TiltCard3D';
 
 interface ServicesGridProps {
   onOpenApplication: (serviceTitle?: string) => void;
@@ -98,57 +99,58 @@ export const ServicesGrid: React.FC<ServicesGridProps> = ({ onOpenApplication })
           </h2>
 
           <p className="mt-5 text-base sm:text-lg text-slate-600 font-normal leading-relaxed">
-            From your hometown to your Indian university dorm room, Fresh Study India provides dedicated guidance at every milestone.
+            From your hometown to your Indian university dorm room, Myers Global Pathway provides dedicated guidance at every milestone.
           </p>
         </div>
 
         {/* 6 Grid Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
           {services.map((srv) => (
-            <div
-              key={srv.id}
-              className="group rounded-3xl bg-white hover:bg-slate-50/50 border border-sky-100 hover:border-sky-300 p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 shadow-[0_10px_30px_rgba(15,23,42,0.04)] hover:shadow-xl flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-5">
-                  <div className="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-center group-hover:scale-105 group-hover:border-slate-300 transition shadow-2xs">
-                    {srv.icon}
+            <TiltCard3D key={srv.id} maxTilt={7} perspective={1000} className="h-full">
+              <div
+                className="group rounded-3xl bg-white hover:bg-slate-50/50 border border-sky-100 hover:border-sky-300 p-7 sm:p-8 transition-all duration-300 shadow-[0_10px_30px_rgba(15,23,42,0.04)] hover:shadow-xl flex flex-col justify-between h-full"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-center group-hover:scale-105 group-hover:border-slate-300 transition shadow-2xs">
+                      {srv.icon}
+                    </div>
+
+                    <span className={`text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full border ${srv.tagClass}`}>
+                      {srv.tag}
+                    </span>
                   </div>
 
-                  <span className={`text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full border ${srv.tagClass}`}>
-                    {srv.tag}
-                  </span>
+                  <h3 className="text-xl font-black text-slate-900 tracking-tight group-hover:text-blue-900 transition-colors mb-3">
+                    {srv.title}
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                    {srv.desc}
+                  </p>
                 </div>
 
-                <h3 className="text-xl font-black text-slate-900 tracking-tight group-hover:text-blue-900 transition-colors mb-3">
-                  {srv.title}
-                </h3>
+                <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
+                  <button
+                    onClick={() => onOpenApplication(srv.title)}
+                    className="text-xs font-black uppercase tracking-wider text-rose-600 hover:text-rose-700 flex items-center gap-1.5 group-hover:gap-2 transition-all cursor-pointer"
+                  >
+                    <span>{srv.actionText}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
 
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                  {srv.desc}
-                </p>
+                  <a
+                    href={getWhatsAppLink('india', `Hello Myers Global Pathway, I want to inquire about your ${srv.title} service.`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] font-mono text-slate-400 hover:text-emerald-600 transition"
+                    title="Direct WhatsApp"
+                  >
+                    WhatsApp →
+                  </a>
+                </div>
               </div>
-
-              <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
-                <button
-                  onClick={() => onOpenApplication(srv.title)}
-                  className="text-xs font-black uppercase tracking-wider text-rose-600 hover:text-rose-700 flex items-center gap-1.5 group-hover:gap-2 transition-all cursor-pointer"
-                >
-                  <span>{srv.actionText}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-
-                <a
-                  href={getWhatsAppLink('india', `Hello Fresh Study India, I want to inquire about your ${srv.title} service.`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[11px] font-mono text-slate-400 hover:text-emerald-600 transition"
-                  title="Direct WhatsApp"
-                >
-                  WhatsApp →
-                </a>
-              </div>
-            </div>
+            </TiltCard3D>
           ))}
         </div>
 

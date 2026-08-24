@@ -566,7 +566,7 @@ export const AdmissionsPortal: React.FC<AdmissionsPortalProps> = ({ isOpen, onCl
 
     // Direct blob download
     const blob = new Blob([
-      `Fresh Study India Document Vault\n\n` +
+      `Myers Global Pathway Document Vault\n\n` +
       `Applicant: ${selectedApp?.fullName || 'Student'}\n` +
       `Tracking Ref: ${selectedApp?.trackingId || 'N/A'}\n` +
       `Document Name: ${doc.name}\n` +
@@ -606,7 +606,7 @@ export const AdmissionsPortal: React.FC<AdmissionsPortalProps> = ({ isOpen, onCl
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `FreshStudyIndia_Applications_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `MyersGlobalPathway_Applications_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -650,7 +650,7 @@ export const AdmissionsPortal: React.FC<AdmissionsPortalProps> = ({ isOpen, onCl
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-black text-white tracking-tight">
-                  Fresh Study India Admissions Portal
+                  Myers Global Pathway Admissions Portal
                 </h2>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono font-bold uppercase tracking-wider">
                   Live Vault
@@ -1024,7 +1024,7 @@ export const AdmissionsPortal: React.FC<AdmissionsPortalProps> = ({ isOpen, onCl
                       <div className="pt-2 border-t border-slate-900 flex items-center justify-between">
                         <span className="text-xs text-slate-400 font-mono">{selectedApp.phone}</span>
                         <a
-                          href={getWhatsAppLink('india', `Hello ${selectedApp.fullName}, this is the Admissions Committee from Fresh Study India regarding your application (${selectedApp.studyField}, Ref: ${selectedApp.trackingId || selectedApp.id}).`)}
+                          href={getWhatsAppLink('india', `Hello ${selectedApp.fullName}, this is the Admissions Committee from Myers Global Pathway regarding your application (${selectedApp.studyField}, Ref: ${selectedApp.trackingId || selectedApp.id}).`)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow"

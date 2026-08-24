@@ -17,7 +17,7 @@ export const FloatingWhatsApp: React.FC = () => {
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    const finalMsg = customMsg.trim() || 'Hello Fresh Study India, I want to inquire about 2026 university admissions in India.';
+    const finalMsg = customMsg.trim() || 'Hello Myers Global Pathway, I want to inquire about 2026 university admissions in India.';
     const link = getWhatsAppLink(selectedDesk, finalMsg);
     window.open(link, '_blank');
     setIsOpen(false);
