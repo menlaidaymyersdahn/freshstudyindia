@@ -11,6 +11,7 @@ dotenv.config();
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DOCUMENTS_DIR = path.join(DATA_DIR, 'documents');
 const APPS_FILE = path.join(DATA_DIR, 'applications.json');
+const ENQUIRIES_FILE = path.join(DATA_DIR, 'enquiries.json');
 
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -41,7 +42,29 @@ function saveApplicationsToDisk(apps: any[]) {
   }
 }
 
-// Initialize server-side Gemini AI client with required User-Agent
+// Helper to load persistent enquiries
+function loadEnquiriesFromDisk(): any[] {
+  try {
+    if (fs.existsSync(ENQUIRIES_FILE)) {
+      const raw = fs.readFileSync(ENQUIRIES_FILE, 'utf-8');
+      return JSON.parse(raw);
+    }
+  } catch (err) {
+    console.error('Error reading enquiries file:', err);
+  }
+  return [];
+}
+
+// Helper to persist enquiries to disk
+function saveEnquiriesToDisk(enquiries: any[]) {
+  try {
+    fs.writeFileSync(ENQUIRIES_FILE, JSON.stringify(enquiries, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Error writing enquiries file:', err);
+  }
+}
+
+// Initialize server-side Gemini AI client
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
   httpOptions: {
@@ -56,41 +79,98 @@ async function startServer() {
   const PORT = 3000;
 
   // Support JSON payloads including uploaded document attachments
-  app.use(express.json({ limit: '100mb' }));
-  app.use(express.urlencoded({ limit: '100mb', extended: true }));
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
   // Load persistent application repository
   let applications: any[] = loadApplicationsFromDisk();
+  let enquiries: any[] = loadEnquiriesFromDisk();
 
   // API Health Endpoint
   app.get('/api/health', (req, res) => {
     res.json({ 
       status: 'ok', 
-      service: 'Fresh Study India API',
+      service: 'Myers Global Pathways API',
       totalApplications: applications.length,
+      totalEnquiries: enquiries.length,
       geminiConfigured: Boolean(process.env.GEMINI_API_KEY),
-      storageType: 'Persistent File & Document Vault'
+      storageType: 'Secure Private Document Vault'
     });
   });
 
-  // 1. SUBMIT APPLICATION PROFILE (With full document storage)
-  app.post('/api/applications', (req, res) => {
+  // 1. SUBMIT STUDENT ENQUIRY
+  app.post('/api/enquiries', (req, res) => {
     try {
-      const { fullName, phone, email, country, studyField, qualification, documents = [] } = req.body;
-      
-      if (!fullName || !phone) {
-        return res.status(400).json({ success: false, error: 'Full name and phone are required.' });
+      const { fullName, email, whatsapp, country, studyInterest, preferredCourse, preferredUniversity, message } = req.body;
+
+      if (!fullName || !email) {
+        return res.status(400).json({ success: false, error: 'Full name and email address are required.' });
       }
 
-      const appId = `FSI-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
-      const trackingRef = `IND-2026-${Math.floor(100000 + Math.random() * 900000)}`;
+      const enquiryId = `ENQ-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
+
+      const newEnquiry = {
+        id: enquiryId,
+        fullName: String(fullName).trim(),
+        email: String(email).trim().toLowerCase(),
+        whatsapp: whatsapp ? String(whatsapp).trim() : '',
+        country: country ? String(country).trim() : '',
+        studyInterest: studyInterest ? String(studyInterest).trim() : '',
+        preferredCourse: preferredCourse ? String(preferredCourse).trim() : '',
+        preferredUniversity: preferredUniversity ? String(preferredUniversity).trim() : '',
+        message: message ? String(message).trim() : '',
+        status: 'NEW',
+        assignedTo: 'admissions@myersglobalpathways.com',
+        createdAt: new Date().toISOString()
+      };
+
+      enquiries = loadEnquiriesFromDisk();
+      enquiries.unshift(newEnquiry);
+      saveEnquiriesToDisk(enquiries);
+
+      console.log(`[Myers Global Pathways] New enquiry received: ${fullName} (${email}) - Course: ${preferredCourse || studyInterest || 'General'}`);
+
+      res.status(201).json({
+        success: true,
+        enquiryId,
+        message: 'Thank you. Your enquiry has been received. Our team will get back to you as soon as possible.'
+      });
+    } catch (err: any) {
+      console.error('Error submitting enquiry:', err);
+      res.status(500).json({ success: false, error: 'Failed to process enquiry.' });
+    }
+  });
+
+  // 2. SUBMIT APPLICATION PROFILE (With private document storage)
+  app.post('/api/applications', (req, res) => {
+    try {
+      const { 
+        fullName, 
+        email, 
+        whatsapp, 
+        country, 
+        dateOfBirth,
+        academicBackground,
+        currentQualification, 
+        preferredStudyLevel,
+        preferredCourse, 
+        preferredUniversity,
+        message,
+        documents = [] 
+      } = req.body;
+      
+      if (!fullName || !email) {
+        return res.status(400).json({ success: false, error: 'Full name and email address are required.' });
+      }
+
+      const appId = `MGP-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const trackingRef = `MGP-IND-${Math.floor(100000 + Math.random() * 900000)}`;
 
       // Process and store each document file securely
       const savedDocs = (Array.isArray(documents) ? documents : []).map((doc: any, index: number) => {
         const docId = doc.id || `doc-${Date.now()}-${index}`;
         let storedFilePath = '';
 
-        // If file data URL exists, save physical copy to documents vault
         if (doc.dataUrl && typeof doc.dataUrl === 'string') {
           try {
             const matches = doc.dataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
@@ -113,9 +193,8 @@ async function startServer() {
           name: doc.name || `Document_${index + 1}`,
           size: doc.size || 0,
           formattedSize: doc.formattedSize || 'N/A',
-          type: doc.type || 'FILE',
+          type: doc.type || 'application/octet-stream',
           category: doc.category || 'Other Supporting Documents',
-          dataUrl: doc.dataUrl || undefined, // retained for immediate preview
           storedFile: storedFilePath || undefined,
           verified: false,
           uploadedAt: new Date().toISOString()
@@ -125,20 +204,25 @@ async function startServer() {
       const newApplication = {
         id: appId,
         trackingId: trackingRef,
-        fullName: fullName.trim(),
-        phone: phone.trim(),
-        email: (email || '').trim(),
-        country: country || 'Liberia',
-        studyField: studyField || 'Computer Science',
-        qualification: qualification || 'High School Diploma (WAEC / WASSCE)',
-        status: 'NEW',
+        fullName: String(fullName).trim(),
+        email: String(email).trim().toLowerCase(),
+        whatsapp: whatsapp ? String(whatsapp).trim() : '',
+        country: country ? String(country).trim() : '',
+        dateOfBirth: dateOfBirth ? String(dateOfBirth).trim() : '',
+        academicBackground: academicBackground ? String(academicBackground).trim() : '',
+        currentQualification: currentQualification ? String(currentQualification).trim() : '',
+        preferredStudyLevel: preferredStudyLevel ? String(preferredStudyLevel).trim() : 'Undergraduate',
+        preferredCourse: preferredCourse ? String(preferredCourse).trim() : '',
+        preferredUniversity: preferredUniversity ? String(preferredUniversity).trim() : '',
+        message: message ? String(message).trim() : '',
+        status: 'Application Submitted',
         documentsCount: savedDocs.length,
         documents: savedDocs,
         notes: [
           {
             id: `note-${Date.now()}`,
             author: 'System',
-            text: `Application profile created with ${savedDocs.length} attached document(s).`,
+            text: `Application dossier created with ${savedDocs.length} initial document(s).`,
             createdAt: new Date().toISOString()
           }
         ],
@@ -146,20 +230,23 @@ async function startServer() {
         updatedAt: new Date().toISOString()
       };
 
+      applications = loadApplicationsFromDisk();
       applications.unshift(newApplication);
       saveApplicationsToDisk(applications);
 
-      console.log(`[Admissions Engine] Application registered: ${fullName} (${country}), Target: ${studyField}, Docs: ${savedDocs.length}, Ref: ${trackingRef}`);
+      console.log(`[Myers Global Pathways] Application registered: ${fullName} (${country}), Target: ${preferredCourse || preferredStudyLevel}, Docs: ${savedDocs.length}, Ref: ${trackingRef}`);
 
       res.status(201).json({
         success: true,
         applicationId: appId,
         trackingId: trackingRef,
-        message: 'Application profile and documents permanently recorded.',
+        message: 'Your application has been received. Our admissions team will review your details and contact you.',
         record: {
           id: appId,
           trackingId: trackingRef,
           fullName: newApplication.fullName,
+          email: newApplication.email,
+          status: newApplication.status,
           documentsCount: savedDocs.length
         }
       });
@@ -169,7 +256,64 @@ async function startServer() {
     }
   });
 
-  // 2. GET ALL APPLICATIONS (For Admissions Dashboard)
+  // 3. STUDENT PORTAL LOOKUP (By Tracking Reference or Email)
+  app.get('/api/student/lookup', (req, res) => {
+    try {
+      const { trackingId, email } = req.query;
+      if (!trackingId && !email) {
+        return res.status(400).json({ success: false, error: 'Tracking reference or email address required.' });
+      }
+
+      applications = loadApplicationsFromDisk();
+      let matched = applications.find(a => {
+        if (trackingId && String(a.trackingId).trim().toUpperCase() === String(trackingId).trim().toUpperCase()) {
+          return true;
+        }
+        if (email && String(a.email).trim().toLowerCase() === String(email).trim().toLowerCase()) {
+          return true;
+        }
+        return false;
+      });
+
+      if (!matched) {
+        return res.status(404).json({ 
+          success: false, 
+          error: 'No application found with the provided details. Please check your reference code or contact admissions@myersglobalpathways.com' 
+        });
+      }
+
+      // Return sanitized student dossier view
+      res.json({
+        success: true,
+        application: {
+          id: matched.id,
+          trackingId: matched.trackingId,
+          fullName: matched.fullName,
+          email: matched.email,
+          whatsapp: matched.whatsapp,
+          country: matched.country,
+          preferredStudyLevel: matched.preferredStudyLevel,
+          preferredCourse: matched.preferredCourse,
+          preferredUniversity: matched.preferredUniversity,
+          status: matched.status || 'Application Submitted',
+          documentsCount: matched.documents?.length || 0,
+          documents: (matched.documents || []).map((d: any) => ({
+            id: d.id,
+            name: d.name,
+            category: d.category,
+            verified: Boolean(d.verified),
+            uploadedAt: d.uploadedAt
+          })),
+          submittedAt: matched.submittedAt,
+          updatedAt: matched.updatedAt
+        }
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: 'Lookup failed' });
+    }
+  });
+
+  // 4. GET ALL APPLICATIONS (For Admissions Admin Dashboard)
   app.get('/api/applications', (req, res) => {
     try {
       applications = loadApplicationsFromDisk();
@@ -188,31 +332,30 @@ async function startServer() {
         filtered = filtered.filter(a => 
           a.fullName?.toLowerCase().includes(q) ||
           a.email?.toLowerCase().includes(q) ||
-          a.phone?.toLowerCase().includes(q) ||
+          a.whatsapp?.toLowerCase().includes(q) ||
           a.trackingId?.toLowerCase().includes(q) ||
-          a.studyField?.toLowerCase().includes(q)
+          a.preferredCourse?.toLowerCase().includes(q) ||
+          a.country?.toLowerCase().includes(q)
         );
       }
 
-      // Return summary without heavy base64 strings for fast dashboard loading
       const summaryList = filtered.map(app => ({
         id: app.id,
         trackingId: app.trackingId || app.id,
         fullName: app.fullName,
-        phone: app.phone,
         email: app.email,
+        whatsapp: app.whatsapp,
         country: app.country,
-        studyField: app.studyField,
-        qualification: app.qualification,
-        status: app.status || 'NEW',
+        preferredStudyLevel: app.preferredStudyLevel,
+        preferredCourse: app.preferredCourse,
+        preferredUniversity: app.preferredUniversity,
+        currentQualification: app.currentQualification,
+        status: app.status || 'Application Submitted',
         documentsCount: app.documents?.length || 0,
         documentsSummary: (app.documents || []).map((d: any) => ({
           id: d.id,
           name: d.name,
           category: d.category,
-          type: d.type,
-          size: d.size,
-          formattedSize: d.formattedSize,
           verified: Boolean(d.verified)
         })),
         notesCount: app.notes?.length || 0,
@@ -232,7 +375,7 @@ async function startServer() {
     }
   });
 
-  // 3. GET SINGLE APPLICATION DOSSIER (Complete with document previews & notes)
+  // 5. GET SINGLE APPLICATION DOSSIER (Complete with notes)
   app.get('/api/applications/:id', (req, res) => {
     try {
       applications = loadApplicationsFromDisk();
@@ -251,49 +394,7 @@ async function startServer() {
     }
   });
 
-  // 4. DOWNLOAD ATTACHED DOCUMENT FILE (Direct binary download stream)
-  app.get('/api/applications/:id/documents/:docId/download', (req, res) => {
-    try {
-      applications = loadApplicationsFromDisk();
-      const appRecord = applications.find(a => a.id === req.params.id);
-
-      if (!appRecord) {
-        return res.status(404).send('Application not found');
-      }
-
-      const docRecord = (appRecord.documents || []).find((d: any) => d.id === req.params.docId);
-      if (!docRecord) {
-        return res.status(404).send('Document not found');
-      }
-
-      // Check physical file on disk first
-      if (docRecord.storedFile) {
-        const filePath = path.join(DOCUMENTS_DIR, docRecord.storedFile);
-        if (fs.existsSync(filePath)) {
-          return res.download(filePath, docRecord.name);
-        }
-      }
-
-      // Fallback: decode base64 dataUrl
-      if (docRecord.dataUrl) {
-        const matches = docRecord.dataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-        if (matches && matches.length === 3) {
-          const mimeType = matches[1];
-          const buffer = Buffer.from(matches[2], 'base64');
-          res.setHeader('Content-Type', mimeType);
-          res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(docRecord.name)}"`);
-          return res.send(buffer);
-        }
-      }
-
-      res.status(404).send('Document file content is not available for download.');
-    } catch (err: any) {
-      console.error('Download error:', err);
-      res.status(500).send('Failed to download document');
-    }
-  });
-
-  // 5. UPDATE APPLICATION STATUS
+  // 6. UPDATE APPLICATION STATUS
   app.patch('/api/applications/:id/status', (req, res) => {
     try {
       const { status, noteText, author = 'Admissions Officer' } = req.body;
@@ -315,7 +416,7 @@ async function startServer() {
       applications[index].notes.push({
         id: `note-${Date.now()}`,
         author,
-        text: noteText || `Status updated from ${oldStatus} to ${status}.`,
+        text: noteText || `Status updated from "${oldStatus}" to "${status}".`,
         createdAt: new Date().toISOString()
       });
 
@@ -331,7 +432,7 @@ async function startServer() {
     }
   });
 
-  // 6. ADD COUNSELOR INTERNAL NOTE
+  // 7. ADD COUNSELOR INTERNAL NOTE
   app.post('/api/applications/:id/notes', (req, res) => {
     try {
       const { text, author = 'Admissions Counselor' } = req.body;
@@ -353,7 +454,7 @@ async function startServer() {
       const newNote = {
         id: `note-${Date.now()}`,
         author,
-        text,
+        text: String(text).trim(),
         createdAt: new Date().toISOString()
       };
 
@@ -372,7 +473,7 @@ async function startServer() {
     }
   });
 
-  // 7. TOGGLE DOCUMENT VERIFICATION
+  // 8. TOGGLE DOCUMENT VERIFICATION
   app.patch('/api/applications/:id/documents/:docId/verify', (req, res) => {
     try {
       const { verified } = req.body;
@@ -402,36 +503,18 @@ async function startServer() {
     }
   });
 
-  // 8. DELETE APPLICATION
-  app.delete('/api/applications/:id', (req, res) => {
-    try {
-      applications = loadApplicationsFromDisk();
-      const initialLength = applications.length;
-      applications = applications.filter(a => a.id !== req.params.id);
-
-      if (applications.length === initialLength) {
-        return res.status(404).json({ success: false, error: 'Application not found' });
-      }
-
-      saveApplicationsToDisk(applications);
-      res.json({ success: true, message: 'Application deleted successfully' });
-    } catch (err: any) {
-      res.status(500).json({ success: false, error: err.message });
-    }
-  });
-
-  // 9. COUNSELOR / ADMISSIONS PORTAL AUTHENTICATION
+  // 9. ADMIN DASHBOARD AUTHENTICATION
   app.post('/api/admin/login', (req, res) => {
     try {
       const { passcode } = req.body;
-      // Supported counselor passcodes: 'fresh2026', 'admissions2026', 'myers2026'
-      if (passcode === 'fresh2026' || passcode === 'admissions2026' || passcode === 'myers2026') {
+      // Supported admin passkeys
+      if (passcode === 'myers2026' || passcode === 'admissions2026') {
         return res.json({
           success: true,
-          token: `fsi-auth-${Date.now()}`,
+          token: `mgp-auth-${Date.now()}`,
           user: {
-            name: 'Admissions Officer',
-            role: 'counselor',
+            name: 'Myers Global Pathways Admissions Officer',
+            role: 'admissions_counselor',
             authorized: true
           }
         });
@@ -446,72 +529,45 @@ async function startServer() {
     }
   });
 
-  // GEMINI CHATBOT ENDPOINT (Multi-turn, role-based, multi-model)
+  // 10. GEMINI ADMISSIONS ADVISORY ENDPOINT
   app.post('/api/gemini/chat', async (req, res) => {
     try {
-      const { 
-        messages, 
-        role = 'general_advisor', 
-        modelType = 'general', // 'fast' | 'general' | 'complex'
-        userContext 
-      } = req.body;
+      const { messages, userContext } = req.body;
 
       if (!messages || !Array.isArray(messages) || messages.length === 0) {
         return res.status(400).json({ error: 'Messages array is required' });
       }
 
-      // Map model selection as instructed:
-      // complex -> gemini-3.1-pro-preview
-      // general -> gemini-3.5-flash
-      // fast -> gemini-3.1-flash-lite
-      let selectedModel = 'gemini-3.5-flash';
-      if (modelType === 'complex') {
-        selectedModel = 'gemini-3.1-pro-preview';
-      } else if (modelType === 'fast') {
-        selectedModel = 'gemini-3.1-flash-lite';
-      }
+      const systemInstruction = `You are the official Admissions Guidance Assistant for Myers Global Pathways ("Your Pathway to Global Education").
 
-      // Dynamic System Instruction based on specialized role
-      let systemInstruction = `You are the official AI Admissions & Counseling Consultant for "Fresh Study India", an international education consultancy and student facilitation agency.
+ABOUT MYERS GLOBAL PATHWAYS:
+- International education consultancy helping international students pursue higher education in India.
+- Services: Study in India guidance, University selection, Course selection, Admission guidance, Application assistance, Documentation guidance, Visa guidance, Pre-departure guidance, Arrival support, Student support.
+- Core Values: Trust, Professionalism, Global Education, Student Support, Transparency, Modern India, International Opportunities.
 
-CRITICAL DIRECTIVES:
-1. ONLY answer questions about OUR AGENCY ("Fresh Study India"), our services, admission facilitation process, scholarship support, visa coaching, and on-ground student assistance.
-2. DO NOT promote, discuss internal proprietary details of, or name-drop specific third-party universities (e.g. do not mention LPU, Lovely Professional University, Chandigarh University, Sharda, Parul, Amity, VIT, SRM, etc.). Instead, refer strictly and professionally to "our partner accredited universities in India (NAAC A++ / A+ rated institutions)".
-3. Agency Services Provided by Fresh Study India:
-   - Academic Profiling & Program Advising: Engineering (B.Tech/M.Tech, AI & ML, Computer Science), Medicine & Health Sciences (MBBS, Pharmacy, Nursing), Business (BBA, MBA), Computer Applications (BCA, MCA), and Sciences.
-   - Institutional Partner Admissions: Direct application processing and official provisional admission letters with no middleman delays.
-   - Merit Scholarships: Facilitating 30% to 100% tuition scholarships based on academic records (WASSCE, WAEC, NECO, KCSE, High School Diplomas, Bachelor degrees).
-   - Visa & Legal Assistance: Certified bonafide letters, AIU equivalence guidance, Indian Embassy interview coaching, and documentation checks.
-   - On-Ground Indian Desk: Airport reception in major Indian international airports (Delhi, Mumbai, Bengaluru, etc.), private campus transfer, on-campus hostel placement, Indian SIM card setup, and on-ground FRRO (Foreigners Regional Registration Office) clearance.
-4. Contact & Support Information:
-   - Official WhatsApp Desk: +231 889425645
-   - Official Email: freshstudyindia@gmail.com
-   - Free Consultation: 100% free preliminary profile assessment and scholarship calculation within 24-48 hours.
-5. Tone & Structure:
-   - Warm, welcoming, professional, well-structured with clear bullet points and headings. Always encourage the student to connect with our agency counselors on WhatsApp (+231 889425645) or apply through the portal.`;
+OFFICIAL EMAIL DIRECTORY (All verified @myersglobalpathways.com):
+- General Enquiries: info@myersglobalpathways.com
+- Admissions: admissions@myersglobalpathways.com
+- Applications: applications@myersglobalpathways.com
+- Student Support: support@myersglobalpathways.com
+- Partnerships: partnerships@myersglobalpathways.com
+- Careers: careers@myersglobalpathways.com
+- Collaborations: collab@myersglobalpathways.com
+- Contact: contact@myersglobalpathways.com
+- Founder / Administration: menlaiday@myersglobalpathways.com
 
-      if (role === 'visa_specialist') {
-        systemInstruction += `\n\nActive Mode: VISA & FRRO COMPLIANCE SPECIALIST. Focus on Fresh Study India's visa coaching, documentation requirements, and on-arrival FRRO guidance.`;
-      } else if (role === 'scholarship_navigator') {
-        systemInstruction += `\n\nActive Mode: SCHOLARSHIP & FINANCIAL NAVIGATOR. Focus on Fresh Study India's scholarship evaluation process, fee transparency, and affordable budget planning.`;
-      } else if (role === 'campus_life_guide') {
-        systemInstruction += `\n\nActive Mode: STUDENT WELFARE & ON-GROUND SUPPORT GUIDE. Focus on Fresh Study India's airport pickup, hostel placement, safety, dining options, and ongoing student mentorship in India.`;
-      }
+IMPORTANT POLICIES:
+- Do not invent statistics, awards, partnerships, student numbers, success rates, reviews, or office locations.
+- Speak in a calm, professional, supportive, and sophisticated editorial tone.
+- Guide students toward starting their application or reaching out to the admissions team at admissions@myersglobalpathways.com.`;
 
-      if (userContext && typeof userContext === 'object') {
-        systemInstruction += `\n\nCurrent Student Context: Name: ${userContext.name || 'Student'}, Target Major: ${userContext.desiredMajor || 'Not specified'}, Country of Origin: ${userContext.country || 'International'}, Academic Level: ${userContext.degreeLevel || 'Undergraduate'}.`;
-      }
-
-      // Convert conversation messages into contents format for multi-turn chat
-      // Format: { role: 'user' | 'model', parts: [{ text: messageText }] }
       const contents = messages.map((msg: { sender: string; text: string; role?: string }) => ({
         role: msg.sender === 'user' || msg.role === 'user' ? 'user' : 'model',
         parts: [{ text: msg.text }],
       }));
 
-      // Generate content with Gemini
       const response = await ai.models.generateContent({
-        model: selectedModel,
+        model: 'gemini-2.5-flash',
         contents: contents,
         config: {
           systemInstruction: systemInstruction,
@@ -519,18 +575,15 @@ CRITICAL DIRECTIVES:
         },
       });
 
-      const replyText = response.text || "I'm sorry, I couldn't generate a response. Please try asking again.";
-
       res.json({
-        reply: replyText,
-        modelUsed: selectedModel,
+        reply: response.text || "Thank you for reaching out to Myers Global Pathways. Please connect with our admissions team at admissions@myersglobalpathways.com for personalized guidance.",
         timestamp: new Date().toISOString()
       });
     } catch (error: any) {
       console.error('Error in /api/gemini/chat:', error);
       res.status(500).json({ 
-        error: error.message || 'Failed to process Gemini chat request',
-        reply: "I encountered an issue connecting to the AI Admissions advisor. Please verify your connection or reach out to our counselors directly."
+        error: error.message || 'Failed to process advisory request',
+        reply: "Our admissions advisors are available to help. Please reach out to admissions@myersglobalpathways.com or submit your enquiry through our portal."
       });
     }
   });
@@ -551,7 +604,7 @@ CRITICAL DIRECTIVES:
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Fresh Study India server running on http://0.0.0.0:${PORT}`);
+    console.log(`Myers Global Pathways server running on http://0.0.0.0:${PORT}`);
   });
 }
 
