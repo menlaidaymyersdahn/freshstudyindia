@@ -29,15 +29,67 @@ export const EditorialTrustIntro: React.FC<EditorialTrustIntroProps> = ({
         {/* Editorial Split Composition */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           
-          {/* Left Column: Rich Editorial Photography */}
+          {/* Left Column: Structured Advisory Commitments Panel */}
           <div className="lg:col-span-5 relative order-2 lg:order-1">
-            <div className="relative rounded-3xl overflow-hidden shadow-xl border-2 border-white bg-white">
-              <img
-                src="/DSC_9531.jpeg"
-                alt="Myers Global Pathways international student graduates in India"
-                className="w-full h-[360px] sm:h-[420px] object-cover object-center"
-                loading="lazy"
-              />
+            <div className="rounded-3xl border-2 border-white shadow-xl bg-white p-6 sm:p-7 text-left space-y-4">
+              <div className="border-b border-sky-100 pb-3">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-blue-700">
+                  Our Advisory Framework
+                </span>
+                <h3 className="text-lg font-bold text-slate-950 mt-0.5">
+                  The Myers Student Commitment
+                </h3>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-lg bg-sky-100 border border-sky-200 text-blue-800 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    1
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900">Direct Institutional Matching</h4>
+                    <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed font-normal">
+                      Aligning academic goals with recognized, accredited university options.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-lg bg-sky-100 border border-sky-200 text-blue-800 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    2
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900">Transparent Tuition & Housing</h4>
+                    <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed font-normal">
+                      Complete clarity on international tuition rates, hostel fees, and living costs.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-lg bg-sky-100 border border-sky-200 text-blue-800 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    3
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900">Official Visa Guidance</h4>
+                    <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed font-normal">
+                      Comprehensive document checks and preparation for consular interviews.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-lg bg-sky-100 border border-sky-200 text-blue-800 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    4
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900">Arrival & Campus Settlement</h4>
+                    <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed font-normal">
+                      Pre-departure briefings and initial check-ins upon arrival in India.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

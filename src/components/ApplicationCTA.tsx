@@ -14,16 +14,10 @@ export const ApplicationCTA: React.FC<ApplicationCTAProps> = ({
   const whatsappConfig = getWhatsAppConfig();
 
   return (
-    <section id="apply-now" className="relative py-20 sm:py-24 bg-gradient-to-r from-blue-900 via-blue-800 to-sky-900 text-white border-t border-b border-sky-300/40 scroll-mt-24 overflow-hidden">
-      {/* Graduation Photography Background Overlay */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="/DSC_9367.jpeg"
-          alt="Myers Global Pathways graduation celebration"
-          className="w-full h-full object-cover object-center opacity-20 filter blur-xs"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-blue-950 via-blue-900/80 to-blue-950" />
-      </div>
+    <section id="apply-now" className="relative py-20 sm:py-24 bg-gradient-to-r from-blue-950 via-blue-900 to-sky-950 text-white border-t border-b border-sky-300/40 scroll-mt-24 overflow-hidden">
+      {/* Subtle ambient lighting orbs */}
+      <div className="absolute -top-24 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-24 right-1/4 w-96 h-96 bg-sky-400/20 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         

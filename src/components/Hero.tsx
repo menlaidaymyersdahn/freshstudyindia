@@ -10,8 +10,8 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ 
   onOpenApplication, 
-  onExploreStudyInIndia,
-  onExploreServices
+  onExploreStudyInIndia, 
+  onExploreServices 
 }) => {
   const whatsappConfig = getWhatsAppConfig();
 
@@ -20,18 +20,6 @@ export const Hero: React.FC<HeroProps> = ({
       id="home" 
       className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 text-slate-900 overflow-hidden bg-gradient-to-b from-[#CDE2F8] via-[#E2EFFC] to-[#EBF3FC] border-b border-sky-300/60"
     >
-      {/* Background Photo with Light Blue Gradient Overlays for High Legibility */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="/DSC_9367.jpeg"
-          alt="Myers Global Pathways graduation ceremony in India"
-          className="w-full h-full object-cover object-center opacity-20 filter scale-105"
-        />
-        {/* Layered luminous sky blue gradients */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#CDE2F8]/95 via-[#E2EFFC]/90 to-[#EBF3FC]/85" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#CDE2F8] via-transparent to-[#EBF3FC]" />
-      </div>
-
       {/* Subtle background ambient lighting */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-sky-400/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
@@ -104,29 +92,73 @@ export const Hero: React.FC<HeroProps> = ({
             </div>
           </div>
 
-          {/* Right Column: High-End Photography Composition Featuring Myers Graduates */}
+          {/* Right Column: Clean Admissions Overview Card */}
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto max-w-md lg:max-w-none">
               
-              {/* Main Editorial Image Frame */}
-              <div className="relative rounded-3xl overflow-hidden border-2 border-white shadow-2xl bg-white group">
-                <img
-                  src="/DSC_9367.jpeg"
-                  alt="Myers Global Pathways student graduates at university convocation ceremony"
-                  className="w-full h-[380px] sm:h-[460px] object-cover object-center group-hover:scale-103 transition-transform duration-700 ease-out"
-                  loading="eager"
-                />
-              </div>
+              <div className="rounded-3xl border-2 border-white shadow-2xl bg-white p-6 sm:p-8 text-left space-y-6">
+                
+                <div className="flex items-center justify-between gap-3 border-b border-sky-100 pb-4">
+                  <div>
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-blue-700">
+                      Admissions Overview
+                    </span>
+                    <h3 className="text-xl font-extrabold text-slate-950 mt-0.5">
+                      2026/2027 Intakes
+                    </h3>
+                  </div>
+                  <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-sky-200 text-blue-700 flex items-center justify-center shrink-0 shadow-xs">
+                    <ShieldCheck className="w-5 h-5 text-blue-600" />
+                  </div>
+                </div>
 
-              {/* Floating Verified Advisory Badge */}
-              <div className="absolute -top-4 -right-2 sm:-right-4 px-4 py-3 rounded-2xl bg-white/95 backdrop-blur-md border border-sky-300 text-slate-900 shadow-xl flex items-center gap-3 text-left">
-                <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
-                  <ShieldCheck className="w-4 h-4" />
+                {/* Key Pillars */}
+                <div className="space-y-3">
+                  <div className="p-3.5 rounded-2xl bg-sky-50/70 border border-sky-100 flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                      ✓
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-950">100% English-Medium Programs</h4>
+                      <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed font-normal">
+                        No IELTS or TOEFL required for qualifying applicants with English high school backgrounds.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-sky-50/70 border border-sky-100 flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                      ✓
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-950">Accredited Degrees</h4>
+                      <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed font-normal">
+                        UGC, AICTE, NAAC accredited universities across Tech, Medicine, Business & Humanities.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-sky-50/70 border border-sky-100 flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                      ✓
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-950">Dedicated Visa Dossier Assistance</h4>
+                      <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed font-normal">
+                        Step-by-step guidance for Indian Embassy/Consulate student visa appointments.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-950">Proven Results</p>
-                  <p className="text-[10px] text-slate-600 font-medium">Official Partner Universities</p>
+
+                {/* Status Bar */}
+                <div className="pt-2">
+                  <div className="px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                    <span>Currently Accepting International Applications</span>
+                  </div>
                 </div>
+
               </div>
 
             </div>
