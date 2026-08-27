@@ -41,7 +41,8 @@ import {
   Zap,
   Copy,
   Share2,
-  Bell
+  Bell,
+  RotateCcw
 } from 'lucide-react';
 
 interface AdminDashboardModalProps {
@@ -170,11 +171,32 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     'Bangalore University Affiliated Health & Tech Institutes'
   ];
 
-  // Auto-fetch data on open or authentication
+  // Auto-fetch data on open or authentication & subscribe to live student submissions
   useEffect(() => {
     if (isOpen && isAuthenticated) {
       fetchApplications();
       fetchEnquiries();
+
+      // Background real-time poller (every 5 seconds while dashboard is open)
+      const pollInterval = setInterval(() => {
+        fetchApplications(true);
+        fetchEnquiries();
+      }, 5000);
+
+      // Instant live notification when an application is submitted in the current window or across browser tabs
+      const handleApplicationSubmitted = () => {
+        fetchApplications();
+        fetchEnquiries();
+      };
+
+      window.addEventListener('mgp_application_submitted', handleApplicationSubmitted);
+      window.addEventListener('storage', handleApplicationSubmitted);
+
+      return () => {
+        clearInterval(pollInterval);
+        window.removeEventListener('mgp_application_submitted', handleApplicationSubmitted);
+        window.removeEventListener('storage', handleApplicationSubmitted);
+      };
     }
   }, [isOpen, isAuthenticated]);
 
@@ -229,26 +251,87 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     fetchEnquiries();
   };
 
-  // Fetch real applications from API
-  const fetchApplications = async () => {
-    setIsLoading(true);
+  // Fetch real applications from API + merge & sync any client cached applications
+  const fetchApplications = async (isBackgroundPoll = false) => {
+    if (!isBackgroundPoll) {
+      setIsLoading(true);
+    }
     try {
+      // 1. Check local storage for any pending or cached student submissions
+      let localApps: any[] = [];
+      try {
+        const rawLocal = localStorage.getItem('mgp_local_applications');
+        if (rawLocal) {
+          localApps = JSON.parse(rawLocal);
+        }
+      } catch (err) {
+        console.warn('Error reading local applications cache:', err);
+      }
+
+      // 2. Fetch from server API
       const res = await fetch('/api/applications');
       const data = await res.json();
+      
+      let serverApps: any[] = [];
       if (res.ok && data.success) {
-        setApplications(data.applications || []);
-        // Refresh active dossier if one is open
-        if (selectedAppId) {
-          const updated = (data.applications || []).find((a: any) => a.id === selectedAppId);
-          if (updated) {
-            openDossier(selectedAppId);
+        serverApps = data.applications || [];
+      }
+
+      // 3. If there are local applications not yet present on the server, sync them to server and merge into view
+      if (Array.isArray(localApps) && localApps.length > 0) {
+        const missingOnServer = localApps.filter((localItem: any) => 
+          !serverApps.some((serverItem: any) => 
+            (localItem.id && serverItem.id === localItem.id) || 
+            (localItem.trackingId && serverItem.trackingId === localItem.trackingId) ||
+            (serverItem.email?.toLowerCase() === localItem.email?.toLowerCase() && serverItem.fullName?.toLowerCase() === localItem.fullName?.toLowerCase())
+          )
+        );
+
+        if (missingOnServer.length > 0) {
+          try {
+            // Push missing applications to server
+            await fetch('/api/applications/sync-local', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ applications: missingOnServer })
+            });
+
+            // Re-fetch updated list from server
+            const recheckRes = await fetch('/api/applications');
+            const recheckData = await recheckRes.json();
+            if (recheckRes.ok && recheckData.success) {
+              serverApps = recheckData.applications || [];
+            }
+          } catch (syncErr) {
+            console.warn('Background sync warning:', syncErr);
+            // Fallback: merge locally so admin sees them immediately
+            serverApps = [...missingOnServer, ...serverApps];
           }
+        }
+      }
+
+      setApplications(serverApps);
+
+      // Refresh active dossier if one is open
+      if (selectedAppId) {
+        const updated = serverApps.find((a: any) => a.id === selectedAppId);
+        if (updated) {
+          openDossier(selectedAppId);
         }
       }
     } catch (err) {
       console.error('Error fetching applications:', err);
+      // If server unreachable, fallback to local applications cache
+      try {
+        const rawLocal = localStorage.getItem('mgp_local_applications');
+        if (rawLocal) {
+          setApplications(JSON.parse(rawLocal));
+        }
+      } catch (_) {}
     } finally {
-      setIsLoading(false);
+      if (!isBackgroundPoll) {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -1455,20 +1538,43 @@ Website: https://myersglobalpathways.com`;
                     )}
 
                     {filteredApps.length === 0 ? (
-                      <div className="p-12 rounded-2xl bg-white border border-slate-200 text-center space-y-4 shadow-xs">
+                      <div className="p-10 rounded-2xl bg-white border border-slate-200 text-center space-y-4 shadow-xs">
                         <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto border border-blue-200 shadow-xs">
                           <FileText className="w-7 h-7" />
                         </div>
                         <div>
-                          <h4 className="text-base font-bold text-slate-900">Admin Board Ready (0 Fake Data)</h4>
+                          <h4 className="text-base font-bold text-slate-900">
+                            {applications.length > 0 ? 'No Matching Applications' : 'Admin Board Ready'}
+                          </h4>
                           <p className="text-xs text-slate-500 max-w-md mx-auto mt-1 leading-relaxed">
-                            {searchQuery 
-                              ? 'No applications match your current search criteria or status filter.' 
-                              : 'All mock and demo data has been cleaned up. Real student applications submitted through the website portal will appear here in real-time.'}
+                            {applications.length > 0 
+                              ? `You have ${applications.length} student application(s) in the database, but none match the current filter (${statusFilter !== 'ALL' ? `Status: "${statusFilter}"` : ''} ${searchQuery ? `Search: "${searchQuery}"` : ''}).`
+                              : 'Real student applications submitted through the website portal will appear here immediately in real-time with documents and full dossiers.'}
                           </p>
                         </div>
-                        {onOpenApplyModal && (
-                          <div className="pt-2">
+                        
+                        <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5">
+                          {applications.length > 0 && (statusFilter !== 'ALL' || searchQuery.trim()) && (
+                            <button
+                              type="button"
+                              onClick={() => { setStatusFilter('ALL'); setSearchQuery(''); }}
+                              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-900 bg-amber-400 hover:bg-amber-300 transition-colors inline-flex items-center gap-1.5 shadow-sm cursor-pointer"
+                            >
+                              <RotateCcw className="w-3.5 h-3.5" />
+                              <span>Reset Filters (Show All {applications.length} Applications)</span>
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => fetchApplications()}
+                            className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors inline-flex items-center gap-1.5 cursor-pointer border border-slate-200"
+                          >
+                            <RefreshCw className="w-3.5 h-3.5 text-blue-600" />
+                            <span>Force Sync / Refresh Database</span>
+                          </button>
+
+                          {onOpenApplyModal && applications.length === 0 && (
                             <button
                               type="button"
                               onClick={() => { onClose(); onOpenApplyModal(); }}
@@ -1477,8 +1583,8 @@ Website: https://myersglobalpathways.com`;
                               <UserPlus className="w-3.5 h-3.5" />
                               <span>Submit a Test Student Application</span>
                             </button>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     ) : (
                       <div className="space-y-2.5 max-h-[580px] overflow-y-auto pr-1">

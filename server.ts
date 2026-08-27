@@ -193,11 +193,17 @@ async function startServer() {
 
         if (doc.dataUrl && typeof doc.dataUrl === 'string') {
           try {
-            const matches = doc.dataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-            if (matches && matches.length === 3) {
-              const mimeType = matches[1];
-              const base64Data = matches[2];
-              const ext = mimeType.split('/')[1]?.replace('jpeg', 'jpg') || 'bin';
+            const commaIndex = doc.dataUrl.indexOf(',');
+            if (commaIndex !== -1) {
+              const header = doc.dataUrl.slice(0, commaIndex);
+              const base64Data = doc.dataUrl.slice(commaIndex + 1);
+              let ext = 'pdf';
+              if (header.includes('image/jpeg') || header.includes('image/jpg')) ext = 'jpg';
+              else if (header.includes('image/png')) ext = 'png';
+              else if (header.includes('image/webp')) ext = 'webp';
+              else if (header.includes('application/pdf')) ext = 'pdf';
+              else if (doc.name && doc.name.includes('.')) ext = doc.name.split('.').pop() || 'bin';
+              
               const filename = `${appId}_${docId}.${ext}`;
               const fullFilePath = path.join(DOCUMENTS_DIR, filename);
               fs.writeFileSync(fullFilePath, Buffer.from(base64Data, 'base64'));
@@ -273,6 +279,82 @@ async function startServer() {
     } catch (error: any) {
       console.error('Error submitting application:', error);
       res.status(500).json({ success: false, error: error.message || 'Failed to submit application' });
+    }
+  });
+
+  // 2b. BATCH SYNC LOCAL/OFFLINE APPLICATIONS
+  app.post('/api/applications/sync-local', (req, res) => {
+    try {
+      const { applications: incomingApps = [] } = req.body;
+      if (!Array.isArray(incomingApps) || incomingApps.length === 0) {
+        return res.json({ success: true, syncedCount: 0, message: 'No applications to sync' });
+      }
+
+      applications = loadApplicationsFromDisk();
+      let addedCount = 0;
+
+      incomingApps.forEach((item: any) => {
+        if (!item || !item.fullName || !item.email) return;
+
+        // Check if application already exists by ID, trackingId, or exact (email + submittedAt)
+        const exists = applications.some(a => 
+          (item.id && a.id === item.id) ||
+          (item.trackingId && a.trackingId === item.trackingId) ||
+          (a.email?.toLowerCase() === item.email?.toLowerCase() && a.fullName?.toLowerCase() === item.fullName?.toLowerCase() && Math.abs(new Date(a.submittedAt).getTime() - new Date(item.submittedAt || 0).getTime()) < 60000)
+        );
+
+        if (!exists) {
+          const appId = item.id || `MGP-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+          const trackingRef = item.trackingId || `MGP-IND-${Math.floor(100000 + Math.random() * 900000)}`;
+
+          const normalizedApp = {
+            id: appId,
+            trackingId: trackingRef,
+            fullName: String(item.fullName).trim(),
+            email: String(item.email).trim().toLowerCase(),
+            whatsapp: item.whatsapp ? String(item.whatsapp).trim() : '',
+            country: item.country ? String(item.country).trim() : '',
+            dateOfBirth: item.dateOfBirth ? String(item.dateOfBirth).trim() : '',
+            academicBackground: item.academicBackground ? String(item.academicBackground).trim() : '',
+            currentQualification: item.currentQualification ? String(item.currentQualification).trim() : '',
+            preferredStudyLevel: item.preferredStudyLevel ? String(item.preferredStudyLevel).trim() : 'Undergraduate',
+            preferredCourse: item.preferredCourse ? String(item.preferredCourse).trim() : '',
+            preferredUniversity: item.preferredUniversity ? String(item.preferredUniversity).trim() : '',
+            message: item.message ? String(item.message).trim() : '',
+            status: item.status || 'Application Submitted',
+            documentsCount: Array.isArray(item.documents) ? item.documents.length : (item.documentsCount || 0),
+            documents: Array.isArray(item.documents) ? item.documents : [],
+            notes: Array.isArray(item.notes) && item.notes.length > 0 ? item.notes : [
+              {
+                id: `note-${Date.now()}`,
+                author: 'System',
+                text: 'Application synchronized from client admissions cache.',
+                createdAt: new Date().toISOString()
+              }
+            ],
+            submittedAt: item.submittedAt || new Date().toISOString(),
+            updatedAt: item.updatedAt || new Date().toISOString()
+          };
+
+          applications.unshift(normalizedApp);
+          addedCount++;
+        }
+      });
+
+      if (addedCount > 0) {
+        saveApplicationsToDisk(applications);
+        console.log(`[Myers Global Pathways] Synced ${addedCount} student application(s) from client cache.`);
+      }
+
+      res.json({
+        success: true,
+        syncedCount: addedCount,
+        total: applications.length,
+        message: `Successfully synchronized ${addedCount} application(s).`
+      });
+    } catch (err: any) {
+      console.error('Error syncing local applications:', err);
+      res.status(500).json({ success: false, error: err.message });
     }
   });
 

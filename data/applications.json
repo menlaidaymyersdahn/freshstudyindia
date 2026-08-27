@@ -1,1 +1,58 @@
-[]
+[
+  {
+    "id": "MGP-1787870857704-4079",
+    "trackingId": "MGP-IND-374932",
+    "fullName": "Kwame Asante",
+    "email": "kwame.asante@example.com",
+    "whatsapp": "+233 24 123 4567",
+    "country": "Ghana",
+    "dateOfBirth": "",
+    "academicBackground": "",
+    "currentQualification": "",
+    "preferredStudyLevel": "Undergraduate",
+    "preferredCourse": "B.Tech Computer Science & AI",
+    "preferredUniversity": "SRM Institute of Science & Technology",
+    "message": "",
+    "status": "Application Submitted",
+    "documentsCount": 0,
+    "documents": [],
+    "notes": [
+      {
+        "id": "note-1787870857704",
+        "author": "System",
+        "text": "Application dossier created with 0 initial document(s).",
+        "createdAt": "2026-08-27T22:47:37.704Z"
+      }
+    ],
+    "submittedAt": "2026-08-27T22:47:37.704Z",
+    "updatedAt": "2026-08-27T22:47:37.704Z"
+  },
+  {
+    "id": "MGP-1787870674201-5045",
+    "trackingId": "MGP-IND-353609",
+    "fullName": "Test Student Emmanuel",
+    "email": "emmanuel.test@example.com",
+    "whatsapp": "+231881234567",
+    "country": "Liberia",
+    "dateOfBirth": "",
+    "academicBackground": "",
+    "currentQualification": "",
+    "preferredStudyLevel": "Undergraduate",
+    "preferredCourse": "B.Tech Computer Science",
+    "preferredUniversity": "SRM Institute of Science & Technology",
+    "message": "",
+    "status": "Application Submitted",
+    "documentsCount": 0,
+    "documents": [],
+    "notes": [
+      {
+        "id": "note-1787870674201",
+        "author": "System",
+        "text": "Application dossier created with 0 initial document(s).",
+        "createdAt": "2026-08-27T22:44:34.201Z"
+      }
+    ],
+    "submittedAt": "2026-08-27T22:44:34.201Z",
+    "updatedAt": "2026-08-27T22:44:34.201Z"
+  }
+]

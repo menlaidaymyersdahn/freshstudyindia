@@ -70,12 +70,54 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
       if (res.ok && data.success) {
         setStudentRecord(data.application);
       } else {
-        setStudentRecord(null);
-        setErrorMessage(data.error || 'No record found. Please verify your reference code or registered email.');
+        // Check local storage fallback
+        let foundLocally = false;
+        try {
+          const rawLocal = localStorage.getItem('mgp_local_applications');
+          if (rawLocal) {
+            const list = JSON.parse(rawLocal);
+            const q = query.trim().toLowerCase();
+            const localMatch = list.find((a: any) => 
+              a.trackingId?.toLowerCase() === q || 
+              a.email?.toLowerCase() === q ||
+              a.id?.toLowerCase() === q
+            );
+            if (localMatch) {
+              setStudentRecord(localMatch);
+              foundLocally = true;
+            }
+          }
+        } catch (_) {}
+
+        if (!foundLocally) {
+          setStudentRecord(null);
+          setErrorMessage(data.error || 'No record found. Please verify your reference code or registered email.');
+        }
       }
     } catch (err) {
-      setStudentRecord(null);
-      setErrorMessage('Unable to connect to the admissions database. Please check your connection or contact admissions@myersglobalpathways.com');
+      // Local fallback in case of connection error
+      let foundLocally = false;
+      try {
+        const rawLocal = localStorage.getItem('mgp_local_applications');
+        if (rawLocal) {
+          const list = JSON.parse(rawLocal);
+          const q = query.trim().toLowerCase();
+          const localMatch = list.find((a: any) => 
+            a.trackingId?.toLowerCase() === q || 
+            a.email?.toLowerCase() === q ||
+            a.id?.toLowerCase() === q
+          );
+          if (localMatch) {
+            setStudentRecord(localMatch);
+            foundLocally = true;
+          }
+        }
+      } catch (_) {}
+
+      if (!foundLocally) {
+        setStudentRecord(null);
+        setErrorMessage('Unable to connect to the admissions database. Please check your connection or contact admissions@myersglobalpathways.com');
+      }
     } finally {
       setIsLoading(false);
     }
