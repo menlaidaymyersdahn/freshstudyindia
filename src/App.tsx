@@ -89,7 +89,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFCFF] text-slate-900 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950">
+    <div className="min-h-screen bg-[#EBF3FC] text-slate-900 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950">
       
       {/* 1. Header Navigation Bar */}
       <Navbar

@@ -8,20 +8,20 @@ interface ApplicationJourneyProps {
 
 export const ApplicationJourney: React.FC<ApplicationJourneyProps> = ({ onOpenApplication }) => {
   return (
-    <section id="journey" className="py-20 lg:py-28 bg-[#FAFCFF] text-slate-900 border-b border-slate-200 scroll-mt-24">
+    <section id="journey" className="py-20 lg:py-28 bg-[#EBF3FC] text-slate-900 border-b border-sky-200 scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="max-w-3xl mb-16 text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-amber-50 border border-amber-200/80 text-amber-900 text-xs font-bold uppercase tracking-wider mb-3">
-            <Compass className="w-3.5 h-3.5 text-amber-700" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white border border-sky-300 text-blue-900 text-xs font-bold uppercase tracking-wider mb-3 shadow-xs">
+            <Compass className="w-3.5 h-3.5 text-blue-600" />
             <span>Process Roadmap</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-950 tracking-tight">
             From Ambition to Arrival
           </h2>
-          <p className="text-base text-slate-600 mt-2 max-w-2xl leading-relaxed">
+          <p className="text-base text-slate-700 mt-2 max-w-2xl leading-relaxed font-normal">
             A clear, transparent seven-step progression guiding international students from initial course exploration to campus arrival in India.
           </p>
         </div>
@@ -30,37 +30,37 @@ export const ApplicationJourney: React.FC<ApplicationJourneyProps> = ({ onOpenAp
         <div className="relative">
           
           {/* Horizontal Desktop Progression Line */}
-          <div className="hidden lg:block absolute top-8 left-6 right-6 h-0.5 bg-slate-200 z-0" />
+          <div className="hidden lg:block absolute top-8 left-6 right-6 h-0.5 bg-sky-300 z-0" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-6 relative z-10">
             {APPLICATION_JOURNEY.map((item, index) => (
               <div 
                 key={item.step}
-                className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-amber-400/80 transition-all duration-200 shadow-sm text-left flex flex-col justify-between group"
+                className="p-5 rounded-3xl bg-white border border-sky-200 hover:border-blue-500 hover:shadow-lg transition-all duration-200 shadow-sm text-left flex flex-col justify-between group"
               >
                 <div>
                   {/* Step Number Badge */}
-                  <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-mono font-bold text-sm flex items-center justify-center mb-4 group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
+                  <div className="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-200 text-blue-950 font-mono font-bold text-sm flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors shadow-xs">
                     {item.step}
                   </div>
 
                   {/* Title & Core Subtitle */}
-                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-amber-800">
+                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-blue-800">
                     {item.title}
                   </h3>
                   
-                  <p className="text-sm font-bold text-slate-900 mt-1 leading-snug">
+                  <p className="text-sm font-bold text-slate-950 mt-1 leading-snug">
                     {item.description}
                   </p>
 
-                  <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                  <p className="text-xs text-slate-600 mt-2 leading-relaxed font-normal">
                     {item.details}
                   </p>
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-slate-100 flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 group-hover:text-amber-700 transition-colors">
-                  <CheckCircle className="w-3.5 h-3.5 text-amber-600" />
-                  <span>Step {index + 1} of 7</span>
+                <div className="pt-4 mt-4 border-t border-sky-100 flex items-center justify-between text-[11px] text-blue-700 font-semibold">
+                  <span>Phase {index + 1}</span>
+                  <CheckCircle className="w-3.5 h-3.5 text-blue-600" />
                 </div>
               </div>
             ))}
@@ -68,23 +68,23 @@ export const ApplicationJourney: React.FC<ApplicationJourneyProps> = ({ onOpenAp
 
         </div>
 
-        {/* Bottom Action Strip */}
-        <div className="mt-14 p-6 sm:p-8 rounded-2xl bg-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-6 text-left">
+        {/* Callout Strip */}
+        <div className="mt-14 p-6 sm:p-8 rounded-3xl bg-white border border-sky-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 text-left">
           <div>
-            <h3 className="text-lg sm:text-xl font-bold text-white">
-              Take Step 01: Discover & Apply Today
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
-              Connect with Myers Global Pathways advisors to begin your preliminary transcript evaluation and university selection.
+            <h4 className="text-base sm:text-lg font-bold text-slate-950">
+              Need guidance identifying which step you are currently on?
+            </h4>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+              Our advisors can evaluate your existing transcripts and documents within 24–48 hours.
             </p>
           </div>
 
           <button
             onClick={onOpenApplication}
-            className="px-6 py-3 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 transition-colors shrink-0 flex items-center gap-2 shadow-md cursor-pointer"
+            className="shrink-0 px-6 py-3 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
           >
-            <span>Start Your Application</span>
-            <ArrowUpRight className="w-4 h-4 text-slate-950" />
+            <span>Begin Step 01</span>
+            <ArrowUpRight className="w-4 h-4" />
           </button>
         </div>
 

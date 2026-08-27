@@ -87,8 +87,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       <header 
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled 
-            ? 'bg-[#0A1128]/95 backdrop-blur-md border-b border-slate-800/90 shadow-lg py-3' 
-            : 'bg-[#0A1128] border-b border-slate-800/60 py-4'
+            ? 'bg-[#E6F1FD]/95 backdrop-blur-md border-b border-sky-300 shadow-sm py-3' 
+            : 'bg-[#EBF4FE]/90 backdrop-blur-sm border-b border-sky-200/90 py-4'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -99,21 +99,21 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => handleLinkClick('home')}
               className="flex items-center gap-3 group text-left cursor-pointer focus:outline-none"
             >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform duration-200 shrink-0">
-                <Compass className="w-5 h-5 text-slate-950 stroke-[2.2]" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform duration-200 shrink-0">
+                <Compass className="w-5 h-5 text-amber-300 stroke-[2.2]" />
               </div>
               <div>
-                <span className="block text-base sm:text-lg font-extrabold tracking-tight text-white group-hover:text-amber-400 transition-colors">
+                <span className="block text-base sm:text-lg font-extrabold tracking-tight text-slate-950 group-hover:text-blue-700 transition-colors">
                   {COMPANY.name}
                 </span>
-                <span className="block text-[10px] tracking-wider uppercase font-semibold text-amber-400">
+                <span className="block text-[10px] tracking-wider uppercase font-bold text-blue-700">
                   {COMPANY.tagline}
                 </span>
               </div>
             </button>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800/80 backdrop-blur-sm">
+            <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 bg-white/80 p-1.5 rounded-2xl border border-sky-200 shadow-xs backdrop-blur-sm">
               {navLinks.map((link) => {
                 const isActive = activeTab === link.id;
                 return (
@@ -122,8 +122,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onClick={() => handleLinkClick(link.id)}
                     className={`px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition-all cursor-pointer flex items-center gap-1.5 ${
                       isActive
-                        ? 'bg-amber-400 text-slate-950 shadow-md ring-1 ring-amber-300'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                        ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-500'
+                        : 'text-slate-700 hover:text-blue-900 hover:bg-sky-100/80'
                     }`}
                   >
                     <span>{link.label}</span>
@@ -137,17 +137,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               {/* Student Portal Trigger */}
               <button
                 onClick={onOpenStudentPortal}
-                className="px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-3.5 py-2.5 rounded-xl text-xs font-bold text-blue-900 bg-white/90 hover:bg-white border border-sky-300 shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
                 title="View your submitted application status"
               >
-                <UserCheck className="w-4 h-4 text-amber-400" />
+                <UserCheck className="w-4 h-4 text-blue-600" />
                 <span>Student Portal</span>
               </button>
 
-              {/* Primary CTA (Larger, more prominent button) */}
+              {/* Primary CTA Button */}
               <button
                 onClick={onOpenApplication}
-                className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-1.5 cursor-pointer"
+                className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-md shadow-amber-500/20 hover:shadow-amber-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Start Application</span>
                 <ArrowUpRight className="w-4 h-4 text-slate-950" />
@@ -158,14 +158,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="flex lg:hidden items-center gap-2">
               <button
                 onClick={onOpenApplication}
-                className="px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 transition-colors cursor-pointer shadow-sm"
+                className="px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 transition-colors cursor-pointer shadow-xs"
               >
                 Apply
               </button>
 
               <button
                 onClick={() => setMobileMenuOpen(true)}
-                className="p-2.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 border border-slate-700 transition-colors cursor-pointer"
+                className="p-2.5 rounded-xl text-slate-800 hover:text-blue-900 bg-white border border-sky-300 shadow-xs transition-colors cursor-pointer"
                 aria-label="Open Navigation Menu"
               >
                 <Menu className="w-5 h-5" />
@@ -186,28 +186,28 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Backdrop Overlay */}
         <div 
           onClick={() => setMobileMenuOpen(false)}
-          className={`fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity duration-300 ease-out ${
+          className={`fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity duration-300 ease-out ${
             mobileMenuOpen ? 'opacity-100' : 'opacity-0'
           }`}
         />
 
         {/* Slide-out Panel from Right */}
         <div 
-          className={`fixed inset-y-0 right-0 max-w-sm w-[88vw] bg-[#0A1128] border-l border-slate-800 text-white shadow-2xl flex flex-col justify-between transform transition-transform duration-300 ease-out z-10 overflow-hidden ${
+          className={`fixed inset-y-0 right-0 max-w-sm w-[88vw] bg-[#EBF4FE] border-l border-sky-300 text-slate-900 shadow-2xl flex flex-col justify-between transform transition-transform duration-300 ease-out z-10 overflow-hidden ${
             mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
           {/* Top Drawer Header */}
-          <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+          <div className="p-4 sm:p-5 border-b border-sky-200 flex items-center justify-between bg-white/70">
             <div className="flex items-center gap-2.5 text-left">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-slate-950 shadow-sm shrink-0">
-                <Compass className="w-4.5 h-4.5 stroke-[2.2]" />
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white shadow-sm shrink-0">
+                <Compass className="w-4.5 h-4.5 text-amber-300 stroke-[2.2]" />
               </div>
               <div>
-                <span className="block text-sm font-extrabold tracking-tight text-white leading-tight">
+                <span className="block text-sm font-extrabold tracking-tight text-slate-950 leading-tight">
                   {COMPANY.name}
                 </span>
-                <span className="block text-[9px] tracking-wider uppercase font-semibold text-amber-400">
+                <span className="block text-[9px] tracking-wider uppercase font-bold text-blue-700">
                   Navigation & Desk
                 </span>
               </div>
@@ -215,7 +215,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2 rounded-xl text-slate-400 hover:text-white bg-slate-800 border border-slate-700 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-slate-700 hover:text-slate-950 bg-white border border-sky-300 transition-colors cursor-pointer shadow-xs"
               aria-label="Close menu"
             >
               <X className="w-4 h-4" />
@@ -232,7 +232,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setMobileMenuOpen(false);
                   onOpenApplication();
                 }}
-                className="w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 transition-all flex items-center justify-between shadow-lg shadow-amber-500/20 cursor-pointer"
+                className="w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 transition-all flex items-center justify-between shadow-md shadow-amber-500/20 cursor-pointer"
               >
                 <span>Start Your Application</span>
                 <ArrowUpRight className="w-4 h-4 text-slate-950" />
@@ -241,7 +241,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Navigation Section */}
             <div className="space-y-1">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-2 mb-2">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-2 mb-2">
                 Pages & Portals
               </div>
 
@@ -254,20 +254,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onClick={() => handleLinkClick(link.id)}
                     className={`w-full p-3 rounded-xl flex items-center justify-between transition-all cursor-pointer ${
                       isActive 
-                        ? 'bg-amber-400 text-slate-950 font-bold shadow-md' 
-                        : 'hover:bg-slate-800/80 text-slate-200'
+                        ? 'bg-blue-600 text-white font-bold shadow-sm' 
+                        : 'hover:bg-white text-slate-800 bg-white/40'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                        isActive ? 'bg-slate-950 text-amber-400' : 'bg-slate-800 text-slate-300'
+                        isActive ? 'bg-white/20 text-white' : 'bg-sky-100 text-blue-700'
                       }`}>
                         <Icon className="w-4 h-4" />
                       </div>
                       <div className="text-left">
                         <span className="block text-sm leading-snug">{link.label}</span>
                         <span className={`block text-[11px] font-normal leading-none mt-0.5 ${
-                          isActive ? 'text-slate-800 font-medium' : 'text-slate-400'
+                          isActive ? 'text-blue-100 font-medium' : 'text-slate-500'
                         }`}>
                           {link.description}
                         </span>
@@ -279,47 +279,47 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             {/* Student Portal Option in Mobile Drawer */}
-            <div className="pt-2 border-t border-slate-800/80">
+            <div className="pt-2 border-t border-sky-200">
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   onOpenStudentPortal();
                 }}
-                className="w-full p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-400/80 text-slate-200 flex items-center justify-between transition-all cursor-pointer"
+                className="w-full p-3 rounded-xl bg-white border border-sky-300 hover:border-blue-500 text-slate-800 flex items-center justify-between transition-all cursor-pointer shadow-xs"
               >
                 <div className="flex items-center gap-3 text-left">
-                  <div className="w-8 h-8 rounded-lg bg-amber-400/20 text-amber-400 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
                     <UserCheck className="w-4 h-4" />
                   </div>
                   <div>
-                    <span className="block text-xs font-bold text-white">Student Portal</span>
-                    <span className="block text-[11px] text-slate-400">Track application status</span>
+                    <span className="block text-xs font-bold text-slate-900">Student Portal</span>
+                    <span className="block text-[11px] text-slate-500">Track application status</span>
                   </div>
                 </div>
               </button>
             </div>
 
             {/* Direct Contact Phone & WhatsApp */}
-            <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 space-y-2">
-              <div className="font-bold text-white flex items-center gap-1.5 text-xs">
-                <Phone className="w-3.5 h-3.5 text-amber-400" />
+            <div className="p-3.5 rounded-2xl bg-white border border-sky-300 shadow-xs text-xs text-slate-700 space-y-2">
+              <div className="font-bold text-slate-900 flex items-center gap-1.5 text-xs">
+                <Phone className="w-3.5 h-3.5 text-blue-600" />
                 <span>Direct Admissions Desk</span>
               </div>
-              <p className="text-[11px] text-slate-400">Monrovia, Liberia: <strong className="text-emerald-400">+231 889425645</strong></p>
-              <p className="text-[11px] text-slate-400">India Desk: <strong className="text-slate-200">+91 93478 69324</strong></p>
+              <p className="text-[11px] text-slate-600">Monrovia, Liberia: <strong className="text-emerald-700">+231 889425645</strong></p>
+              <p className="text-[11px] text-slate-600">India Desk: <strong className="text-blue-800">+91 93478 69324</strong></p>
             </div>
 
           </div>
 
           {/* Drawer Footer */}
-          <div className="p-4 border-t border-slate-800 bg-slate-900/90 text-[11px] text-slate-400 flex items-center justify-between">
+          <div className="p-4 border-t border-sky-200 bg-white/80 text-[11px] text-slate-500 flex items-center justify-between">
             <span>© 2026 {COMPANY.shortName}</span>
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
                 onOpenAdminPortal();
               }}
-              className="text-amber-400 hover:underline cursor-pointer"
+              className="text-blue-700 hover:underline font-semibold cursor-pointer"
             >
               Admin Portal
             </button>

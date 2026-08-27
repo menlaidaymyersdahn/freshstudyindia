@@ -80,13 +80,13 @@ export const ContactSection: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="py-20 lg:py-28 bg-[#FAFCFF] text-slate-900 scroll-mt-24">
+    <section id="contact" className="py-20 lg:py-28 bg-[#EBF3FC] text-slate-900 scroll-mt-24 border-b border-sky-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="max-w-3xl mb-14 text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-amber-50 border border-amber-200/80 text-amber-900 text-xs font-bold uppercase tracking-wider mb-3">
-            <Mail className="w-3.5 h-3.5 text-amber-700" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white border border-sky-300 text-blue-900 text-xs font-bold uppercase tracking-wider mb-3 shadow-xs">
+            <Mail className="w-3.5 h-3.5 text-blue-600" />
             <span>Connect With Us</span>
           </div>
 
@@ -94,7 +94,7 @@ export const ContactSection: React.FC = () => {
             Let's Start Your Journey.
           </h2>
 
-          <p className="text-base text-slate-600 mt-2 max-w-2xl leading-relaxed">
+          <p className="text-base text-slate-700 mt-2 max-w-2xl leading-relaxed font-normal">
             Have questions about studying in India? Contact the Myers Global Pathways team and we'll help you understand your next steps.
           </p>
         </div>
@@ -106,7 +106,7 @@ export const ContactSection: React.FC = () => {
           <div className="lg:col-span-6 space-y-6 text-left">
             
             {/* WhatsApp Advisory Box */}
-            <div className="p-6 sm:p-7 rounded-3xl bg-[#0A1128] text-white border border-slate-800 shadow-xl space-y-4">
+            <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-blue-950 via-blue-900 to-sky-950 text-white border border-sky-400/40 shadow-xl space-y-4">
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
                   <MessageCircle className="w-6 h-6" />
@@ -115,13 +115,13 @@ export const ContactSection: React.FC = () => {
                   <h3 className="text-lg sm:text-xl font-bold text-white">
                     Direct Admissions WhatsApp Desk
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-300">
+                  <p className="text-xs sm:text-sm text-blue-100">
                     Real-time consultation with our international education advisors
                   </p>
                 </div>
               </div>
 
-              <p className="text-sm text-slate-300 leading-relaxed font-normal">
+              <p className="text-sm text-blue-100 leading-relaxed font-normal">
                 Connect with our team to discuss university selections, admission timelines, document attestation, and Indian student visas.
               </p>
 
@@ -143,7 +143,7 @@ export const ContactSection: React.FC = () => {
                   href={whatsappConfig.altUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-3.5 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-wider text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="px-4 py-3.5 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-wider text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <MessageCircle className="w-4 h-4 text-emerald-400" />
                   <span>Alt: +91 93478 69324</span>
@@ -152,25 +152,25 @@ export const ContactSection: React.FC = () => {
             </div>
 
             {/* Official Email Directory */}
-            <div className="p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 shadow-md space-y-4">
-              <div className="border-b border-slate-100 pb-3.5">
+            <div className="p-6 sm:p-7 rounded-3xl bg-white border border-sky-200 shadow-md space-y-4">
+              <div className="border-b border-sky-100 pb-3.5">
                 <h3 className="text-base sm:text-lg font-bold text-slate-950">
                   Official Email Directory
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                <p className="text-xs sm:text-sm text-slate-600 mt-1 font-normal">
                   Direct verified departmental mailboxes for international students and institutional partners.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {OFFICIAL_EMAIL_DIRECTORY.map((contact) => (
-                  <div key={contact.email} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-amber-400 transition-all">
-                    <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  <div key={contact.email} className="p-3.5 rounded-2xl bg-sky-50/60 border border-sky-200 hover:border-blue-400 transition-all">
+                    <p className="text-xs font-bold text-blue-950 uppercase tracking-wider">
                       {contact.department}
                     </p>
                     <a
                       href={`mailto:${contact.email}`}
-                      className="text-xs sm:text-sm font-semibold text-amber-800 hover:text-amber-900 hover:underline break-all mt-1 block"
+                      className="text-xs sm:text-sm font-bold text-blue-700 hover:text-blue-900 hover:underline break-all mt-1 block"
                     >
                       {contact.email}
                     </a>
@@ -183,13 +183,13 @@ export const ContactSection: React.FC = () => {
 
           {/* Right Column: Professional Enquiry Form */}
           <div className="lg:col-span-6">
-            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-lg text-left">
+            <div className="p-6 sm:p-8 rounded-3xl bg-white border border-sky-200 shadow-lg text-left">
               
-              <div className="border-b border-slate-100 pb-4 mb-6">
-                <h3 className="text-xl font-bold text-slate-950">
+              <div className="border-b border-sky-100 pb-4 mb-6">
+                <h3 className="text-xl font-extrabold text-slate-950">
                   Send an Admissions Enquiry
                 </h3>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs sm:text-sm text-slate-600 mt-1 font-normal">
                   Fill in your details below and an advisor will respond promptly.
                 </p>
               </div>
@@ -220,7 +220,7 @@ export const ContactSection: React.FC = () => {
                 {/* Full Name & Email */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    <label className="block text-xs font-bold text-slate-800 mb-1">
                       Full Name <span className="text-rose-600">*</span>
                     </label>
                     <input
@@ -229,12 +229,12 @@ export const ContactSection: React.FC = () => {
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                       placeholder="e.g. John Doe"
-                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900"
+                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-sky-50/50 border border-sky-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    <label className="block text-xs font-bold text-slate-800 mb-1">
                       Email Address <span className="text-rose-600">*</span>
                     </label>
                     <input
@@ -243,7 +243,7 @@ export const ContactSection: React.FC = () => {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="john@example.com"
-                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900"
+                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-sky-50/50 border border-sky-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900"
                     />
                   </div>
                 </div>
@@ -251,7 +251,7 @@ export const ContactSection: React.FC = () => {
                 {/* WhatsApp & Country */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    <label className="block text-xs font-bold text-slate-800 mb-1">
                       WhatsApp Number
                     </label>
                     <input
@@ -259,12 +259,12 @@ export const ContactSection: React.FC = () => {
                       value={formData.whatsapp}
                       onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
                       placeholder="e.g. +231 88 123 4567"
-                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900"
+                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-sky-50/50 border border-sky-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    <label className="block text-xs font-bold text-slate-800 mb-1">
                       Country of Residence
                     </label>
                     <input
@@ -272,7 +272,7 @@ export const ContactSection: React.FC = () => {
                       value={formData.country}
                       onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                       placeholder="e.g. Liberia, Ghana, Nigeria..."
-                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900"
+                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-sky-50/50 border border-sky-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900"
                     />
                   </div>
                 </div>
@@ -280,13 +280,13 @@ export const ContactSection: React.FC = () => {
                 {/* Study Level & Course */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    <label className="block text-xs font-bold text-slate-800 mb-1">
                       What do you want to study?
                     </label>
                     <select
                       value={formData.studyInterest}
                       onChange={(e) => setFormData({ ...formData, studyInterest: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900"
+                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-sky-50/50 border border-sky-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900 cursor-pointer"
                     >
                       <option value="Undergraduate Degree">Undergraduate (Bachelor’s Degree)</option>
                       <option value="Postgraduate Degree">Postgraduate (Master’s Degree)</option>
@@ -296,7 +296,7 @@ export const ContactSection: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    <label className="block text-xs font-bold text-slate-800 mb-1">
                       Preferred Course / Major
                     </label>
                     <input
@@ -304,14 +304,14 @@ export const ContactSection: React.FC = () => {
                       value={formData.preferredCourse}
                       onChange={(e) => setFormData({ ...formData, preferredCourse: e.target.value })}
                       placeholder="e.g. Computer Science, MBA, Pharmacy"
-                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900"
+                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-sky-50/50 border border-sky-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900"
                     />
                   </div>
                 </div>
 
                 {/* Preferred University (Optional) */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-800 mb-1">
                     Preferred University (If known)
                   </label>
                   <input
@@ -319,13 +319,13 @@ export const ContactSection: React.FC = () => {
                     value={formData.preferredUniversity}
                     onChange={(e) => setFormData({ ...formData, preferredUniversity: e.target.value })}
                     placeholder="Leave blank if seeking recommendations"
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-sky-50/50 border border-sky-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900"
                   />
                 </div>
 
                 {/* Message */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-800 mb-1">
                     Your Questions or Background
                   </label>
                   <textarea
@@ -333,7 +333,7 @@ export const ContactSection: React.FC = () => {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Share any specific questions regarding tuition budgets, intake dates, or entry requirements..."
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-sky-50/50 border border-sky-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900"
                   />
                 </div>
 
