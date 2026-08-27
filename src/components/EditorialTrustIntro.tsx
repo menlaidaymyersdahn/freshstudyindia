@@ -38,16 +38,6 @@ export const EditorialTrustIntro: React.FC<EditorialTrustIntroProps> = ({
                 className="w-full h-[360px] sm:h-[420px] object-cover object-center"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
-              
-              <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-white/95 backdrop-blur-sm border border-sky-200 text-left shadow-md">
-                <p className="text-xs font-bold text-slate-900">
-                  Dedicated International Advisory
-                </p>
-                <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed font-medium">
-                  Navigating academic standards, credential evaluations, and embassy requirements with clarity.
-                </p>
-              </div>
             </div>
           </div>
 

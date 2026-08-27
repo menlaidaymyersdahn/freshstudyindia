@@ -116,22 +116,6 @@ export const Hero: React.FC<HeroProps> = ({
                   className="w-full h-[380px] sm:h-[460px] object-cover object-center group-hover:scale-103 transition-transform duration-700 ease-out"
                   loading="eager"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-
-                {/* Subtle Image Tagline Overlay */}
-                <div className="absolute bottom-5 left-5 right-5 p-4 rounded-2xl bg-white/95 backdrop-blur-md border border-sky-200 text-left shadow-lg">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-[11px] uppercase tracking-wider font-bold text-blue-700">
-                      Myers Global Graduates
-                    </p>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-bold border border-amber-300">
-                      Class of 2024
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-800 mt-1.5 font-medium leading-relaxed">
-                    Celebrating international students successfully admitted, graduated, and thriving in top universities in India.
-                  </p>
-                </div>
               </div>
 
               {/* Floating Verified Advisory Badge */}
