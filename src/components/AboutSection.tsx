@@ -1,6 +1,6 @@
 import React from 'react';
 import { CORE_PRINCIPLES } from '../config/company';
-import { ShieldCheck, HeartHandshake, Compass, Users, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Compass, Target, CheckCircle2 } from 'lucide-react';
 
 export const AboutSection: React.FC = () => {
   return (
@@ -23,25 +23,41 @@ export const AboutSection: React.FC = () => {
           </p>
         </div>
 
-        {/* Editorial Split: Photography + Core Principles */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+        {/* Editorial Split: Mission Highlight + Core Principles */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
           
-          {/* Left Column: Editorial Photo Frame */}
+          {/* Left Column: Our Mission Highlight Card */}
           <div className="lg:col-span-5 relative">
-            <div className="rounded-3xl overflow-hidden border-2 border-white bg-white shadow-xl">
-              <img
-                src="/DSC_9531.jpeg"
-                alt="Myers Global Pathways international student advisory and mentorship"
-                className="w-full h-[400px] object-cover object-center"
-                loading="lazy"
-              />
-              <div className="p-6 bg-white border-t border-sky-100 text-left">
-                <p className="text-xs font-bold uppercase tracking-wider text-blue-700">
+            <div className="p-7 sm:p-8 rounded-3xl bg-white border border-sky-200 shadow-lg text-left space-y-5">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-sky-200 text-blue-700 flex items-center justify-center shadow-xs">
+                <Target className="w-6 h-6 text-blue-600" />
+              </div>
+
+              <div>
+                <p className="text-xs font-extrabold uppercase tracking-wider text-blue-700">
                   Our Mission
                 </p>
-                <p className="text-xs sm:text-sm text-slate-700 mt-1 leading-relaxed font-normal">
+                <h3 className="text-xl sm:text-2xl font-extrabold text-slate-950 mt-1.5 tracking-tight leading-snug">
+                  Empowering Global Scholars with Clarity & Integrity
+                </h3>
+                <p className="text-sm sm:text-base text-slate-700 mt-3 leading-relaxed font-normal">
                   To provide accessible, honest, and comprehensive admissions guidance that empowers international students to pursue their academic ambitions with confidence.
                 </p>
+              </div>
+
+              <div className="pt-4 border-t border-sky-100 space-y-3">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                  <p className="text-xs text-slate-700 font-medium leading-relaxed">
+                    Direct partnerships and verified admissions channels with recognized Indian universities.
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                  <p className="text-xs text-slate-700 font-medium leading-relaxed">
+                    End-to-end assistance from initial qualification review to visa issuance and campus settlement.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
