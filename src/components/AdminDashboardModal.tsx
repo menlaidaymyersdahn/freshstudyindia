@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { ApplicationStatus, ApplicationSubmission, EnquirySubmission, StudentDocument, CommunicationLog, AdmissionDetails } from '../types';
 import { COMPANY, getWhatsAppConfig } from '../config/company';
 import { 
+  initAuth, 
+  googleSignIn, 
+  logout as googleLogout, 
+  getAccessToken 
+} from '../lib/googleAuth';
+import { 
   X, 
   Search, 
   ShieldCheck, 
@@ -42,7 +48,13 @@ import {
   Copy,
   Share2,
   Bell,
-  RotateCcw
+  RotateCcw,
+  MailCheck,
+  SendHorizontal,
+  Sliders,
+  CheckCircle,
+  KeyRound,
+  LogOut
 } from 'lucide-react';
 
 interface AdminDashboardModalProps {
@@ -146,8 +158,98 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   const [copiedChannel, setCopiedChannel] = useState<'whatsapp' | 'email' | null>(null);
   const [autoLogCommunication, setAutoLogCommunication] = useState(true);
 
+  // 6. Automated Status Email Notification Modal & Custom Dispatcher
+  const [statusEmailModal, setStatusEmailModal] = useState<{
+    open: boolean;
+    app: ApplicationSubmission;
+    targetStatus: string;
+    preview: {
+      subject: string;
+      text: string;
+      html: string;
+      statusBadgeColor: string;
+      statusBadgeBg: string;
+    } | null;
+    customNote: string;
+    isSending: boolean;
+    previewTab: 'visual' | 'text';
+  } | null>(null);
+
+  const [autoEmailNotifyOnStatusChange, setAutoEmailNotifyOnStatusChange] = useState<boolean>(true);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
+  const [bulkSendEmailNotify, setBulkSendEmailNotify] = useState<boolean>(true);
+  const [viewLogDetailModal, setViewLogDetailModal] = useState<CommunicationLog | null>(null);
+  const [commTabFilter, setCommTabFilter] = useState<'all' | 'emails' | 'notes' | 'whatsapp'>('all');
+
+  // Google Workspace OAuth 2.0 State (admissions@myersglobalpathways.com)
+  const [isWorkspaceConnected, setIsWorkspaceConnected] = useState<boolean>(false);
+  const [workspaceEmail, setWorkspaceEmail] = useState<string>('admissions@myersglobalpathways.com');
+  const [isConnectingWorkspace, setIsConnectingWorkspace] = useState<boolean>(false);
+  const [workspaceTokenExpiresIn, setWorkspaceTokenExpiresIn] = useState<number | null>(null);
+
   // Success Feedback Banner
   const [actionSuccessMsg, setActionSuccessMsg] = useState<string | null>(null);
+
+  // Check Google Workspace server status
+  const checkWorkspaceStatus = async () => {
+    try {
+      const res = await fetch('/api/auth/google-workspace-token');
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsWorkspaceConnected(data.connected);
+        if (data.email) setWorkspaceEmail(data.email);
+        if (data.expiresIn) setWorkspaceTokenExpiresIn(data.expiresIn);
+      }
+    } catch (err) {
+      console.warn('Failed to verify Google Workspace connection:', err);
+    }
+  };
+
+  // Google Workspace OAuth Sign-In handler
+  const handleGoogleWorkspaceConnect = async () => {
+    setIsConnectingWorkspace(true);
+    try {
+      const result = await googleSignIn();
+      if (result) {
+        setIsWorkspaceConnected(true);
+        setWorkspaceEmail(result.user.email || 'admissions@myersglobalpathways.com');
+        showNotification(`✓ Google Workspace connected (${result.user.email || 'admissions@myersglobalpathways.com'}). Gmail API active!`);
+      }
+    } catch (err: any) {
+      console.error('Google Workspace sign-in error:', err);
+      alert(err.message || 'Failed to authenticate Google Workspace account. Please try again.');
+    } finally {
+      setIsConnectingWorkspace(false);
+    }
+  };
+
+  // Google Workspace Disconnect handler
+  const handleGoogleWorkspaceDisconnect = async () => {
+    try {
+      await googleLogout();
+      setIsWorkspaceConnected(false);
+      showNotification('Google Workspace session disconnected.');
+    } catch (err) {
+      console.error('Error signing out of Google Workspace:', err);
+    }
+  };
+
+  // Listen for Google Auth state and sync
+  useEffect(() => {
+    checkWorkspaceStatus();
+    const unsubscribe = initAuth(
+      (user, token) => {
+        setIsWorkspaceConnected(Boolean(token));
+        if (user.email) setWorkspaceEmail(user.email);
+      },
+      () => {
+        setIsWorkspaceConnected(false);
+      }
+    );
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, []);
 
   const statusOptions: ApplicationStatus[] = [
     'Application Submitted',
@@ -362,17 +464,28 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     }
   };
 
-  // Update Application Status
-  const handleStatusChange = async (newStatus: string) => {
+  // Update Application Status & Trigger Automated Email Notification
+  const handleStatusChange = async (newStatus: string, customNoteText?: string, overrideSendEmail?: boolean) => {
     if (!selectedAppId) return;
 
+    const shouldSendEmail = overrideSendEmail !== undefined ? overrideSendEmail : autoEmailNotifyOnStatusChange;
+    setIsUpdatingStatus(true);
+
     try {
+      const token = await getAccessToken();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const res = await fetch(`/api/applications/${selectedAppId}/status`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ 
           status: newStatus,
-          noteText: `Application status updated to "${newStatus}" by Admissions Officer.`
+          noteText: customNoteText || `Application status updated to "${newStatus}" by Admissions Officer.`,
+          author: 'Menlaiday Myers (Admissions Officer)',
+          sendEmail: shouldSendEmail
         })
       });
 
@@ -381,15 +494,106 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         const updatedApp = data.application;
         setSelectedAppDossier(updatedApp);
         fetchApplications();
-        showNotification(`Status updated to "${newStatus}"`);
+        
+        if (data.emailNotification?.success) {
+          showNotification(`🚀 Status changed to "${newStatus}" & automated email dispatched to ${updatedApp.email} via Google Workspace!`);
+        } else {
+          showNotification(`✓ Status updated to "${newStatus}"`);
+        }
 
         // Automated Trigger: If status is set to 'Admission Decision' or 'Ready for India', auto-trigger notification modal
         if (newStatus === 'Admission Decision' || newStatus === 'Ready for India') {
           handleOpenInstantNotificationTrigger(updatedApp);
         }
+      } else {
+        alert(data.error || 'Failed to update status');
       }
     } catch (err) {
       console.error('Status update failed:', err);
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
+  // Open Status Email Preview Modal
+  const handleOpenStatusEmailPreview = async (app: ApplicationSubmission, targetStatus?: string) => {
+    const statusToUse = targetStatus || app.status || 'Application Submitted';
+    try {
+      const res = await fetch(`/api/applications/${app.id}/email-preview?status=${encodeURIComponent(statusToUse)}`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setStatusEmailModal({
+          open: true,
+          app,
+          targetStatus: statusToUse,
+          preview: data.preview,
+          customNote: '',
+          isSending: false,
+          previewTab: 'visual'
+        });
+      } else {
+        alert(data.error || 'Failed to fetch email preview');
+      }
+    } catch (err) {
+      console.error('Error fetching email preview:', err);
+    }
+  };
+
+  // Re-fetch preview when status changes inside the modal
+  const handleStatusEmailModalStatusChange = async (newStatus: string) => {
+    if (!statusEmailModal) return;
+    try {
+      const res = await fetch(`/api/applications/${statusEmailModal.app.id}/email-preview?status=${encodeURIComponent(newStatus)}&customNote=${encodeURIComponent(statusEmailModal.customNote)}`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setStatusEmailModal(prev => prev ? {
+          ...prev,
+          targetStatus: newStatus,
+          preview: data.preview
+        } : null);
+      }
+    } catch (err) {
+      console.error('Error refreshing preview:', err);
+    }
+  };
+
+  // Dispatch Custom Status Email
+  const handleDispatchCustomStatusEmail = async () => {
+    if (!statusEmailModal || !statusEmailModal.app.id) return;
+    setStatusEmailModal(prev => prev ? { ...prev, isSending: true } : null);
+
+    try {
+      const token = await getAccessToken();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const res = await fetch(`/api/applications/${statusEmailModal.app.id}/send-status-email`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          status: statusEmailModal.targetStatus,
+          customNote: statusEmailModal.customNote.trim() || undefined,
+          author: 'Menlaiday Myers (Admissions Director)'
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showNotification(`✉️ Status notification email successfully dispatched to ${statusEmailModal.app.email} via Google Workspace!`);
+        if (statusEmailModal.app.id) {
+          openDossier(statusEmailModal.app.id);
+          fetchApplications();
+        }
+        setStatusEmailModal(null);
+      } else {
+        alert(data.error || 'Failed to send status email');
+      }
+    } catch (err) {
+      console.error('Error dispatching status email:', err);
+    } finally {
+      setStatusEmailModal(prev => prev ? { ...prev, isSending: false } : null);
     }
   };
 
@@ -965,13 +1169,14 @@ Website: https://myersglobalpathways.com`;
         body: JSON.stringify({
           ids: selectedAppIds,
           status: targetStatus,
-          author: 'Menlaiday Myers (Admissions Desk)'
+          author: 'Menlaiday Myers (Admissions Desk)',
+          sendEmail: bulkSendEmailNotify
         })
       });
 
       const data = await res.json();
       if (res.ok && data.success) {
-        showNotification(`Updated status to "${targetStatus}" for ${data.updatedCount} applications.`);
+        showNotification(`✓ Updated status to "${targetStatus}" for ${data.updatedCount} applications. ${data.emailsDispatchedCount ? `Dispatched ${data.emailsDispatchedCount} notification email(s).` : ''}`);
         setSelectedAppIds([]);
         fetchApplications();
         if (selectedAppId) {
@@ -1213,6 +1418,65 @@ Website: https://myersglobalpathways.com`;
             </button>
           </div>
         </div>
+
+        {/* Google Workspace / Gmail API Hub Status Bar */}
+        {isAuthenticated && (
+          <div className="bg-[#050D1F] px-4 sm:px-6 py-2 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-2.5 text-xs">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-2 w-2 relative shrink-0">
+                {isWorkspaceConnected ? (
+                  <>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </>
+                ) : (
+                  <span className="inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
+                )}
+              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-slate-300">Google Workspace Email:</span>
+                {isWorkspaceConnected ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Gmail API Active ({workspaceEmail})</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    <Mail className="w-3.5 h-3.5 text-amber-400" />
+                    <span>admissions@myersglobalpathways.com (Ready to authenticate)</span>
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {isWorkspaceConnected ? (
+                <button
+                  type="button"
+                  onClick={handleGoogleWorkspaceDisconnect}
+                  className="px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-rose-300 hover:bg-slate-800 transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  <LogOut className="w-3 h-3" />
+                  <span>Disconnect</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleGoogleWorkspaceConnect}
+                  disabled={isConnectingWorkspace}
+                  className="px-3 py-1 rounded-lg text-[11px] font-bold text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-50"
+                >
+                  {isConnectingWorkspace ? (
+                    <Loader2 className="w-3 h-3 animate-spin text-slate-950" />
+                  ) : (
+                    <KeyRound className="w-3 h-3 text-slate-950" />
+                  )}
+                  <span>Sign in with Google (OAuth 2.0)</span>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Action Success Alert Notification */}
         {actionSuccessMsg && (
@@ -1518,6 +1782,21 @@ Website: https://myersglobalpathways.com`;
                               <Trash2 className="w-3.5 h-3.5 text-rose-600" />
                               <span>Delete ({selectedAppIds.length})</span>
                             </button>
+
+                            {/* Bulk Email Dispatch Toggle */}
+                            <label 
+                              className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-[11px] font-semibold cursor-pointer select-none"
+                              title="Send automated email notifications when changing status in bulk"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={bulkSendEmailNotify}
+                                onChange={(e) => setBulkSendEmailNotify(e.target.checked)}
+                                className="w-3.5 h-3.5 text-blue-600 rounded cursor-pointer"
+                              />
+                              <Mail className="w-3 h-3 text-blue-700" />
+                              <span>Notify students via email</span>
+                            </label>
 
                             {/* Deselect All */}
                             <button
@@ -1980,14 +2259,65 @@ Website: https://myersglobalpathways.com`;
                         </div>
                       )}
 
-                      {/* Status Selector */}
-                      <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                          Update Application Stage & Status
-                        </label>
-                        <div className="flex items-center gap-2">
+                      {/* Status Selector & Automated Email Dispatch Control */}
+                      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 shadow-2xs">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                            <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-800">
+                              Application Stage & Status Pipeline
+                            </label>
+                          </div>
+
+                          {/* Preview / Dispatch Custom Status Email Button */}
+                          <button
+                            type="button"
+                            onClick={() => handleOpenStatusEmailPreview(selectedAppDossier)}
+                            className="px-2.5 py-1 rounded-lg text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                            title="Preview and customize notification email before dispatch"
+                          >
+                            <MailCheck className="w-3.5 h-3.5 text-blue-600" />
+                            <span>Preview / Trigger Status Email</span>
+                          </button>
+                        </div>
+
+                        {/* Quick Status Stage Transition Buttons */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                          {statusOptions.map((st) => {
+                            const isCurrent = selectedAppDossier.status === st;
+                            const isDecision = st === 'Admission Decision';
+                            const isReady = st === 'Ready for India';
+                            
+                            return (
+                              <button
+                                key={st}
+                                type="button"
+                                disabled={isUpdatingStatus || isCurrent}
+                                onClick={() => handleStatusChange(st)}
+                                className={`px-2.5 py-2 rounded-xl text-[11px] font-bold text-left transition-all flex items-center justify-between border cursor-pointer ${
+                                  isCurrent
+                                    ? isDecision
+                                      ? 'bg-amber-100 border-amber-300 text-amber-950 ring-1 ring-amber-400 font-extrabold'
+                                      : isReady
+                                      ? 'bg-emerald-100 border-emerald-300 text-emerald-950 ring-1 ring-emerald-400 font-extrabold'
+                                      : 'bg-blue-700 border-blue-700 text-white shadow-xs'
+                                    : 'bg-white border-slate-200 text-slate-700 hover:border-blue-300 hover:bg-blue-50/50'
+                                }`}
+                              >
+                                <span className="truncate">{st}</span>
+                                {isCurrent && (
+                                  <CheckCircle className="w-3.5 h-3.5 shrink-0 ml-1" />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Status Selector Dropdown */}
+                        <div className="flex items-center gap-2 pt-1">
                           <select
                             value={selectedAppDossier.status}
+                            disabled={isUpdatingStatus}
                             onChange={(e) => handleStatusChange(e.target.value)}
                             className="flex-1 px-3 py-2 rounded-xl text-xs bg-white border border-slate-300 font-bold text-slate-900 cursor-pointer shadow-xs focus:ring-2 focus:ring-blue-500/20"
                           >
@@ -1995,6 +2325,33 @@ Website: https://myersglobalpathways.com`;
                               <option key={st} value={st}>{st}</option>
                             ))}
                           </select>
+                        </div>
+
+                        {/* Automated Email Notification Trigger Toggle Card */}
+                        <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200/80 text-xs flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                              <Mail className="w-3.5 h-3.5" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-slate-900 text-xs">
+                                Automated Student Email Notification
+                              </p>
+                              <p className="text-[11px] text-slate-600">
+                                Dispatches official status update email to <span className="font-semibold text-blue-900">{selectedAppDossier.email}</span>
+                              </p>
+                            </div>
+                          </div>
+
+                          <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input
+                              type="checkbox"
+                              checked={autoEmailNotifyOnStatusChange}
+                              onChange={(e) => setAutoEmailNotifyOnStatusChange(e.target.checked)}
+                              className="sr-only peer"
+                            />
+                            <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                          </label>
                         </div>
                       </div>
 
@@ -2067,12 +2424,47 @@ Website: https://myersglobalpathways.com`;
                         )}
                       </div>
 
-                      {/* Counselor Internal Review Notes & Timeline */}
-                      <div className="pt-3 border-t border-slate-200 space-y-2.5">
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                          Counselor Review Notes & Communication Trail
-                        </h4>
+                      {/* Counselor Internal Review Notes & Communication Trail */}
+                      <div className="pt-3 border-t border-slate-200 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                            Counselor Notes & Communication Log
+                          </h4>
 
+                          {/* Filter Tabs */}
+                          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-[10px] font-bold">
+                            <button
+                              type="button"
+                              onClick={() => setCommTabFilter('all')}
+                              className={`px-2 py-0.5 rounded-md transition-all ${
+                                commTabFilter === 'all' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              All
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setCommTabFilter('emails')}
+                              className={`px-2 py-0.5 rounded-md transition-all flex items-center gap-1 ${
+                                commTabFilter === 'emails' ? 'bg-white text-blue-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              <Mail className="w-2.5 h-2.5" />
+                              <span>Emails ({selectedAppDossier.communicationLogs?.filter(c => c.type === 'email').length || 0})</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setCommTabFilter('notes')}
+                              className={`px-2 py-0.5 rounded-md transition-all ${
+                                commTabFilter === 'notes' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              Notes ({selectedAppDossier.notes?.length || 0})
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Add Note Input */}
                         <form onSubmit={handleAddNote} className="flex gap-2">
                           <input
                             type="text"
@@ -2090,18 +2482,100 @@ Website: https://myersglobalpathways.com`;
                           </button>
                         </form>
 
-                        {selectedAppDossier.notes && selectedAppDossier.notes.length > 0 && (
-                          <div className="space-y-1.5 max-h-36 overflow-y-auto text-xs pr-1">
-                            {selectedAppDossier.notes.map((note) => (
+                        {/* Unified Timeline: Counselor Notes + Communication Logs */}
+                        <div className="space-y-2 max-h-56 overflow-y-auto text-xs pr-1">
+                          {/* Automated Email & WhatsApp Communication Logs */}
+                          {(commTabFilter === 'all' || commTabFilter === 'emails' || commTabFilter === 'whatsapp') && 
+                            selectedAppDossier.communicationLogs && 
+                            selectedAppDossier.communicationLogs.map((log) => {
+                              if (commTabFilter === 'emails' && log.type !== 'email') return null;
+                              if (commTabFilter === 'whatsapp' && log.type !== 'whatsapp') return null;
+
+                              const isEmail = log.type === 'email';
+                              const isWhatsApp = log.type === 'whatsapp';
+
+                              return (
+                                <div 
+                                  key={log.id} 
+                                  className={`p-3 rounded-xl border text-xs transition-all ${
+                                    isEmail 
+                                      ? 'bg-blue-50/80 border-blue-200' 
+                                      : isWhatsApp 
+                                      ? 'bg-emerald-50/80 border-emerald-200' 
+                                      : 'bg-slate-50 border-slate-200'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                                    <div className="flex items-center gap-1.5">
+                                      <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1 ${
+                                        isEmail 
+                                          ? 'bg-blue-200 text-blue-900' 
+                                          : isWhatsApp 
+                                          ? 'bg-emerald-200 text-emerald-950' 
+                                          : 'bg-slate-200 text-slate-800'
+                                      }`}>
+                                        {isEmail && <Mail className="w-3 h-3 text-blue-800" />}
+                                        {isWhatsApp && <Phone className="w-3 h-3 text-emerald-800" />}
+                                        <span>{isEmail ? 'Automated Email Dispatched' : isWhatsApp ? 'WhatsApp Dispatched' : 'Communication Log'}</span>
+                                      </span>
+
+                                      <span className="text-[10px] text-slate-500 font-medium truncate max-w-[180px]">
+                                        To: {log.recipient}
+                                      </span>
+                                    </div>
+
+                                    <span className="text-[10px] text-slate-400">
+                                      {new Date(log.timestamp).toLocaleString()}
+                                    </span>
+                                  </div>
+
+                                  {log.subject && (
+                                    <p className="font-bold text-slate-900 text-xs mb-1">
+                                      Subject: {log.subject}
+                                    </p>
+                                  )}
+
+                                  <p className="text-slate-700 line-clamp-2 text-[11px] bg-white/70 p-2 rounded-lg border border-slate-200/60 font-mono">
+                                    {log.message}
+                                  </p>
+
+                                  <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-slate-200/60 text-[10px]">
+                                    <span className="text-slate-500 font-medium">Sent by: {log.sentBy}</span>
+                                    
+                                    <button
+                                      type="button"
+                                      onClick={() => setViewLogDetailModal(log)}
+                                      className="font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1 cursor-pointer"
+                                    >
+                                      <Eye className="w-3 h-3" />
+                                      <span>View Full Dispatch</span>
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })
+                          }
+
+                          {/* Counselor Notes */}
+                          {(commTabFilter === 'all' || commTabFilter === 'notes') && 
+                            selectedAppDossier.notes && 
+                            selectedAppDossier.notes.map((note) => (
                               <div key={note.id} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
                                 <p className="text-slate-800">{note.text}</p>
                                 <span className="text-[10px] text-slate-400 mt-1 block">
                                   {note.author} • {new Date(note.createdAt).toLocaleString()}
                                 </span>
                               </div>
-                            ))}
-                          </div>
-                        )}
+                            ))
+                          }
+
+                          {(!selectedAppDossier.notes || selectedAppDossier.notes.length === 0) &&
+                           (!selectedAppDossier.communicationLogs || selectedAppDossier.communicationLogs.length === 0) && (
+                            <p className="text-xs text-slate-400 italic text-center p-3">
+                              No notes or communications logged yet.
+                            </p>
+                          )}
+                        </div>
                       </div>
 
                     </div>
@@ -3349,6 +3823,251 @@ Website: https://myersglobalpathways.com`;
               </div>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 6: AUTOMATED STATUS EMAIL PREVIEW & INSTANT SENDER MODAL */}
+      {/* ========================================================================= */}
+      {statusEmailModal && statusEmailModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] animate-scaleUp">
+            
+            {/* Modal Header */}
+            <div className="px-6 py-4 bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-white/10 text-white flex items-center justify-center border border-white/20 shadow-xs">
+                  <MailCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-white">
+                    Automated Status Email Notification
+                  </h3>
+                  <p className="text-xs text-blue-100 mt-0.5">
+                    Live preview and instant dispatch for <strong>{statusEmailModal.app.fullName}</strong> ({statusEmailModal.app.email})
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setStatusEmailModal(null)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-4 text-left">
+              
+              {/* Target Status Selector */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Notification Status Stage
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {statusOptions.map((st) => (
+                    <button
+                      key={st}
+                      type="button"
+                      onClick={() => handleStatusEmailModalStatusChange(st)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                        statusEmailModal.targetStatus === st
+                          ? 'bg-blue-700 text-white border-blue-700 shadow-xs'
+                          : 'bg-white text-slate-700 border-slate-200 hover:bg-blue-50 hover:border-blue-300'
+                      }`}
+                    >
+                      {st}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Counselor Optional Custom Note */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Personalized Counselor Message (Included in Email)
+                </label>
+                <textarea
+                  rows={2}
+                  value={statusEmailModal.customNote}
+                  onChange={(e) => {
+                    const note = e.target.value;
+                    setStatusEmailModal(prev => prev ? { ...prev, customNote: note } : null);
+                  }}
+                  onBlur={() => handleStatusEmailModalStatusChange(statusEmailModal.targetStatus)}
+                  placeholder="Add specific advice (e.g. Please bring original transcripts, or upload your passport copy)..."
+                  className="w-full p-2.5 rounded-xl text-xs bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900"
+                />
+              </div>
+
+              {/* Subject & View Switcher */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-700">
+                    Subject: <span className="text-blue-900 font-semibold">{statusEmailModal.preview?.subject || 'Myers Global Pathways Notification'}</span>
+                  </span>
+
+                  <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-[10px] font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setStatusEmailModal(prev => prev ? { ...prev, previewTab: 'visual' } : null)}
+                      className={`px-2 py-0.5 rounded-md transition-all ${
+                        statusEmailModal.previewTab === 'visual' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600'
+                      }`}
+                    >
+                      Formatted HTML View
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setStatusEmailModal(prev => prev ? { ...prev, previewTab: 'text' } : null)}
+                      className={`px-2 py-0.5 rounded-md transition-all ${
+                        statusEmailModal.previewTab === 'text' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600'
+                      }`}
+                    >
+                      Plain Text View
+                    </button>
+                  </div>
+                </div>
+
+                {/* Email Preview Frame */}
+                {statusEmailModal.previewTab === 'visual' ? (
+                  <div className="p-4 rounded-2xl bg-slate-100 border border-slate-200 max-h-72 overflow-y-auto">
+                    {statusEmailModal.preview?.html ? (
+                      <div 
+                        className="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden text-xs"
+                        dangerouslySetInnerHTML={{ __html: statusEmailModal.preview.html }}
+                      />
+                    ) : (
+                      <div className="p-8 text-center text-slate-400">Loading preview...</div>
+                    )}
+                  </div>
+                ) : (
+                  <textarea
+                    readOnly
+                    rows={10}
+                    value={statusEmailModal.preview?.text || ''}
+                    className="w-full p-3 rounded-2xl text-xs bg-slate-900 text-emerald-400 font-mono leading-relaxed border border-slate-800"
+                  />
+                )}
+              </div>
+
+              <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-950 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CheckCheck className="w-4 h-4 text-blue-700 shrink-0" />
+                  <span>
+                    Sending this will update the applicant's official audit trail and deliver the notification directly to <strong>{statusEmailModal.app.email}</strong>.
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => setStatusEmailModal(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200 transition-colors"
+              >
+                Cancel
+              </button>
+
+              <div className="flex items-center gap-2">
+                {/* Mailto Fallback */}
+                {statusEmailModal.preview && (
+                  <a
+                    href={`mailto:${statusEmailModal.app.email}?subject=${encodeURIComponent(statusEmailModal.preview.subject)}&body=${encodeURIComponent(statusEmailModal.preview.text)}`}
+                    className="px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 transition-colors flex items-center gap-1"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Open in Email App</span>
+                  </a>
+                )}
+
+                {/* Primary Automated Dispatch Button */}
+                <button
+                  type="button"
+                  onClick={handleDispatchCustomStatusEmail}
+                  disabled={statusEmailModal.isSending}
+                  className="px-6 py-2.5 rounded-xl text-xs font-extrabold text-white bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-700 hover:from-blue-600 hover:to-indigo-500 shadow-md flex items-center gap-2 cursor-pointer transition-all active:scale-98"
+                >
+                  {statusEmailModal.isSending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <SendHorizontal className="w-4 h-4 stroke-[2.5]" />
+                      <span>⚡ Dispatch Notification Email Now</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 7: VIEW COMMUNICATION LOG DETAIL MODAL */}
+      {/* ========================================================================= */}
+      {viewLogDetailModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh] animate-scaleUp">
+            <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-white/10 text-white flex items-center justify-center">
+                  {viewLogDetailModal.type === 'email' ? <Mail className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold">Communication Dispatch Record</h4>
+                  <p className="text-[11px] text-slate-400">{new Date(viewLogDetailModal.timestamp).toLocaleString()}</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setViewLogDetailModal(null)}
+                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-3 text-left text-xs">
+              <div className="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <p><strong>Channel:</strong> <span className="uppercase text-blue-700 font-bold">{viewLogDetailModal.type}</span></p>
+                <p><strong>Recipient:</strong> {viewLogDetailModal.recipient}</p>
+                <p><strong>Sent By:</strong> {viewLogDetailModal.sentBy}</p>
+                <p><strong>Status:</strong> Dispatched & Logged</p>
+              </div>
+
+              {viewLogDetailModal.subject && (
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Subject</label>
+                  <p className="font-bold text-slate-900 bg-slate-50 p-2.5 rounded-xl border border-slate-200">{viewLogDetailModal.subject}</p>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Message Content</label>
+                <div className="p-3.5 rounded-xl bg-slate-900 text-emerald-300 font-mono text-[11px] leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto">
+                  {viewLogDetailModal.message}
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setViewLogDetailModal(null)}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-white hover:bg-slate-900"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

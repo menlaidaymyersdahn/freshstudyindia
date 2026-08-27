@@ -11,7 +11,8 @@ import {
   Trash2, 
   ArrowRight, 
   FileCheck,
-  Lock
+  Lock,
+  MailCheck
 } from 'lucide-react';
 
 interface ApplicationModalProps {
@@ -272,6 +273,17 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                 <p className="text-[11px] text-slate-500 mt-2">
                   Save this code to check your status in the Student Portal at any time.
                 </p>
+              </div>
+
+              {/* Confirmation Email Dispatched Notice */}
+              <div className="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200 max-w-md mx-auto text-left flex items-start gap-2.5 text-xs text-emerald-950">
+                <MailCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold">Confirmation Email Sent</p>
+                  <p className="text-[11px] text-emerald-800 mt-0.5">
+                    An official application receipt and dossier confirmation has been dispatched from <span className="font-mono font-semibold">admissions@myersglobalpathways.com</span> to your email address.
+                  </p>
+                </div>
               </div>
 
               {/* Security Confirmation Notice */}

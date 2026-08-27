@@ -4,6 +4,13 @@ import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
+import { 
+  generateStatusEmail, 
+  dispatchStatusNotificationEmail,
+  setServerWorkspaceToken,
+  clearServerWorkspaceToken,
+  getServerWorkspaceTokenInfo
+} from './server/emailNotifications.js';
 
 dotenv.config();
 
@@ -114,7 +121,49 @@ async function startServer() {
       totalApplications: applications.length,
       totalEnquiries: enquiries.length,
       geminiConfigured: Boolean(process.env.GEMINI_API_KEY),
+      googleWorkspaceOAuth: getServerWorkspaceTokenInfo(),
       storageType: 'Secure Private Document Vault'
+    });
+  });
+
+  // GOOGLE WORKSPACE OAUTH 2.0 TOKEN STATUS & SYNC ENDPOINTS
+  app.get('/api/auth/google-workspace-token', (req, res) => {
+    res.json({
+      success: true,
+      ...getServerWorkspaceTokenInfo()
+    });
+  });
+
+  app.post('/api/auth/google-workspace-token', (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const bearer = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+      const token = req.body.token || bearer;
+      const email = req.body.email || 'admissions@myersglobalpathways.com';
+
+      if (!token) {
+        return res.status(400).json({ success: false, error: 'OAuth access token is required.' });
+      }
+
+      setServerWorkspaceToken(token, email);
+
+      res.json({
+        success: true,
+        message: `Google Workspace OAuth token registered successfully for ${email}.`,
+        email,
+        connected: true
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  app.delete('/api/auth/google-workspace-token', (req, res) => {
+    clearServerWorkspaceToken();
+    res.json({
+      success: true,
+      message: 'Google Workspace token cleared.',
+      connected: false
     });
   });
 
@@ -162,7 +211,7 @@ async function startServer() {
   });
 
   // 2. SUBMIT APPLICATION PROFILE (With private document storage)
-  app.post('/api/applications', (req, res) => {
+  app.post('/api/applications', async (req, res) => {
     try {
       const { 
         fullName, 
@@ -262,11 +311,32 @@ async function startServer() {
 
       console.log(`[Myers Global Pathways] Application registered: ${fullName} (${country}), Target: ${preferredCourse || preferredStudyLevel}, Docs: ${savedDocs.length}, Ref: ${trackingRef}`);
 
+      // Automatically dispatch confirmation email from admissions@myersglobalpathways.com to student
+      let confirmationEmailResult: any = null;
+      try {
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const authHeader = req.headers.authorization;
+        const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : (req.body?.oauthToken || undefined);
+
+        confirmationEmailResult = await dispatchStatusNotificationEmail(
+          newApplication,
+          'Application Submitted',
+          {
+            author: 'Admissions Automated Notification Hub',
+            baseUrl,
+            bearerToken
+          }
+        );
+      } catch (emailErr: any) {
+        console.warn('[Application Submission] Confirmation email dispatch warning:', emailErr.message);
+      }
+
       res.status(201).json({
         success: true,
         applicationId: appId,
         trackingId: trackingRef,
         message: 'Your application has been received. Our admissions team will review your details and contact you.',
+        confirmationEmail: confirmationEmailResult,
         record: {
           id: appId,
           trackingId: trackingRef,
@@ -547,10 +617,10 @@ async function startServer() {
     }
   });
 
-  // 6. UPDATE APPLICATION STATUS
-  app.patch('/api/applications/:id/status', (req, res) => {
+  // 6. UPDATE APPLICATION STATUS & TRIGGER AUTOMATED EMAIL NOTIFICATION
+  app.patch('/api/applications/:id/status', async (req, res) => {
     try {
-      const { status, noteText, author = 'Admissions Officer' } = req.body;
+      const { status, noteText, author = 'Admissions Officer', sendEmail = true } = req.body;
       applications = loadApplicationsFromDisk();
       const index = applications.findIndex(a => a.id === req.params.id);
 
@@ -566,10 +636,35 @@ async function startServer() {
         applications[index].notes = [];
       }
 
+      // Trigger Automated Email Notification if requested (default: true)
+      let emailNotificationResult = null;
+      if (sendEmail !== false && applications[index].email) {
+        try {
+          const baseUrl = `${req.protocol}://${req.get('host')}`;
+          const authHeader = req.headers.authorization;
+          const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : (req.body?.bearerToken || req.body?.oauthToken || undefined);
+
+          emailNotificationResult = await dispatchStatusNotificationEmail(
+            applications[index],
+            status,
+            {
+              customNote: noteText,
+              author,
+              baseUrl,
+              bearerToken
+            }
+          );
+        } catch (emailErr: any) {
+          console.warn('[Status Update] Email notification trigger warning:', emailErr.message);
+        }
+      }
+
       applications[index].notes.push({
         id: `note-${Date.now()}`,
         author,
-        text: noteText || `Status updated from "${oldStatus}" to "${status}".`,
+        text: noteText 
+          ? `${noteText} (Status: ${oldStatus} ➔ ${status}${emailNotificationResult?.success ? ' • Automated email notification dispatched' : ''})`
+          : `Status updated from "${oldStatus}" to "${status}".${emailNotificationResult?.success ? ' Automated notification email dispatched to ' + applications[index].email : ''}`,
         createdAt: new Date().toISOString()
       });
 
@@ -577,8 +672,79 @@ async function startServer() {
 
       res.json({
         success: true,
-        message: 'Status updated successfully',
+        message: `Status updated successfully to "${status}".${emailNotificationResult?.success ? ' Automated email notification triggered.' : ''}`,
+        application: applications[index],
+        emailNotification: emailNotificationResult
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 6b. ON-DEMAND MANUAL SEND OR RE-TRIGGER STATUS NOTIFICATION EMAIL
+  app.post('/api/applications/:id/send-status-email', async (req, res) => {
+    try {
+      const { status, customNote, author = 'Admissions Officer' } = req.body;
+      applications = loadApplicationsFromDisk();
+      const index = applications.findIndex(a => a.id === req.params.id);
+
+      if (index === -1) {
+        return res.status(404).json({ success: false, error: 'Application not found' });
+      }
+
+      const targetStatus = status || applications[index].status || 'Application Submitted';
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const authHeader = req.headers.authorization;
+      const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : (req.body?.bearerToken || req.body?.oauthToken || undefined);
+
+      const emailResult = await dispatchStatusNotificationEmail(
+        applications[index],
+        targetStatus,
+        {
+          customNote,
+          author,
+          baseUrl,
+          bearerToken
+        }
+      );
+
+      saveApplicationsToDisk(applications);
+
+      res.json({
+        success: emailResult.success,
+        message: emailResult.success 
+          ? `Status notification email for "${targetStatus}" sent to ${applications[index].email}.`
+          : `Failed to dispatch email: ${emailResult.error}`,
+        emailResult,
         application: applications[index]
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 6c. PREVIEW STATUS NOTIFICATION EMAIL TEMPLATE
+  app.get('/api/applications/:id/email-preview', (req, res) => {
+    try {
+      const { status, customNote } = req.query;
+      applications = loadApplicationsFromDisk();
+      const appItem = applications.find(a => a.id === req.params.id);
+
+      if (!appItem) {
+        return res.status(404).json({ success: false, error: 'Application not found' });
+      }
+
+      const targetStatus = (status as string) || appItem.status || 'Application Submitted';
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const preview = generateStatusEmail(appItem, targetStatus, customNote as string, baseUrl);
+
+      res.json({
+        success: true,
+        applicationId: appItem.id,
+        applicantName: appItem.fullName,
+        recipient: appItem.email,
+        status: targetStatus,
+        preview
       });
     } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });
@@ -697,8 +863,8 @@ async function startServer() {
     }
   });
 
-  // 8d. APPROVE APPLICATION & GENERATE ADMISSION DECISION
-  app.post('/api/applications/:id/approve', (req, res) => {
+  // 8d. APPROVE APPLICATION & GENERATE ADMISSION DECISION & TRIGGER NOTIFICATION EMAIL
+  app.post('/api/applications/:id/approve', async (req, res) => {
     try {
       const { 
         approvedUniversity, 
@@ -707,7 +873,8 @@ async function startServer() {
         scholarshipPercentage = '20% Global Excellence Merit Waiver', 
         intakeSemester = 'Fall Intake 2026',
         counselorNotes = 'Application approved after credential evaluation and meeting university entry criteria.',
-        author = 'Menlaiday Myers (Admissions Director)'
+        author = 'Menlaiday Myers (Admissions Director)',
+        sendEmail = true
       } = req.body;
 
       applications = loadApplicationsFromDisk();
@@ -757,14 +924,34 @@ async function startServer() {
       });
       appItem.documentsCount = appItem.documents.length;
 
+      // Trigger Automated Admission Decision Email Notification
+      let emailNotificationResult = null;
+      if (sendEmail !== false && appItem.email) {
+        try {
+          const baseUrl = `${req.protocol}://${req.get('host')}`;
+          emailNotificationResult = await dispatchStatusNotificationEmail(
+            appItem,
+            'Admission Decision',
+            {
+              customNote: counselorNotes,
+              author,
+              baseUrl
+            }
+          );
+        } catch (emailErr: any) {
+          console.warn('[Approval] Automated email notification trigger warning:', emailErr.message);
+        }
+      }
+
       saveApplicationsToDisk(applications);
 
       console.log(`[Myers Global Pathways] Application approved for ${appItem.fullName} - ${admissionDetails.approvedProgram}`);
 
       res.json({
         success: true,
-        message: `Application for ${appItem.fullName} successfully approved! Offer letter generated.`,
-        application: appItem
+        message: `Application for ${appItem.fullName} successfully approved! Offer letter generated and automated notification email triggered.`,
+        application: appItem,
+        emailNotification: emailNotificationResult
       });
     } catch (err: any) {
       console.error('Error approving application:', err);
@@ -772,8 +959,8 @@ async function startServer() {
     }
   });
 
-  // 8d-1. BULK APPROVE MULTIPLE APPLICATIONS
-  app.post('/api/applications/bulk-approve', (req, res) => {
+  // 8d-1. BULK APPROVE MULTIPLE APPLICATIONS & SEND NOTIFICATIONS
+  app.post('/api/applications/bulk-approve', async (req, res) => {
     try {
       const { 
         ids = [], 
@@ -782,7 +969,8 @@ async function startServer() {
         tuitionFeeUsd = '2,800',
         intakeSemester = 'Fall Intake 2026',
         counselorNotes = 'Batch approval granted following comprehensive credential verification and academic eligibility assessment.',
-        author = 'Menlaiday Myers (Admissions Director)'
+        author = 'Menlaiday Myers (Admissions Director)',
+        sendEmail = true
       } = req.body;
 
       if (!Array.isArray(ids) || ids.length === 0) {
@@ -791,9 +979,12 @@ async function startServer() {
 
       applications = loadApplicationsFromDisk();
       let approvedCount = 0;
+      let emailsDispatchedCount = 0;
       const idSet = new Set(ids);
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
 
-      applications = applications.map(appItem => {
+      for (let i = 0; i < applications.length; i++) {
+        const appItem = applications[i];
         if (idSet.has(appItem.id)) {
           approvedCount++;
           const targetUni = approvedUniversity || appItem.preferredUniversity || 'SRM Institute of Science & Technology / Anna University';
@@ -832,25 +1023,36 @@ async function startServer() {
             uploadedAt: new Date().toISOString()
           });
 
-          return {
-            ...appItem,
-            status: 'Admission Decision',
-            admissionDetails,
-            notes: updatedNotes,
-            documents: updatedDocs,
-            documentsCount: updatedDocs.length,
-            updatedAt: new Date().toISOString()
-          };
+          appItem.status = 'Admission Decision';
+          appItem.admissionDetails = admissionDetails;
+          appItem.notes = updatedNotes;
+          appItem.documents = updatedDocs;
+          appItem.documentsCount = updatedDocs.length;
+          appItem.updatedAt = new Date().toISOString();
+
+          // Dispatch email if requested
+          if (sendEmail !== false && appItem.email) {
+            try {
+              await dispatchStatusNotificationEmail(appItem, 'Admission Decision', {
+                customNote: counselorNotes,
+                author,
+                baseUrl
+              });
+              emailsDispatchedCount++;
+            } catch (emErr) {
+              console.warn(`Bulk approve email error for ${appItem.email}:`, emErr);
+            }
+          }
         }
-        return appItem;
-      });
+      }
 
       saveApplicationsToDisk(applications);
 
       res.json({
         success: true,
-        message: `Successfully approved ${approvedCount} student application(s). Provisional offer letters generated.`,
-        approvedCount
+        message: `Successfully approved ${approvedCount} student application(s). ${emailsDispatchedCount} automated admission notification email(s) triggered.`,
+        approvedCount,
+        emailsDispatchedCount
       });
     } catch (err: any) {
       console.error('Error during bulk approve:', err);
@@ -858,10 +1060,10 @@ async function startServer() {
     }
   });
 
-  // 8d-2. BULK UPDATE STATUS FOR APPLICATIONS
-  app.post('/api/applications/bulk-status', (req, res) => {
+  // 8d-2. BULK UPDATE STATUS FOR APPLICATIONS & SEND NOTIFICATIONS
+  app.post('/api/applications/bulk-status', async (req, res) => {
     try {
-      const { ids = [], status, author = 'Admissions Officer' } = req.body;
+      const { ids = [], status, noteText, author = 'Admissions Officer', sendEmail = true } = req.body;
       if (!Array.isArray(ids) || ids.length === 0 || !status) {
         return res.status(400).json({ success: false, error: 'Valid application IDs and status required' });
       }
@@ -869,34 +1071,47 @@ async function startServer() {
       applications = loadApplicationsFromDisk();
       const idSet = new Set(ids);
       let updatedCount = 0;
+      let emailsDispatchedCount = 0;
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
 
-      applications = applications.map(appItem => {
+      for (let i = 0; i < applications.length; i++) {
+        const appItem = applications[i];
         if (idSet.has(appItem.id)) {
           updatedCount++;
           const updatedNotes = appItem.notes ? [...appItem.notes] : [];
           updatedNotes.unshift({
             id: `note-${Date.now()}-${updatedCount}`,
             author,
-            text: `Batch status changed to "${status}".`,
+            text: noteText || `Batch status changed to "${status}".`,
             createdAt: new Date().toISOString()
           });
 
-          return {
-            ...appItem,
-            status,
-            notes: updatedNotes,
-            updatedAt: new Date().toISOString()
-          };
+          appItem.status = status;
+          appItem.notes = updatedNotes;
+          appItem.updatedAt = new Date().toISOString();
+
+          if (sendEmail !== false && appItem.email) {
+            try {
+              await dispatchStatusNotificationEmail(appItem, status, {
+                customNote: noteText,
+                author,
+                baseUrl
+              });
+              emailsDispatchedCount++;
+            } catch (emErr) {
+              console.warn(`Bulk status email error for ${appItem.email}:`, emErr);
+            }
+          }
         }
-        return appItem;
-      });
+      }
 
       saveApplicationsToDisk(applications);
 
       res.json({
         success: true,
-        message: `Successfully updated status to "${status}" for ${updatedCount} student application(s).`,
-        updatedCount
+        message: `Successfully updated status to "${status}" for ${updatedCount} student application(s). ${emailsDispatchedCount} notification email(s) triggered.`,
+        updatedCount,
+        emailsDispatchedCount
       });
     } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });
