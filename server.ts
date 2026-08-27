@@ -358,33 +358,76 @@ async function startServer() {
     }
   });
 
-  // 3. STUDENT PORTAL LOOKUP (By Tracking Reference or Email)
-  app.get('/api/student/lookup', (req, res) => {
+  // 3. STUDENT PORTAL LOOKUP (By Tracking Reference, Email, Phone, Name, or ID)
+  const handleStudentLookup = (req: any, res: any) => {
     try {
-      const { trackingId, email } = req.query;
-      if (!trackingId && !email) {
-        return res.status(400).json({ success: false, error: 'Tracking reference or email address required.' });
+      const rawQuery = req.query.query || req.query.trackingId || req.query.email || req.query.q || req.query.ref || req.body?.query || req.body?.trackingId || req.body?.email || req.body?.q || '';
+      const searchTerm = String(rawQuery).trim();
+
+      if (!searchTerm) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Please provide your Application Reference code (e.g. MGP-IND-123456) or registered email address.' 
+        });
       }
 
       applications = loadApplicationsFromDisk();
+      const termLower = searchTerm.toLowerCase();
+      const termDigits = searchTerm.replace(/\D/g, '');
+
+      // 1. Direct or Smart Match
       let matched = applications.find(a => {
-        if (trackingId && String(a.trackingId).trim().toUpperCase() === String(trackingId).trim().toUpperCase()) {
+        const appTracking = String(a.trackingId || '').toLowerCase().trim();
+        const appId = String(a.id || '').toLowerCase().trim();
+        const appEmail = String(a.email || '').toLowerCase().trim();
+        const appName = String(a.fullName || '').toLowerCase().trim();
+        const appWhatsapp = String(a.whatsapp || '').replace(/\D/g, '');
+
+        // Exact matches
+        if (appTracking === termLower || appId === termLower || appEmail === termLower) {
           return true;
         }
-        if (email && String(a.email).trim().toLowerCase() === String(email).trim().toLowerCase()) {
+
+        // Numeric suffix match (e.g. user entered "374932" or "IND-374932")
+        if (termDigits.length >= 4 && appTracking.includes(termDigits)) {
           return true;
         }
+
+        // Tracking without prefix
+        if (appTracking.replace(/[^a-z0-9]/gi, '') === termLower.replace(/[^a-z0-9]/gi, '')) {
+          return true;
+        }
+
+        // Phone match
+        if (termDigits.length >= 6 && appWhatsapp && appWhatsapp.includes(termDigits)) {
+          return true;
+        }
+
+        // Full name exact match
+        if (appName === termLower) {
+          return true;
+        }
+
         return false;
       });
+
+      // 2. Secondary Partial Match if no exact match
+      if (!matched && termLower.length >= 3) {
+        matched = applications.find(a => 
+          (a.email && a.email.toLowerCase().includes(termLower)) ||
+          (a.fullName && a.fullName.toLowerCase().includes(termLower)) ||
+          (a.trackingId && a.trackingId.toLowerCase().includes(termLower))
+        );
+      }
 
       if (!matched) {
         return res.status(404).json({ 
           success: false, 
-          error: 'No application found with the provided details. Please check your reference code or contact admissions@myersglobalpathways.com' 
+          error: `No application dossier found matching "${searchTerm}". Please verify your reference code or registered email.` 
         });
       }
 
-      // Return sanitized student dossier view
+      // Return complete student dossier view
       res.json({
         success: true,
         application: {
@@ -397,7 +440,10 @@ async function startServer() {
           preferredStudyLevel: matched.preferredStudyLevel,
           preferredCourse: matched.preferredCourse,
           preferredUniversity: matched.preferredUniversity,
+          currentQualification: matched.currentQualification || '',
+          academicBackground: matched.academicBackground || '',
           status: matched.status || 'Application Submitted',
+          admissionDetails: matched.admissionDetails || null,
           documentsCount: matched.documents?.length || 0,
           documents: (matched.documents || []).map((d: any) => ({
             id: d.id,
@@ -406,14 +452,19 @@ async function startServer() {
             verified: Boolean(d.verified),
             uploadedAt: d.uploadedAt
           })),
+          notesCount: matched.notes?.length || 0,
           submittedAt: matched.submittedAt,
           updatedAt: matched.updatedAt
         }
       });
     } catch (err: any) {
-      res.status(500).json({ success: false, error: 'Lookup failed' });
+      console.error('Lookup failed error:', err);
+      res.status(500).json({ success: false, error: 'Database lookup encountered an error. Please try again shortly.' });
     }
-  });
+  };
+
+  app.get('/api/student/lookup', handleStudentLookup);
+  app.post('/api/student/lookup', handleStudentLookup);
 
   // 4. GET ALL APPLICATIONS (For Admissions Admin Dashboard)
   app.get('/api/applications', (req, res) => {
@@ -1051,7 +1102,11 @@ async function startServer() {
   app.get('/api/applications/:id/offer-letter', (req, res) => {
     try {
       applications = loadApplicationsFromDisk();
-      const app = applications.find(a => a.id === req.params.id);
+      const targetParam = String(req.params.id).trim().toLowerCase();
+      const app = applications.find(a => 
+        String(a.id || '').toLowerCase() === targetParam || 
+        String(a.trackingId || '').toLowerCase() === targetParam
+      );
       if (!app) {
         return res.status(404).send('Application not found');
       }
