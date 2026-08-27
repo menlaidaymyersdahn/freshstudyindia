@@ -13,11 +13,23 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication, onExploreClick })
   return (
     <section 
       id="home" 
-      className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 bg-[#0A1128] text-white overflow-hidden"
+      className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 text-white overflow-hidden bg-[#0A1128]"
     >
-      {/* Subtle background ambient lighting (no excessive gradients) */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-600/5 rounded-full blur-3xl pointer-events-none" />
+      {/* Background Photo with Dark Gradient Overlays for High Legibility */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/DSC_9367.jpeg"
+          alt="Myers Global Pathways graduation ceremony in India"
+          className="w-full h-full object-cover object-center opacity-30 sm:opacity-25 filter scale-105"
+        />
+        {/* Layered dark radial & directional gradients to ensure crisp text contrast */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0A1128] via-[#0A1128]/90 to-[#0A1128]/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A1128] via-transparent to-[#0A1128]" />
+      </div>
+
+      {/* Subtle background ambient lighting */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
@@ -25,7 +37,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication, onExploreClick })
           {/* Left Column: Editorial Headline & Actions */}
           <div className="lg:col-span-7 space-y-6 text-left">
             {/* Editorial Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-amber-400 text-xs font-semibold tracking-wide">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-amber-400 text-xs font-semibold tracking-wide backdrop-blur-sm">
               <Compass className="w-3.5 h-3.5 text-amber-400" />
               <span>International Education Consultancy</span>
             </div>
@@ -55,7 +67,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication, onExploreClick })
 
               <button
                 onClick={onExploreClick}
-                className="px-5 py-3.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide text-white bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 transition-colors flex items-center gap-2 cursor-pointer"
+                className="px-5 py-3.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide text-white bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 backdrop-blur-sm transition-colors flex items-center gap-2 cursor-pointer"
               >
                 <span>Explore Study in India</span>
                 <ArrowDown className="w-4 h-4 text-slate-400" />
@@ -79,27 +91,32 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication, onExploreClick })
             </div>
           </div>
 
-          {/* Right Column: High-End Photography Composition (Strictly No 3D) */}
+          {/* Right Column: High-End Photography Composition Featuring Myers Graduates */}
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto max-w-md lg:max-w-none">
               
               {/* Main Editorial Image Frame */}
-              <div className="relative rounded-3xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-900 group">
+              <div className="relative rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl bg-slate-900 group">
                 <img
-                  src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=85"
-                  alt="International university students studying together"
+                  src="/DSC_9367.jpeg"
+                  alt="Myers Global Pathways student graduates at university convocation ceremony"
                   className="w-full h-[380px] sm:h-[440px] object-cover object-center group-hover:scale-103 transition-transform duration-700 ease-out"
                   loading="eager"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128] via-transparent to-transparent opacity-80" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128] via-[#0A1128]/20 to-transparent opacity-85" />
 
                 {/* Subtle Image Tagline Overlay */}
-                <div className="absolute bottom-5 left-5 right-5 p-4 rounded-2xl bg-[#0A1128]/90 backdrop-blur-md border border-slate-800 text-left">
-                  <p className="text-[11px] uppercase tracking-wider font-bold text-amber-400">
-                    Comprehensive Student Guidance
-                  </p>
-                  <p className="text-xs text-slate-200 mt-1 font-medium leading-relaxed">
-                    From university selection to visa guidance and campus arrival in India.
+                <div className="absolute bottom-5 left-5 right-5 p-4 rounded-2xl bg-[#0A1128]/95 backdrop-blur-md border border-slate-800 text-left">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-[11px] uppercase tracking-wider font-bold text-amber-400">
+                      Myers Global Graduates
+                    </p>
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 font-semibold border border-amber-400/30">
+                      Class of 2024
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-200 mt-1.5 font-medium leading-relaxed">
+                    Celebrating international students successfully admitted, graduated, and thriving in top universities in India.
                   </p>
                 </div>
               </div>
@@ -110,8 +127,8 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication, onExploreClick })
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-white">Dedicated Support</p>
-                  <p className="text-[10px] text-slate-400">Academic & Visa Advisory</p>
+                  <p className="text-xs font-bold text-white">Proven Results</p>
+                  <p className="text-[10px] text-slate-400">Official Partner Universities</p>
                 </div>
               </div>
 

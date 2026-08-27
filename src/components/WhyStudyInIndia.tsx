@@ -68,8 +68,8 @@ export const WhyStudyInIndia: React.FC<WhyStudyInIndiaProps> = ({ onOpenApplicat
           {/* Center Column: Editorial Campus Photography */}
           <div className="lg:col-span-4 relative rounded-3xl overflow-hidden border border-slate-800 min-h-[380px] flex flex-col justify-end bg-slate-900 group">
             <img 
-              src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=85" 
-              alt="International students celebrating university graduation ceremony"
+              src="/DSC_9531.jpeg" 
+              alt="Myers Global Pathways international students celebrating academic success"
               className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-700 ease-out"
               loading="lazy"
             />

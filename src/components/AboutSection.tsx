@@ -30,8 +30,8 @@ export const AboutSection: React.FC = () => {
           <div className="lg:col-span-5 relative">
             <div className="rounded-3xl overflow-hidden border border-slate-800 bg-slate-900 shadow-2xl">
               <img
-                src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1200&q=85"
-                alt="International students engaged in collaborative study session"
+                src="/DSC_9531.jpeg"
+                alt="Myers Global Pathways international student advisory and mentorship"
                 className="w-full h-[400px] object-cover object-center"
                 loading="lazy"
               />

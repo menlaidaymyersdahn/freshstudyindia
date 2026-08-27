@@ -33,8 +33,8 @@ export const EditorialTrustIntro: React.FC<EditorialTrustIntroProps> = ({
           <div className="lg:col-span-5 relative order-2 lg:order-1">
             <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 bg-white">
               <img
-                src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=85"
-                alt="Modern university campus library and lecture spaces in India"
+                src="/DSC_9531.jpeg"
+                alt="Myers Global Pathways international student graduates in India"
                 className="w-full h-[360px] sm:h-[420px] object-cover object-center"
                 loading="lazy"
               />
