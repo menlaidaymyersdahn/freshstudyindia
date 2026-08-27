@@ -3,7 +3,7 @@ import { CORE_SERVICES } from '../config/company';
 import { ServiceItem } from '../types';
 import { ArrowUpRight, CheckCircle2, ChevronRight, Sparkles, Layers, Grid } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem } from './ScrollReveal';
+import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem, TextScrollReveal } from './ScrollReveal';
 
 interface ServicesSectionProps {
   onOpenApplication: (service?: ServiceItem) => void;
@@ -27,10 +27,10 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onOpenApplicat
               <span>Comprehensive Advisory Scope</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-950 tracking-tight">
-              Our Complete Services
+              <TextScrollReveal text="Our Complete Services" />
             </h2>
             <p className="text-base sm:text-lg text-slate-700 mt-3 max-w-2xl leading-relaxed font-normal">
-              Every stage of your educational journey is fully supported — from course discovery and visa documentation to flight arrival and on-campus welfare in India.
+              <TextScrollReveal delay={0.12} text="Every stage of your educational journey is fully supported — from course discovery and visa documentation to flight arrival and on-campus welfare in India." />
             </p>
           </div>
 

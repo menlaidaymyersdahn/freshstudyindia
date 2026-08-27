@@ -1,7 +1,7 @@
 import React from 'react';
 import { WHY_STUDY_IN_INDIA } from '../config/company';
 import { GraduationCap, Wallet, BookOpen, TrendingUp, Users, Globe, ArrowRight } from 'lucide-react';
-import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem } from './ScrollReveal';
+import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem, TextScrollReveal } from './ScrollReveal';
 
 interface WhyStudyInIndiaProps {
   onOpenApplication: () => void;
@@ -34,10 +34,10 @@ export const WhyStudyInIndia: React.FC<WhyStudyInIndiaProps> = ({ onOpenApplicat
             <span>Educational Destination</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-950 tracking-tight">
-            Why Study in India?
+            <TextScrollReveal text="Why Study in India?" />
           </h2>
           <p className="text-base text-slate-700 mt-3 max-w-2xl leading-relaxed font-normal">
-            India offers a compelling combination of academic rigor, accessible living expenses, and an expansive spectrum of recognized degree programs taught in English.
+            <TextScrollReveal delay={0.12} text="India offers a compelling combination of academic rigor, accessible living expenses, and an expansive spectrum of recognized degree programs taught in English." />
           </p>
         </ScrollReveal>
 

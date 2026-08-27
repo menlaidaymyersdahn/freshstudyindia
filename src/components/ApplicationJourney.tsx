@@ -1,7 +1,7 @@
 import React from 'react';
 import { APPLICATION_JOURNEY } from '../config/company';
 import { ArrowUpRight, CheckCircle, Compass } from 'lucide-react';
-import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem } from './ScrollReveal';
+import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem, TextScrollReveal } from './ScrollReveal';
 
 interface ApplicationJourneyProps {
   onOpenApplication: () => void;
@@ -20,10 +20,10 @@ export const ApplicationJourney: React.FC<ApplicationJourneyProps> = ({ onOpenAp
           </div>
 
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-950 tracking-tight">
-            From Ambition to Arrival
+            <TextScrollReveal text="From Ambition to Arrival" />
           </h2>
           <p className="text-base text-slate-700 mt-2 max-w-2xl leading-relaxed font-normal">
-            A clear, transparent seven-step progression guiding international students from initial course exploration to campus arrival in India.
+            <TextScrollReveal delay={0.15} text="A clear, transparent seven-step progression guiding international students from initial course exploration to campus arrival in India." />
           </p>
         </ScrollReveal>
 

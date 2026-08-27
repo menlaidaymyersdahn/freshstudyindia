@@ -111,3 +111,57 @@ export const ScrollStaggerItem: React.FC<{
     </motion.div>
   );
 };
+
+export const TextScrollReveal: React.FC<{
+  text: string;
+  className?: string;
+  delay?: number;
+  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'span';
+}> = ({
+  text,
+  className = '',
+  delay = 0,
+  as: Component = 'p'
+}) => {
+  const words = text.split(' ');
+
+  return (
+    <motion.span
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: '-40px' }}
+      variants={{
+        hidden: {},
+        visible: {
+          transition: {
+            staggerChildren: 0.04,
+            delayChildren: delay
+          }
+        }
+      }}
+      className={`inline-block ${className}`}
+    >
+      {words.map((word, i) => (
+        <motion.span
+          key={`${word}-${i}`}
+          variants={{
+            hidden: { opacity: 0, y: 14, filter: 'blur(3px)' },
+            visible: {
+              opacity: 1,
+              y: 0,
+              filter: 'blur(0px)',
+              transition: {
+                duration: 0.45,
+                ease: [0.21, 0.47, 0.32, 0.98]
+              }
+            }
+          }}
+          className="inline-block mr-[0.28em] last:mr-0"
+        >
+          {word}
+        </motion.span>
+      ))}
+    </motion.span>
+  );
+};
+

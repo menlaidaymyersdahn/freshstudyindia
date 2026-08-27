@@ -13,7 +13,8 @@ import {
   BookOpen,
   HelpCircle,
   Mail,
-  Phone
+  Phone,
+  ShieldCheck
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -133,11 +134,21 @@ export const Navbar: React.FC<NavbarProps> = ({
             </nav>
 
             {/* Right Action Buttons */}
-            <div className="hidden md:flex items-center gap-2.5">
+            <div className="hidden md:flex items-center gap-2">
+              {/* Admin Portal Trigger */}
+              <button
+                onClick={onOpenAdminPortal}
+                className="px-3 py-2 rounded-xl text-xs font-bold text-slate-800 bg-white/80 hover:bg-white hover:text-blue-900 border border-sky-300 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                title="Admissions Staff & Admin Portal"
+              >
+                <ShieldCheck className="w-4 h-4 text-amber-600" />
+                <span className="hidden xl:inline">Admin Portal</span>
+              </button>
+
               {/* Student Portal Trigger */}
               <button
                 onClick={onOpenStudentPortal}
-                className="px-3.5 py-2.5 rounded-xl text-xs font-bold text-blue-900 bg-white/90 hover:bg-white border border-sky-300 shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-3.5 py-2 rounded-xl text-xs font-bold text-blue-900 bg-white/90 hover:bg-white border border-sky-300 shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
                 title="View your submitted application status"
               >
                 <UserCheck className="w-4 h-4 text-blue-600" />
@@ -147,7 +158,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               {/* Primary CTA Button */}
               <button
                 onClick={onOpenApplication}
-                className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-md shadow-amber-500/20 hover:shadow-amber-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-1.5 cursor-pointer"
+                className="px-4.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-md shadow-amber-500/20 hover:shadow-amber-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Start Application</span>
                 <ArrowUpRight className="w-4 h-4 text-slate-950" />
@@ -278,8 +289,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               })}
             </div>
 
-            {/* Student Portal Option in Mobile Drawer */}
-            <div className="pt-2 border-t border-sky-200">
+            {/* Student & Admin Portal Options in Mobile Drawer */}
+            <div className="pt-2 border-t border-sky-200 space-y-2">
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
@@ -294,6 +305,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <div>
                     <span className="block text-xs font-bold text-slate-900">Student Portal</span>
                     <span className="block text-[11px] text-slate-500">Track application status</span>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenAdminPortal();
+                }}
+                className="w-full p-3 rounded-xl bg-amber-50 border border-amber-300 hover:border-amber-500 text-slate-900 flex items-center justify-between transition-all cursor-pointer shadow-xs"
+              >
+                <div className="flex items-center gap-3 text-left">
+                  <div className="w-8 h-8 rounded-lg bg-amber-200 text-amber-900 flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="block text-xs font-bold text-slate-950">Admissions Admin Portal</span>
+                    <span className="block text-[11px] text-amber-800">Manage, contact & approve students</span>
                   </div>
                 </div>
               </button>

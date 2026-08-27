@@ -208,10 +208,50 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
                   </div>
                   <div>
                     <span className="text-slate-500 text-[10px] uppercase font-semibold">Attached Docs</span>
-                    <p className="font-semibold text-slate-900">{studentRecord.documentsCount || 0} file(s)</p>
+                    <p className="font-semibold text-slate-900">{studentRecord.documentsCount || studentRecord.documents?.length || 0} file(s)</p>
                   </div>
                 </div>
               </div>
+
+              {/* Official Admission Offer Letter Banner (If Approved) */}
+              {(studentRecord.admissionDetails || studentRecord.status === 'Admission Decision' || studentRecord.status === 'Ready for India') && (
+                <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-300 text-slate-900 space-y-3 shadow-xs">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shrink-0 shadow-xs">
+                        ✓
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
+                          Congratulations!
+                        </span>
+                        <h4 className="text-base font-extrabold text-emerald-950">
+                          Provisional Letter of Admission Issued
+                        </h4>
+                      </div>
+                    </div>
+
+                    <a
+                      href={`/api/applications/${studentRecord.id}/offer-letter`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 transition-colors shadow-sm flex items-center gap-1.5 shrink-0"
+                    >
+                      <FileCheck className="w-4 h-4" />
+                      <span>Download Official Offer Letter</span>
+                    </a>
+                  </div>
+
+                  {studentRecord.admissionDetails && (
+                    <div className="p-3 bg-white/90 rounded-xl border border-emerald-200 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                      <p><strong>Approved University:</strong> {studentRecord.admissionDetails.approvedUniversity}</p>
+                      <p><strong>Program:</strong> {studentRecord.admissionDetails.approvedProgram}</p>
+                      <p><strong>Annual Tuition:</strong> ${studentRecord.admissionDetails.tuitionFeeUsd}/yr</p>
+                      <p><strong>Scholarship Grant:</strong> {studentRecord.admissionDetails.scholarshipPercentage}</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* 6-Stage Progress Tracker */}
               <div className="space-y-3">

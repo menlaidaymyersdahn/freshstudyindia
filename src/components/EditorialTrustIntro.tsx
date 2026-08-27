@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight, Compass, CheckCircle2 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { ScrollReveal } from './ScrollReveal';
+import { ScrollReveal, TextScrollReveal } from './ScrollReveal';
 
 interface EditorialTrustIntroProps {
   onOpenApplication: () => void;
@@ -24,7 +24,7 @@ export const EditorialTrustIntro: React.FC<EditorialTrustIntroProps> = ({
           </div>
 
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight">
-            Your Journey to India Starts With the Right Guidance.
+            <TextScrollReveal text="Your Journey to India Starts With the Right Guidance." />
           </h2>
         </ScrollReveal>
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { CORE_PRINCIPLES } from '../config/company';
 import { Compass, Target, CheckCircle2 } from 'lucide-react';
-import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem } from './ScrollReveal';
+import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem, TextScrollReveal } from './ScrollReveal';
 
 export const AboutSection: React.FC = () => {
   return (
@@ -16,11 +16,11 @@ export const AboutSection: React.FC = () => {
           </div>
 
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-950 tracking-tight leading-tight">
-            Guidance Built Around Your Journey.
+            <TextScrollReveal text="Guidance Built Around Your Journey." />
           </h2>
           
           <p className="text-base text-slate-700 mt-3 leading-relaxed font-normal">
-            Myers Global Pathways is an international education consultancy committed to helping international students explore and access higher education opportunities in India through structured, transparent, and personalized advisory.
+            <TextScrollReveal delay={0.15} text="Myers Global Pathways is an international education consultancy committed to helping international students explore and access higher education opportunities in India through structured, transparent, and personalized advisory." />
           </p>
         </ScrollReveal>
 

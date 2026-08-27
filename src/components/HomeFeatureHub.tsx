@@ -2,7 +2,7 @@ import React from 'react';
 import { NavTab } from '../types';
 import { Globe, Sparkles, GraduationCap, HelpCircle, ArrowUpRight, CheckCircle2, BookOpen, Mail } from 'lucide-react';
 import { motion } from 'motion/react';
-import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem } from './ScrollReveal';
+import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem, TextScrollReveal } from './ScrollReveal';
 
 interface HomeFeatureHubProps {
   onSelectTab: (tab: NavTab) => void;
@@ -72,10 +72,10 @@ export const HomeFeatureHub: React.FC<HomeFeatureHubProps> = ({
               <span>Explore Dedicated Portals</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
-              Navigate Your Educational Journey
+              <TextScrollReveal text="Navigate Your Educational Journey" />
             </h2>
             <p className="text-base sm:text-lg text-slate-700 mt-2 leading-relaxed font-normal">
-              Select any section to explore in-depth information, programs, services, and admissions answers.
+              <TextScrollReveal delay={0.15} text="Select any section to explore in-depth information, programs, services, and admissions answers." />
             </p>
           </div>
 

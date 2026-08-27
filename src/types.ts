@@ -19,6 +19,28 @@ export interface StudentDocument {
   uploadedAt: string;
 }
 
+export interface CommunicationLog {
+  id: string;
+  type: 'whatsapp' | 'email' | 'call' | 'system';
+  recipient: string;
+  subject?: string;
+  message: string;
+  sentBy: string;
+  timestamp: string;
+}
+
+export interface AdmissionDetails {
+  approvedUniversity: string;
+  approvedProgram: string;
+  tuitionFeeUsd: string;
+  scholarshipPercentage?: string;
+  intakeSemester: string;
+  decisionDate: string;
+  counselorNotes?: string;
+  offerLetterIssued: boolean;
+  offerLetterId?: string;
+}
+
 export interface ApplicationSubmission {
   id?: string;
   trackingId?: string;
@@ -34,8 +56,11 @@ export interface ApplicationSubmission {
   preferredUniversity: string;
   message?: string;
   documents?: StudentDocument[];
+  documentsCount?: number;
   status?: ApplicationStatus;
   notes?: { id: string; author: string; text: string; createdAt: string }[];
+  admissionDetails?: AdmissionDetails;
+  communicationLogs?: CommunicationLog[];
   submittedAt?: string;
   updatedAt?: string;
 }
@@ -51,6 +76,8 @@ export interface EnquirySubmission {
   preferredUniversity?: string;
   message?: string;
   status?: string;
+  assignedTo?: string;
+  notes?: { id: string; text: string; createdAt: string }[];
   createdAt?: string;
 }
 
