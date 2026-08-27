@@ -1,13 +1,18 @@
 import React from 'react';
-import { ArrowUpRight, ArrowDown, Compass, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight, Compass, CheckCircle2, ShieldCheck, Sparkles, Globe } from 'lucide-react';
 import { getWhatsAppConfig } from '../config/company';
 
 interface HeroProps {
   onOpenApplication: () => void;
-  onExploreClick: () => void;
+  onExploreStudyInIndia: () => void;
+  onExploreServices: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenApplication, onExploreClick }) => {
+export const Hero: React.FC<HeroProps> = ({ 
+  onOpenApplication, 
+  onExploreStudyInIndia,
+  onExploreServices
+}) => {
   const whatsappConfig = getWhatsAppConfig();
 
   return (
@@ -23,7 +28,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication, onExploreClick })
           className="w-full h-full object-cover object-center opacity-30 sm:opacity-25 filter scale-105"
         />
         {/* Layered dark radial & directional gradients to ensure crisp text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0A1128] via-[#0A1128]/90 to-[#0A1128]/80" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0A1128] via-[#0A1128]/95 to-[#0A1128]/85" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0A1128] via-transparent to-[#0A1128]" />
       </div>
 
@@ -37,45 +42,53 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication, onExploreClick })
           {/* Left Column: Editorial Headline & Actions */}
           <div className="lg:col-span-7 space-y-6 text-left">
             {/* Editorial Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-amber-400 text-xs font-semibold tracking-wide backdrop-blur-sm">
-              <Compass className="w-3.5 h-3.5 text-amber-400" />
-              <span>International Education Consultancy</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/90 border border-slate-700/80 text-amber-400 text-xs sm:text-sm font-semibold tracking-wide backdrop-blur-sm shadow-sm">
+              <Compass className="w-4 h-4 text-amber-400" />
+              <span>International Higher Education Consultancy</span>
             </div>
 
             {/* Main Headline */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
               Your Pathway to <br className="hidden sm:inline" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-amber-200">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-amber-100 to-amber-400">
                 Study in India
               </span>
             </h1>
 
             {/* Supporting Text */}
-            <p className="text-base sm:text-lg text-slate-300 max-w-2xl leading-relaxed font-normal">
-              Personalized guidance for international students seeking quality education, university opportunities, and a smoother journey to India.
+            <p className="text-base sm:text-lg lg:text-xl text-slate-200 max-w-2xl leading-relaxed font-normal">
+              Personalized guidance for international students seeking quality higher education, accredited degree opportunities, and a smooth journey to India.
             </p>
 
             {/* Primary & Secondary Action CTAs */}
             <div className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
               <button
                 onClick={onOpenApplication}
-                className="px-6 py-3.5 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 cursor-pointer"
+                className="px-7 py-4 rounded-2xl text-sm sm:text-base font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-xl shadow-amber-500/25 hover:shadow-amber-500/35 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2.5 cursor-pointer"
               >
                 <span>Start Your Application</span>
-                <ArrowUpRight className="w-4 h-4 text-slate-950" />
+                <ArrowUpRight className="w-5 h-5 text-slate-950" />
               </button>
 
               <button
-                onClick={onExploreClick}
-                className="px-5 py-3.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide text-white bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 backdrop-blur-sm transition-colors flex items-center gap-2 cursor-pointer"
+                onClick={onExploreStudyInIndia}
+                className="px-5 py-4 rounded-2xl text-xs sm:text-sm font-bold tracking-wide text-white bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 backdrop-blur-sm transition-all flex items-center gap-2 cursor-pointer hover:border-amber-400/60"
               >
-                <span>Explore Study in India</span>
-                <ArrowDown className="w-4 h-4 text-slate-400" />
+                <Globe className="w-4 h-4 text-amber-400" />
+                <span>Study in India</span>
+              </button>
+
+              <button
+                onClick={onExploreServices}
+                className="px-5 py-4 rounded-2xl text-xs sm:text-sm font-bold tracking-wide text-white bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 backdrop-blur-sm transition-all flex items-center gap-2 cursor-pointer hover:border-amber-400/60"
+              >
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>Our 8 Services</span>
               </button>
             </div>
 
             {/* Trust Pillars Checklist */}
-            <div className="pt-4 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-300">
+            <div className="pt-4 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm text-slate-300 font-medium">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
                 <span>Personalized Advising</span>
@@ -86,7 +99,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication, onExploreClick })
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>End-to-End Support</span>
+                <span>End-to-End Visa Support</span>
               </div>
             </div>
           </div>
@@ -100,7 +113,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenApplication, onExploreClick })
                 <img
                   src="/DSC_9367.jpeg"
                   alt="Myers Global Pathways student graduates at university convocation ceremony"
-                  className="w-full h-[380px] sm:h-[440px] object-cover object-center group-hover:scale-103 transition-transform duration-700 ease-out"
+                  className="w-full h-[380px] sm:h-[460px] object-cover object-center group-hover:scale-103 transition-transform duration-700 ease-out"
                   loading="eager"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128] via-[#0A1128]/20 to-transparent opacity-85" />

@@ -1,4 +1,4 @@
-import { ServiceItem, JourneyStep, EmailContact } from '../types';
+import { ServiceItem, JourneyStep, EmailContact, FAQItem } from '../types';
 
 export const COMPANY = {
   name: 'MYERS GLOBAL PATHWAYS',
@@ -6,6 +6,12 @@ export const COMPANY = {
   tagline: 'Your Pathway to Global Education',
   description: 'Personalized guidance for international students seeking quality education, university opportunities, and a smoother journey to India.',
   year: 2026,
+  founder: 'Menlaiday Myers',
+  primaryWhatsApp: '+231 889425645',
+  primaryPhone: '+231 889425645',
+  alternativePhone: '+91 93478 69324',
+  alternativeWhatsApp: '+91 93478 69324',
+  primaryLocation: 'Monrovia, Liberia & Hyderabad, India',
 };
 
 // Official Myers Global Pathways Email Directory
@@ -59,21 +65,76 @@ export const OFFICIAL_EMAIL_DIRECTORY: EmailContact[] = [
 ];
 
 // WhatsApp Configuration Helper
-// Checks environment variable VITE_WHATSAPP_NUMBER or NEXT_PUBLIC_WHATSAPP_NUMBER
+// Default Primary: +231 889425645 | Alternative: +91 93478 69324
 export const getWhatsAppConfig = () => {
-  const envNumber = (import.meta.env.VITE_WHATSAPP_NUMBER || '').replace(/[^0-9]/g, '');
-  const isConfigured = Boolean(envNumber && envNumber.length >= 8);
+  const envNumber = (import.meta.env.VITE_WHATSAPP_NUMBER || '231889425645').replace(/[^0-9]/g, '');
+  const altNumber = '919347869324';
   
   return {
-    isConfigured,
-    number: envNumber || '',
-    displayLabel: 'Chat With Myers Global Pathways',
+    isConfigured: true,
+    number: envNumber || '231889425645',
+    formattedNumber: '+231 889425645',
+    altNumber: altNumber,
+    altFormattedNumber: '+91 93478 69324',
+    displayLabel: 'Chat with Myers Global Pathways',
     buttonText: 'CHAT ON WHATSAPP',
-    url: isConfigured 
-      ? `https://wa.me/${envNumber}?text=${encodeURIComponent('Hello Myers Global Pathways, I would like to inquire about studying in India.')}`
-      : 'mailto:admissions@myersglobalpathways.com?subject=WhatsApp%20Admissions%20Inquiry'
+    url: `https://wa.me/${envNumber || '231889425645'}?text=${encodeURIComponent('Hello Myers Global Pathways, I would like to inquire about studying in India.')}`,
+    altUrl: `https://wa.me/${altNumber}?text=${encodeURIComponent('Hello Myers Global Pathways, I would like to inquire about studying in India.')}`
   };
 };
+
+// Comprehensive FAQs (F&Q) for International Students
+export const FAQ_ITEMS: FAQItem[] = [
+  {
+    id: 'faq-requirements',
+    category: 'Admissions',
+    question: 'What are the minimum academic requirements to study in India?',
+    answer: 'For Undergraduate (Bachelor\'s) degrees, students need completed Senior High School certificates (such as WAEC, WASSCE, O-Levels, A-Levels, High School Diploma, or national equivalent) with acceptable passing grades in relevant subjects. For Postgraduate (Master\'s) programs, a recognized Bachelor\'s degree in a related field is required. Our counselors assess your specific transcripts to recommend the best matching institutions.'
+  },
+  {
+    id: 'faq-ielts',
+    category: 'Admissions',
+    question: 'Do I need to take IELTS or TOEFL to apply to universities in India?',
+    answer: 'In most cases, NO. If your previous education was taught in the English language, Indian universities accept an English Medium of Instruction certificate or standard high school English grades. IELTS or TOEFL is not mandatory for the vast majority of international applicants.'
+  },
+  {
+    id: 'faq-courses',
+    category: 'Courses & Universities',
+    question: 'Which popular courses and degree programs are available?',
+    answer: 'Indian universities offer recognized programs across all fields including Engineering (B.Tech/M.Tech in Computer Science, Artificial Intelligence, Cyber Security, Civil, Mechanical, Robotics), Health Sciences (MBBS, B.Sc Nursing, Pharmacy, Medical Lab Technology), Management (BBA, MBA, Finance, Marketing), Information Technology (BCA, MCA, Data Science), Law, Agriculture, and Biotechnology.'
+  },
+  {
+    id: 'faq-costs',
+    category: 'Fees & Living',
+    question: 'How affordable is tuition and the cost of living in India?',
+    answer: 'Tuition fees in India are significantly lower than Western countries, typically ranging from $1,500 to $4,500 USD per academic year depending on the institution and course. Living expenses, including university hostel accommodation and meal plans, typically range between $150 to $250 USD per month.'
+  },
+  {
+    id: 'faq-visa',
+    category: 'Visa & Travel',
+    question: 'How does Myers Global Pathways assist with the Indian Student Visa?',
+    answer: 'Once you receive your official Provisional Admission Letter and Bona Fide Certificate from the university, our team provides step-by-step guidance on preparing the visa documentation dossier, booking the consular appointment at the Indian Embassy or VFS Global center, and fulfilling all immigration prerequisites.'
+  },
+  {
+    id: 'faq-intakes',
+    category: 'Admissions',
+    question: 'When are the university intake periods in India?',
+    answer: 'The primary intake is the Fall/Monsoon semester (starting in July / August / September). A secondary Spring intake (January / February) is also available for selected undergraduate and postgraduate programs. We recommend starting your application 2 to 4 months in advance.'
+  },
+  {
+    id: 'faq-accommodation',
+    category: 'Accommodation & Student Life',
+    question: 'What accommodation options are available on campus?',
+    answer: 'Most partner universities provide dedicated, secure on-campus international hostels with furnished rooms (single, twin-sharing, or AC options), high-speed Wi-Fi, 24/7 security, laundry facilities, and diverse cafeteria options catering to international dietary preferences.'
+  },
+  {
+    id: 'faq-contact-channels',
+    category: 'Student Support',
+    question: 'How can I get in touch with the admissions desk directly?',
+    answer: 'You can email our admissions desk directly at admissions@myersglobalpathways.com, reach us on WhatsApp at +231 889425645 (or alternative +91 93478 69324), or submit your application profile directly on this website for immediate evaluation.'
+  }
+];
+
 
 // 01 to 08 Core Services for Interactive Master-Detail Section
 export const CORE_SERVICES: ServiceItem[] = [

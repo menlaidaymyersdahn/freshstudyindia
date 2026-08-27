@@ -78,3 +78,13 @@ export interface EmailContact {
   email: string;
   purpose: string;
 }
+
+export interface FAQItem {
+  id: string;
+  question: string;
+  answer: string;
+  category: 'Admissions' | 'Courses & Universities' | 'Fees & Living' | 'Visa & Travel' | 'Student Support' | 'Accommodation & Student Life' | string;
+}
+
+export type NavTab = 'home' | 'study-in-india' | 'services' | 'universities' | 'faq' | 'about' | 'contact';
+

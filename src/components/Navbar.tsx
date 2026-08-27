@@ -1,29 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { COMPANY, getWhatsAppConfig } from '../config/company';
+import { NavTab } from '../types';
 import { 
   Menu, 
   X, 
   ArrowUpRight, 
   Compass, 
-  ShieldCheck, 
   UserCheck, 
-  MessageCircle, 
-  Mail, 
-  ChevronRight, 
   GraduationCap, 
   Globe, 
   Sparkles,
-  BookOpen
+  BookOpen,
+  HelpCircle,
+  Mail,
+  Phone
 } from 'lucide-react';
 
 interface NavbarProps {
+  activeTab: NavTab;
+  onSelectTab: (tab: NavTab) => void;
   onOpenApplication: () => void;
   onOpenStudentPortal: () => void;
   onOpenAdminPortal: () => void;
-  activeSection?: string;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
+  activeTab,
+  onSelectTab,
   onOpenApplication,
   onOpenStudentPortal,
   onOpenAdminPortal
@@ -32,13 +35,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const whatsappConfig = getWhatsAppConfig();
 
-  const navLinks = [
-    { label: 'Home', href: '#home', icon: Compass, description: 'Overview & introduction' },
-    { label: 'Study in India', href: '#why-india', icon: Globe, description: 'Academic landscape & benefits' },
-    { label: 'Services', href: '#services', icon: Sparkles, description: 'End-to-end admission guidance' },
-    { label: 'Universities', href: '#explorer', icon: GraduationCap, description: 'Program directory & finder' },
-    { label: 'About', href: '#about', icon: BookOpen, description: 'Our mission & core principles' },
-    { label: 'Contact', href: '#contact', icon: Mail, description: 'Admissions desk & enquiries' },
+  const navLinks: Array<{ id: NavTab; label: string; icon: React.ElementType; description: string }> = [
+    { id: 'home', label: 'Home', icon: Compass, description: 'Overview & introduction' },
+    { id: 'study-in-india', label: 'Study in India', icon: Globe, description: 'Academic landscape & benefits' },
+    { id: 'services', label: 'Services', icon: Sparkles, description: 'Our 8 end-to-end services' },
+    { id: 'universities', label: 'Universities', icon: GraduationCap, description: 'Program directory & finder' },
+    { id: 'faq', label: 'FAQ', icon: HelpCircle, description: 'Frequently asked questions' },
+    { id: 'about', label: 'About', icon: BookOpen, description: 'Our mission & core principles' },
+    { id: 'contact', label: 'Contact', icon: Mail, description: 'Admissions desk & directory' },
   ];
 
   useEffect(() => {
@@ -72,12 +76,10 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleNavClick = (href: string) => {
+  const handleLinkClick = (tabId: NavTab) => {
     setMobileMenuOpen(false);
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    onSelectTab(tabId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -85,86 +87,85 @@ export const Navbar: React.FC<NavbarProps> = ({
       <header 
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled 
-            ? 'bg-[#0A1128]/95 backdrop-blur-md border-b border-slate-800/80 shadow-md py-3' 
-            : 'bg-[#0A1128] border-b border-slate-800/40 py-4.5'
+            ? 'bg-[#0A1128]/95 backdrop-blur-md border-b border-slate-800/90 shadow-lg py-3' 
+            : 'bg-[#0A1128] border-b border-slate-800/60 py-4'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-4">
             
             {/* Brand Logo & Name */}
-            <a 
-              href="#home" 
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('#home');
-              }}
-              className="flex items-center gap-3 group text-left cursor-pointer"
+            <button 
+              onClick={() => handleLinkClick('home')}
+              className="flex items-center gap-3 group text-left cursor-pointer focus:outline-none"
             >
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform duration-200 shrink-0">
                 <Compass className="w-5 h-5 text-slate-950 stroke-[2.2]" />
               </div>
               <div>
-                <span className="block text-base sm:text-lg font-bold tracking-tight text-white group-hover:text-amber-400 transition-colors">
+                <span className="block text-base sm:text-lg font-extrabold tracking-tight text-white group-hover:text-amber-400 transition-colors">
                   {COMPANY.name}
                 </span>
-                <span className="block text-[10px] tracking-wider uppercase font-medium text-slate-400">
+                <span className="block text-[10px] tracking-wider uppercase font-semibold text-amber-400">
                   {COMPANY.tagline}
                 </span>
               </div>
-            </a>
+            </button>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(link.href);
-                  }}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors cursor-pointer"
-                >
-                  {link.label}
-                </a>
-              ))}
+            <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800/80 backdrop-blur-sm">
+              {navLinks.map((link) => {
+                const isActive = activeTab === link.id;
+                return (
+                  <button
+                    key={link.id}
+                    onClick={() => handleLinkClick(link.id)}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition-all cursor-pointer flex items-center gap-1.5 ${
+                      isActive
+                        ? 'bg-amber-400 text-slate-950 shadow-md ring-1 ring-amber-300'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                    }`}
+                  >
+                    <span>{link.label}</span>
+                  </button>
+                );
+              })}
             </nav>
 
             {/* Right Action Buttons */}
-            <div className="hidden md:flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-2.5">
               {/* Student Portal Trigger */}
               <button
                 onClick={onOpenStudentPortal}
-                className="px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/70 border border-slate-700/60 transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer"
                 title="View your submitted application status"
               >
-                <UserCheck className="w-3.5 h-3.5 text-amber-400" />
+                <UserCheck className="w-4 h-4 text-amber-400" />
                 <span>Student Portal</span>
               </button>
 
-              {/* Primary CTA */}
+              {/* Primary CTA (Larger, more prominent button) */}
               <button
                 onClick={onOpenApplication}
-                className="px-4.5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-md shadow-amber-500/20 hover:shadow-amber-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-1.5 cursor-pointer"
+                className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-1.5 cursor-pointer"
               >
-                <span>Start Your Application</span>
+                <span>Start Application</span>
                 <ArrowUpRight className="w-4 h-4 text-slate-950" />
               </button>
             </div>
 
             {/* Mobile Menu & Quick Apply Trigger */}
-            <div className="flex md:hidden items-center gap-2">
+            <div className="flex lg:hidden items-center gap-2">
               <button
                 onClick={onOpenApplication}
-                className="px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 transition-colors cursor-pointer shadow-sm"
+                className="px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 transition-colors cursor-pointer shadow-sm"
               >
                 Apply
               </button>
 
               <button
                 onClick={() => setMobileMenuOpen(true)}
-                className="p-2 rounded-lg text-slate-300 hover:text-white bg-slate-800/80 border border-slate-700/60 transition-colors cursor-pointer"
+                className="p-2.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 border border-slate-700 transition-colors cursor-pointer"
                 aria-label="Open Navigation Menu"
               >
                 <Menu className="w-5 h-5" />
@@ -174,18 +175,18 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </header>
 
-      {/* Refined Slide-Out Mobile Drawer */}
+      {/* Slide-Out Mobile Drawer */}
       <div 
-        className={`fixed inset-0 z-50 md:hidden transition-visibility duration-300 ${
+        className={`fixed inset-0 z-50 lg:hidden transition-visibility duration-300 ${
           mobileMenuOpen ? 'visible pointer-events-auto' : 'invisible pointer-events-none delay-300'
         }`}
         aria-modal="true"
         role="dialog"
       >
-        {/* Backdrop Overlay with Gaussian Blur */}
+        {/* Backdrop Overlay */}
         <div 
           onClick={() => setMobileMenuOpen(false)}
-          className={`fixed inset-0 bg-slate-950/75 backdrop-blur-sm transition-opacity duration-300 ease-out ${
+          className={`fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity duration-300 ease-out ${
             mobileMenuOpen ? 'opacity-100' : 'opacity-0'
           }`}
         />
@@ -197,7 +198,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           }`}
         >
           {/* Top Drawer Header */}
-          <div className="p-4 sm:p-5 border-b border-slate-800/90 flex items-center justify-between bg-slate-900/60 backdrop-blur-md">
+          <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
             <div className="flex items-center gap-2.5 text-left">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-slate-950 shadow-sm shrink-0">
                 <Compass className="w-4.5 h-4.5 stroke-[2.2]" />
@@ -214,7 +215,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2 rounded-xl text-slate-400 hover:text-white bg-slate-800/80 border border-slate-700/80 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-slate-400 hover:text-white bg-slate-800 border border-slate-700 transition-colors cursor-pointer"
               aria-label="Close menu"
             >
               <X className="w-4 h-4" />
@@ -222,155 +223,110 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Drawer Body (Scrollable) */}
-          <div className="flex-1 overflow-y-auto px-4 sm:px-5 py-4 space-y-6 text-left">
+          <div className="flex-1 overflow-y-auto px-4 sm:px-5 py-4 space-y-5 text-left">
             
             {/* Primary Action Button */}
-            <div className="pt-1">
+            <div>
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   onOpenApplication();
                 }}
-                className="w-full py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 transition-all flex items-center justify-between shadow-lg shadow-amber-500/20 cursor-pointer group"
+                className="w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 transition-all flex items-center justify-between shadow-lg shadow-amber-500/20 cursor-pointer"
               >
                 <span>Start Your Application</span>
-                <ArrowUpRight className="w-4 h-4 text-slate-950 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                <ArrowUpRight className="w-4 h-4 text-slate-950" />
               </button>
             </div>
 
             {/* Navigation Section */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-2 mb-2">
-                Main Menu
+                Pages & Portals
               </div>
 
-              <div className="space-y-1">
-                {navLinks.map((link) => {
-                  const Icon = link.icon;
-                  return (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleNavClick(link.href);
-                      }}
-                      className="group flex items-center justify-between p-3 rounded-xl hover:bg-slate-800/80 border border-transparent hover:border-slate-700/60 transition-all cursor-pointer"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-amber-400 group-hover:text-amber-300 group-hover:border-slate-700 shrink-0 transition-colors">
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <span className="block text-xs font-bold text-slate-200 group-hover:text-white transition-colors">
-                            {link.label}
-                          </span>
-                          <span className="block text-[10px] text-slate-400 group-hover:text-slate-300 transition-colors">
-                            {link.description}
-                          </span>
-                        </div>
+              {navLinks.map((link) => {
+                const Icon = link.icon;
+                const isActive = activeTab === link.id;
+                return (
+                  <button
+                    key={link.id}
+                    onClick={() => handleLinkClick(link.id)}
+                    className={`w-full p-3 rounded-xl flex items-center justify-between transition-all cursor-pointer ${
+                      isActive 
+                        ? 'bg-amber-400 text-slate-950 font-bold shadow-md' 
+                        : 'hover:bg-slate-800/80 text-slate-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                        isActive ? 'bg-slate-950 text-amber-400' : 'bg-slate-800 text-slate-300'
+                      }`}>
+                        <Icon className="w-4 h-4" />
                       </div>
-
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all" />
-                    </a>
-                  );
-                })}
-              </div>
+                      <div className="text-left">
+                        <span className="block text-sm leading-snug">{link.label}</span>
+                        <span className={`block text-[11px] font-normal leading-none mt-0.5 ${
+                          isActive ? 'text-slate-800 font-medium' : 'text-slate-400'
+                        }`}>
+                          {link.description}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Portals & Self-Service Section */}
-            <div className="pt-2 border-t border-slate-800/80 space-y-2">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-2">
-                Student & Staff Portals
-              </div>
-
-              <div className="grid grid-cols-1 gap-2">
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    onOpenStudentPortal();
-                  }}
-                  className="w-full p-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-left flex items-center justify-between transition-colors cursor-pointer group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
-                      <UserCheck className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="block text-xs font-bold text-slate-200 group-hover:text-white">
-                        Student Portal
-                      </span>
-                      <span className="block text-[10px] text-slate-400">
-                        Track submitted applications
-                      </span>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-400 transition-colors" />
-                </button>
-
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    onOpenAdminPortal();
-                  }}
-                  className="w-full p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/80 border border-slate-800 text-left flex items-center justify-between transition-colors cursor-pointer group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 shrink-0">
-                      <ShieldCheck className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="block text-xs font-medium text-slate-400 group-hover:text-slate-300">
-                        Admissions Officer Desk
-                      </span>
-                      <span className="block text-[10px] text-slate-400">
-                        Counselor authentication
-                      </span>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                </button>
-              </div>
-            </div>
-
-            {/* Quick Contact Desk */}
-            <div className="pt-2 border-t border-slate-800/80 space-y-2.5">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-2">
-                Admissions Contact Desk
-              </div>
-
-              {whatsappConfig.isConfigured && (
-                <a
-                  href={whatsappConfig.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-colors text-xs font-semibold"
-                >
-                  <MessageCircle className="w-4 h-4 shrink-0" />
-                  <span className="truncate">Chat on WhatsApp Admissions Desk</span>
-                </a>
-              )}
-
-              <a
-                href="mailto:admissions@myersglobalpathways.com"
-                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition-colors text-xs"
+            {/* Student Portal Option in Mobile Drawer */}
+            <div className="pt-2 border-t border-slate-800/80">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenStudentPortal();
+                }}
+                className="w-full p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-400/80 text-slate-200 flex items-center justify-between transition-all cursor-pointer"
               >
-                <Mail className="w-4 h-4 text-amber-400 shrink-0" />
-                <span className="truncate">admissions@myersglobalpathways.com</span>
-              </a>
+                <div className="flex items-center gap-3 text-left">
+                  <div className="w-8 h-8 rounded-lg bg-amber-400/20 text-amber-400 flex items-center justify-center shrink-0">
+                    <UserCheck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="block text-xs font-bold text-white">Student Portal</span>
+                    <span className="block text-[11px] text-slate-400">Track application status</span>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {/* Direct Contact Phone & WhatsApp */}
+            <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 space-y-2">
+              <div className="font-bold text-white flex items-center gap-1.5 text-xs">
+                <Phone className="w-3.5 h-3.5 text-amber-400" />
+                <span>Direct Admissions Desk</span>
+              </div>
+              <p className="text-[11px] text-slate-400">Monrovia, Liberia: <strong className="text-emerald-400">+231 889425645</strong></p>
+              <p className="text-[11px] text-slate-400">India Desk: <strong className="text-slate-200">+91 93478 69324</strong></p>
             </div>
 
           </div>
 
           {/* Drawer Footer */}
-          <div className="p-4 border-t border-slate-800/90 bg-slate-900/80 text-[10px] text-slate-400 text-center flex items-center justify-between">
+          <div className="p-4 border-t border-slate-800 bg-slate-900/90 text-[11px] text-slate-400 flex items-center justify-between">
             <span>© 2026 {COMPANY.shortName}</span>
-            <span className="text-amber-400 font-medium">Study in India</span>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                onOpenAdminPortal();
+              }}
+              className="text-amber-400 hover:underline cursor-pointer"
+            >
+              Admin Portal
+            </button>
           </div>
+
         </div>
       </div>
     </>
   );
 };
-
-

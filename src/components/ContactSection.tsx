@@ -106,63 +106,71 @@ export const ContactSection: React.FC = () => {
           <div className="lg:col-span-6 space-y-6 text-left">
             
             {/* WhatsApp Advisory Box */}
-            <div className="p-6 rounded-2xl bg-[#0A1128] text-white border border-slate-800 shadow-md">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                  <MessageCircle className="w-5 h-5" />
+            <div className="p-6 sm:p-7 rounded-3xl bg-[#0A1128] text-white border border-slate-800 shadow-xl space-y-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <MessageCircle className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">
-                    {whatsappConfig.displayLabel}
+                  <h3 className="text-lg sm:text-xl font-bold text-white">
+                    Direct Admissions WhatsApp Desk
                   </h3>
-                  <p className="text-xs text-slate-400">
-                    Direct communication with our admissions team
+                  <p className="text-xs sm:text-sm text-slate-300">
+                    Real-time consultation with our international education advisors
                   </p>
                 </div>
               </div>
 
-              <p className="text-xs text-slate-300 my-3 leading-relaxed">
-                Connect with our advisors to ask quick questions about university options, application deadlines, and admission procedures.
+              <p className="text-sm text-slate-300 leading-relaxed font-normal">
+                Connect with our team to discuss university selections, admission timelines, document attestation, and Indian student visas.
               </p>
 
-              {whatsappConfig.isConfigured ? (
+              {/* Number Buttons: Primary (+231) and Alternative (+91) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                {/* Primary Number (+231 889425645) */}
                 <a
                   href={whatsappConfig.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-950 bg-emerald-400 hover:bg-emerald-300 transition-colors shadow-sm cursor-pointer"
+                  className="px-4 py-3.5 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-emerald-400 hover:bg-emerald-300 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>{whatsappConfig.buttonText}</span>
+                  <span>Chat: +231 889425645</span>
                 </a>
-              ) : (
-                <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-900/90 px-3.5 py-2.5 rounded-xl border border-slate-800">
-                  <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
-                  <span>WhatsApp Desk: Inquire via <a href="mailto:admissions@myersglobalpathways.com" className="text-amber-400 font-semibold hover:underline">admissions@myersglobalpathways.com</a></span>
-                </div>
-              )}
+
+                {/* Alternative Number (+91 93478 69324) */}
+                <a
+                  href={whatsappConfig.altUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-3.5 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-wider text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <MessageCircle className="w-4 h-4 text-emerald-400" />
+                  <span>Alt: +91 93478 69324</span>
+                </a>
+              </div>
             </div>
 
             {/* Official Email Directory */}
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
-              <div className="border-b border-slate-100 pb-3">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900">
+            <div className="p-6 sm:p-7 rounded-3xl bg-white border border-slate-200 shadow-md space-y-4">
+              <div className="border-b border-slate-100 pb-3.5">
+                <h3 className="text-base sm:text-lg font-bold text-slate-950">
                   Official Email Directory
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Direct departmental communications for international students and partners.
+                <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                  Direct verified departmental mailboxes for international students and institutional partners.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {OFFICIAL_EMAIL_DIRECTORY.map((contact) => (
-                  <div key={contact.email} className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 hover:border-amber-400/80 transition-colors">
-                    <p className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                  <div key={contact.email} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-amber-400 transition-all">
+                    <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                       {contact.department}
                     </p>
                     <a
                       href={`mailto:${contact.email}`}
-                      className="text-xs font-semibold text-amber-800 hover:text-amber-900 hover:underline break-all mt-0.5 block"
+                      className="text-xs sm:text-sm font-semibold text-amber-800 hover:text-amber-900 hover:underline break-all mt-1 block"
                     >
                       {contact.email}
                     </a>
