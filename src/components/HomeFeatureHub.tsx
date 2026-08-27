@@ -1,6 +1,8 @@
 import React from 'react';
 import { NavTab } from '../types';
 import { Globe, Sparkles, GraduationCap, HelpCircle, ArrowUpRight, CheckCircle2, BookOpen, Mail } from 'lucide-react';
+import { motion } from 'motion/react';
+import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem } from './ScrollReveal';
 
 interface HomeFeatureHubProps {
   onSelectTab: (tab: NavTab) => void;
@@ -63,7 +65,7 @@ export const HomeFeatureHub: React.FC<HomeFeatureHubProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 text-left">
+        <ScrollReveal className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 text-left">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-sky-300 text-blue-900 text-xs sm:text-sm font-bold uppercase tracking-wider mb-3 shadow-xs">
               <Sparkles className="w-4 h-4 text-blue-600" />
@@ -86,64 +88,63 @@ export const HomeFeatureHub: React.FC<HomeFeatureHubProps> = ({
               <ArrowUpRight className="w-4 h-4" />
             </button>
           </div>
-        </div>
+        </ScrollReveal>
 
-        {/* Feature Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+        {/* Feature Cards Grid with Staggered Scroll Animation */}
+        <ScrollStaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
           {features.map((item) => {
             const Icon = item.icon;
             return (
-              <div
-                key={item.tab}
-                className="p-7 sm:p-8 rounded-3xl bg-white border border-sky-200 shadow-sm hover:shadow-xl hover:border-blue-400 transition-all duration-300 flex flex-col justify-between group"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-blue-800 bg-sky-50 px-3 py-1 rounded-lg border border-sky-200">
-                      {item.badge}
-                    </span>
-                    <div className={`w-11 h-11 rounded-2xl ${item.iconBg} flex items-center justify-center ${item.iconColor} shadow-xs group-hover:scale-105 transition-transform`}>
-                      <Icon className="w-5 h-5" />
+              <ScrollStaggerItem key={item.tab}>
+                <div className="h-full p-7 sm:p-8 rounded-3xl bg-white border border-sky-200 shadow-sm hover:shadow-xl hover:border-blue-400 transition-all duration-300 flex flex-col justify-between group">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-blue-800 bg-sky-50 px-3 py-1 rounded-lg border border-sky-200">
+                        {item.badge}
+                      </span>
+                      <div className={`w-11 h-11 rounded-2xl ${item.iconBg} flex items-center justify-center ${item.iconColor} shadow-xs group-hover:scale-105 transition-transform`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                    </div>
+
+                    <h3 className="text-xl sm:text-2xl font-extrabold text-slate-950 group-hover:text-blue-700 transition-colors">
+                      {item.title}
+                    </h3>
+
+                    <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+                      {item.description}
+                    </p>
+
+                    <div className="pt-2 space-y-2">
+                      {item.highlights.map((h, i) => (
+                        <div key={i} className="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700">
+                          <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
+                          <span className="font-medium">{h}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  <h3 className="text-xl sm:text-2xl font-extrabold text-slate-950 group-hover:text-blue-700 transition-colors">
-                    {item.title}
-                  </h3>
-
-                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
-                    {item.description}
-                  </p>
-
-                  <div className="pt-2 space-y-2">
-                    {item.highlights.map((h, i) => (
-                      <div key={i} className="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
-                        <span className="font-medium">{h}</span>
-                      </div>
-                    ))}
+                  <div className="pt-6 mt-6 border-t border-sky-100 flex items-center justify-between">
+                    <button
+                      onClick={() => {
+                        onSelectTab(item.tab);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-blue-950 bg-sky-50 hover:bg-blue-600 hover:text-white group-hover:bg-blue-600 group-hover:text-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs border border-sky-200"
+                    >
+                      <span>{item.actionText}</span>
+                      <ArrowUpRight className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
-
-                <div className="pt-6 mt-6 border-t border-sky-100 flex items-center justify-between">
-                  <button
-                    onClick={() => {
-                      onSelectTab(item.tab);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-blue-950 bg-sky-50 hover:bg-blue-600 hover:text-white group-hover:bg-blue-600 group-hover:text-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs border border-sky-200"
-                  >
-                    <span>{item.actionText}</span>
-                    <ArrowUpRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+              </ScrollStaggerItem>
             );
           })}
-        </div>
+        </ScrollStaggerContainer>
 
         {/* Quick Links to About and Contact */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 text-left">
+        <ScrollReveal delay={0.2} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 text-left">
           <button
             onClick={() => {
               onSelectTab('about');
@@ -181,7 +182,7 @@ export const HomeFeatureHub: React.FC<HomeFeatureHubProps> = ({
             </div>
             <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-700 transition-colors" />
           </button>
-        </div>
+        </ScrollReveal>
 
       </div>
     </section>

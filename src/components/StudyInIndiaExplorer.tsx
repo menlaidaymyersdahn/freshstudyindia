@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Filter, BookOpen, Building2, MapPin, GraduationCap, MessageSquare, Info } from 'lucide-react';
+import { ScrollReveal } from './ScrollReveal';
 
 interface StudyInIndiaExplorerProps {
   onOpenApplication: (preset?: { studyLevel?: string; field?: string }) => void;
@@ -37,7 +38,7 @@ export const StudyInIndiaExplorer: React.FC<StudyInIndiaExplorerProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="max-w-3xl mb-12 text-left">
+        <ScrollReveal className="max-w-3xl mb-12 text-left">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white border border-sky-300 text-blue-900 text-xs font-bold uppercase tracking-wider mb-3 shadow-xs">
             <BookOpen className="w-3.5 h-3.5 text-blue-600" />
             <span>Academic Directory</span>
@@ -49,10 +50,10 @@ export const StudyInIndiaExplorer: React.FC<StudyInIndiaExplorerProps> = ({
           <p className="text-sm sm:text-base text-slate-700 mt-2 leading-relaxed font-normal">
             Filter by qualification level and academic discipline to explore potential study pathways with our admissions advisors.
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* Interactive Filter Toolbar */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-white border border-sky-200 shadow-sm space-y-4">
+        <ScrollReveal delay={0.1} className="p-6 sm:p-8 rounded-3xl bg-white border border-sky-200 shadow-sm space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             
             {/* Search Input */}
@@ -125,10 +126,10 @@ export const StudyInIndiaExplorer: React.FC<StudyInIndiaExplorerProps> = ({
               </button>
             ))}
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* Advisory Guidance Box */}
-        <div className="mt-8 p-8 sm:p-12 rounded-3xl bg-white border border-sky-200 text-center max-w-3xl mx-auto shadow-sm">
+        <ScrollReveal delay={0.2} className="mt-8 p-8 sm:p-12 rounded-3xl bg-white border border-sky-200 text-center max-w-3xl mx-auto shadow-sm">
           <div className="w-14 h-14 rounded-2xl bg-blue-100 border border-sky-300 text-blue-700 flex items-center justify-center mx-auto mb-4 shadow-xs">
             <Building2 className="w-7 h-7" />
           </div>
@@ -165,7 +166,7 @@ export const StudyInIndiaExplorer: React.FC<StudyInIndiaExplorerProps> = ({
             <Info className="w-3.5 h-3.5 text-blue-600" />
             <span>Advisors respond with tailored course recommendations based on your transcript.</span>
           </div>
-        </div>
+        </ScrollReveal>
 
       </div>
     </section>

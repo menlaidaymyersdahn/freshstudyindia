@@ -1,6 +1,7 @@
 import React from 'react';
 import { WHY_STUDY_IN_INDIA } from '../config/company';
 import { GraduationCap, Wallet, BookOpen, TrendingUp, Users, Globe, ArrowRight } from 'lucide-react';
+import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem } from './ScrollReveal';
 
 interface WhyStudyInIndiaProps {
   onOpenApplication: () => void;
@@ -27,7 +28,7 @@ export const WhyStudyInIndia: React.FC<WhyStudyInIndiaProps> = ({ onOpenApplicat
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="max-w-3xl mb-14 text-left">
+        <ScrollReveal className="max-w-3xl mb-14 text-left">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white border border-sky-300 text-blue-900 text-xs font-bold uppercase tracking-wider mb-3 shadow-xs">
             <Globe className="w-3.5 h-3.5 text-blue-600" />
             <span>Educational Destination</span>
@@ -38,36 +39,37 @@ export const WhyStudyInIndia: React.FC<WhyStudyInIndiaProps> = ({ onOpenApplicat
           <p className="text-base text-slate-700 mt-3 max-w-2xl leading-relaxed font-normal">
             India offers a compelling combination of academic rigor, accessible living expenses, and an expansive spectrum of recognized degree programs taught in English.
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* Asymmetrical Editorial Composition */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           
           {/* Left Column: Top 3 Core Pillars */}
-          <div className="lg:col-span-4 flex flex-col justify-between space-y-6">
+          <ScrollStaggerContainer className="lg:col-span-4 flex flex-col justify-between space-y-6">
             {primaryPillars.map((pillar) => (
-              <div 
-                key={pillar.id}
-                className="p-6 rounded-2xl bg-white border border-sky-200 hover:border-blue-400 hover:shadow-md transition-all text-left shadow-xs"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2.5 rounded-xl bg-sky-50 border border-sky-200 shrink-0">
-                    {getIcon(pillar.icon)}
+              <ScrollStaggerItem key={pillar.id}>
+                <div 
+                  className="p-6 rounded-2xl bg-white border border-sky-200 hover:border-blue-400 hover:shadow-md transition-all text-left shadow-xs"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2.5 rounded-xl bg-sky-50 border border-sky-200 shrink-0">
+                      {getIcon(pillar.icon)}
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-slate-950">{pillar.title}</h3>
+                      <p className="text-[11px] font-bold text-blue-700">{pillar.subtitle}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-base font-bold text-slate-950">{pillar.title}</h3>
-                    <p className="text-[11px] font-bold text-blue-700">{pillar.subtitle}</p>
-                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed mt-2 font-normal">
+                    {pillar.description}
+                  </p>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed mt-2 font-normal">
-                  {pillar.description}
-                </p>
-              </div>
+              </ScrollStaggerItem>
             ))}
-          </div>
+          </ScrollStaggerContainer>
 
           {/* Center Column: Editorial Campus Photography */}
-          <div className="lg:col-span-4 relative rounded-3xl overflow-hidden border-2 border-white shadow-xl min-h-[380px] flex flex-col justify-end bg-white group">
+          <ScrollReveal delay={0.15} className="lg:col-span-4 relative rounded-3xl overflow-hidden border-2 border-white shadow-xl min-h-[380px] flex flex-col justify-end bg-white group">
             <img 
               src="/DSC_9531.jpeg" 
               alt="Myers Global Pathways international students celebrating academic success"
@@ -95,30 +97,31 @@ export const WhyStudyInIndia: React.FC<WhyStudyInIndiaProps> = ({ onOpenApplicat
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* Right Column: Secondary 3 Pillars */}
-          <div className="lg:col-span-4 flex flex-col justify-between space-y-6">
+          <ScrollStaggerContainer delayChildren={0.2} className="lg:col-span-4 flex flex-col justify-between space-y-6">
             {secondaryPillars.map((pillar) => (
-              <div 
-                key={pillar.id}
-                className="p-6 rounded-2xl bg-white border border-sky-200 hover:border-blue-400 hover:shadow-md transition-all text-left shadow-xs"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2.5 rounded-xl bg-sky-50 border border-sky-200 shrink-0">
-                    {getIcon(pillar.icon)}
+              <ScrollStaggerItem key={pillar.id}>
+                <div 
+                  className="p-6 rounded-2xl bg-white border border-sky-200 hover:border-blue-400 hover:shadow-md transition-all text-left shadow-xs"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2.5 rounded-xl bg-sky-50 border border-sky-200 shrink-0">
+                      {getIcon(pillar.icon)}
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-slate-950">{pillar.title}</h3>
+                      <p className="text-[11px] font-bold text-blue-700">{pillar.subtitle}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-base font-bold text-slate-950">{pillar.title}</h3>
-                    <p className="text-[11px] font-bold text-blue-700">{pillar.subtitle}</p>
-                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed mt-2 font-normal">
+                    {pillar.description}
+                  </p>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed mt-2 font-normal">
-                  {pillar.description}
-                </p>
-              </div>
+              </ScrollStaggerItem>
             ))}
-          </div>
+          </ScrollStaggerContainer>
 
         </div>
 

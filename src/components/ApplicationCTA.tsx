@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowUpRight, MessageSquare, ShieldCheck } from 'lucide-react';
 import { getWhatsAppConfig } from '../config/company';
+import { ScrollReveal } from './ScrollReveal';
 
 interface ApplicationCTAProps {
   onOpenApplication: () => void;
@@ -19,7 +20,7 @@ export const ApplicationCTA: React.FC<ApplicationCTAProps> = ({
       <div className="absolute -top-24 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-24 right-1/4 w-96 h-96 bg-sky-400/20 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      <ScrollReveal className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 border border-white/30 text-amber-300 text-xs font-bold tracking-wide mb-6 backdrop-blur-md">
           <ShieldCheck className="w-4 h-4" />
@@ -52,7 +53,7 @@ export const ApplicationCTA: React.FC<ApplicationCTAProps> = ({
           </button>
         </div>
 
-      </div>
+      </ScrollReveal>
     </section>
   );
 };

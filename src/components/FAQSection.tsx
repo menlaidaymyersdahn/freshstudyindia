@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FAQ_ITEMS } from '../config/company';
 import { HelpCircle, ChevronDown, Sparkles, MessageCircle, ArrowUpRight, Search } from 'lucide-react';
 import { getWhatsAppConfig } from '../config/company';
+import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem } from './ScrollReveal';
 
 interface FAQSectionProps {
   onOpenApplication: () => void;
@@ -23,7 +24,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
     { id: 'Courses & Universities', label: 'Courses & Degrees' },
     { id: 'Fees & Living', label: 'Tuition & Costs' },
     { id: 'Visa & Travel', label: 'Student Visa' },
-    { id: 'Student Support', label: 'Support & Contact' },
+    { id: 'Support & Contact', label: 'Support & Contact' },
   ];
 
   const filteredFaqs = FAQ_ITEMS.filter((item) => {
@@ -43,7 +44,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="max-w-3xl mb-12 text-left">
+        <ScrollReveal className="max-w-3xl mb-12 text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-sky-300 text-blue-900 text-xs sm:text-sm font-bold uppercase tracking-wider mb-3.5 shadow-xs">
             <HelpCircle className="w-4 h-4 text-blue-600" />
             <span>Frequently Asked Questions</span>
@@ -57,10 +58,10 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
           <p className="text-base sm:text-lg text-slate-700 mt-3 max-w-2xl leading-relaxed font-normal">
             Everything you need to know about Indian university admissions, degree programs, student visas, and life on campus.
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* Search & Filter Toolbar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-8">
+        <ScrollReveal delay={0.1} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-8">
           
           {/* Category Chips */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
@@ -90,7 +91,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
               className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-sky-300 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-xs"
             />
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* FAQ Accordion Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -111,53 +112,56 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
                 </button>
               </div>
             ) : (
-              filteredFaqs.map((faq) => {
-                const isOpen = expandedId === faq.id;
-                return (
-                  <div
-                    key={faq.id}
-                    className={`rounded-2xl border transition-all duration-200 bg-white overflow-hidden ${
-                      isOpen
-                        ? 'border-blue-400 shadow-md ring-1 ring-blue-400/30'
-                        : 'border-sky-200 hover:border-sky-300 shadow-xs'
-                    }`}
-                  >
-                    <button
-                      onClick={() => toggleAccordion(faq.id)}
-                      className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none"
-                    >
-                      <div className="space-y-1">
-                        <span className="inline-block text-[11px] font-bold text-blue-700 uppercase tracking-wider">
-                          {faq.category}
-                        </span>
-                        <h3 className="text-base sm:text-lg font-bold text-slate-950 pr-2">
-                          {faq.question}
-                        </h3>
-                      </div>
+              <ScrollStaggerContainer className="space-y-3.5">
+                {filteredFaqs.map((faq) => {
+                  const isOpen = expandedId === faq.id;
+                  return (
+                    <ScrollStaggerItem key={faq.id}>
                       <div
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 ${
-                          isOpen ? 'bg-blue-600 text-white rotate-180' : 'bg-sky-50 text-blue-900 border border-sky-200'
+                        className={`rounded-2xl border transition-all duration-200 bg-white overflow-hidden ${
+                          isOpen
+                            ? 'border-blue-400 shadow-md ring-1 ring-blue-400/30'
+                            : 'border-sky-200 hover:border-sky-300 shadow-xs'
                         }`}
                       >
-                        <ChevronDown className="w-5 h-5" />
-                      </div>
-                    </button>
+                        <button
+                          onClick={() => toggleAccordion(faq.id)}
+                          className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none"
+                        >
+                          <div className="space-y-1">
+                            <span className="inline-block text-[11px] font-bold text-blue-700 uppercase tracking-wider">
+                              {faq.category}
+                            </span>
+                            <h3 className="text-base sm:text-lg font-bold text-slate-950 pr-2">
+                              {faq.question}
+                            </h3>
+                          </div>
+                          <div
+                            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 ${
+                              isOpen ? 'bg-blue-600 text-white rotate-180' : 'bg-sky-50 text-blue-900 border border-sky-200'
+                            }`}
+                          >
+                            <ChevronDown className="w-5 h-5" />
+                          </div>
+                        </button>
 
-                    {isOpen && (
-                      <div className="px-5 sm:px-6 pb-6 pt-1 border-t border-sky-100 animate-fadeIn">
-                        <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-normal">
-                          {faq.answer}
-                        </p>
+                        {isOpen && (
+                          <div className="px-5 sm:px-6 pb-6 pt-1 border-t border-sky-100 animate-fadeIn">
+                            <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-normal">
+                              {faq.answer}
+                            </p>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                );
-              })
+                    </ScrollStaggerItem>
+                  );
+                })}
+              </ScrollStaggerContainer>
             )}
           </div>
 
           {/* Right Callout Box */}
-          <div className="lg:col-span-4 space-y-5 text-left">
+          <ScrollReveal direction="right" delay={0.2} className="lg:col-span-4 space-y-5 text-left">
             <div className="p-6 sm:p-7 rounded-3xl bg-white text-slate-900 border border-sky-300 shadow-lg space-y-4">
               <div className="w-11 h-11 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold shadow-xs">
                 <Sparkles className="w-6 h-6" />
@@ -199,7 +203,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
                 <p>Alternative: <span className="text-slate-900 font-bold">+91 93478 69324</span></p>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
 
         </div>
 

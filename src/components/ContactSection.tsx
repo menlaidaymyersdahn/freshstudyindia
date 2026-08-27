@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { OFFICIAL_EMAIL_DIRECTORY, getWhatsAppConfig } from '../config/company';
 import { Mail, MessageCircle, Send, CheckCircle2, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
+import { ScrollReveal } from './ScrollReveal';
 
 export const ContactSection: React.FC = () => {
   const whatsappConfig = getWhatsAppConfig();
@@ -84,7 +85,7 @@ export const ContactSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="max-w-3xl mb-14 text-left">
+        <ScrollReveal className="max-w-3xl mb-14 text-left">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white border border-sky-300 text-blue-900 text-xs font-bold uppercase tracking-wider mb-3 shadow-xs">
             <Mail className="w-3.5 h-3.5 text-blue-600" />
             <span>Connect With Us</span>
@@ -97,13 +98,13 @@ export const ContactSection: React.FC = () => {
           <p className="text-base text-slate-700 mt-2 max-w-2xl leading-relaxed font-normal">
             Have questions about studying in India? Contact the Myers Global Pathways team and we'll help you understand your next steps.
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* Split-Screen Editorial Contact Experience */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
           
           {/* Left Column: Official Email Directory & WhatsApp Channel */}
-          <div className="lg:col-span-6 space-y-6 text-left">
+          <ScrollReveal direction="left" delay={0.1} className="lg:col-span-6 space-y-6 text-left">
             
             {/* WhatsApp Advisory Box */}
             <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-blue-950 via-blue-900 to-sky-950 text-white border border-sky-400/40 shadow-xl space-y-4">
@@ -179,10 +180,10 @@ export const ContactSection: React.FC = () => {
               </div>
             </div>
 
-          </div>
+          </ScrollReveal>
 
           {/* Right Column: Professional Enquiry Form */}
-          <div className="lg:col-span-6">
+          <ScrollReveal direction="right" delay={0.2} className="lg:col-span-6">
             <div className="p-6 sm:p-8 rounded-3xl bg-white border border-sky-200 shadow-lg text-left">
               
               <div className="border-b border-sky-100 pb-4 mb-6">
@@ -362,7 +363,7 @@ export const ContactSection: React.FC = () => {
               </form>
 
             </div>
-          </div>
+          </ScrollReveal>
 
         </div>
 

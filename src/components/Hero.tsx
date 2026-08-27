@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowUpRight, Compass, CheckCircle2, ShieldCheck, Sparkles, Globe } from 'lucide-react';
+import { motion } from 'motion/react';
 import { getWhatsAppConfig } from '../config/company';
 
 interface HeroProps {
@@ -30,26 +31,46 @@ export const Hero: React.FC<HeroProps> = ({
           {/* Left Column: Editorial Headline & Actions */}
           <div className="lg:col-span-7 space-y-6 text-left">
             {/* Editorial Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 border border-sky-300 text-blue-900 text-xs sm:text-sm font-bold tracking-wide backdrop-blur-sm shadow-xs">
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 border border-sky-300 text-blue-900 text-xs sm:text-sm font-bold tracking-wide backdrop-blur-sm shadow-xs"
+            >
               <Compass className="w-4 h-4 text-blue-600" />
               <span>International Higher Education Consultancy</span>
-            </div>
+            </motion.div>
 
             {/* Main Headline */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-950 leading-[1.12]">
+            <motion.h1
+              initial={{ opacity: 0, y: 25 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-950 leading-[1.12]"
+            >
               Your Pathway to <br className="hidden sm:inline" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-blue-800 to-sky-700">
                 Study in India
               </span>
-            </h1>
+            </motion.h1>
 
             {/* Supporting Text */}
-            <p className="text-base sm:text-lg lg:text-xl text-slate-700 max-w-2xl leading-relaxed font-normal">
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+              className="text-base sm:text-lg lg:text-xl text-slate-700 max-w-2xl leading-relaxed font-normal"
+            >
               Personalized guidance for international students seeking quality higher education, accredited degree opportunities, and a smooth journey to India.
-            </p>
+            </motion.p>
 
             {/* Primary & Secondary Action CTAs */}
-            <div className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3, ease: 'easeOut' }}
+              className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4"
+            >
               <button
                 onClick={onOpenApplication}
                 className="px-7 py-4 rounded-2xl text-sm sm:text-base font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/35 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2.5 cursor-pointer"
@@ -73,10 +94,15 @@ export const Hero: React.FC<HeroProps> = ({
                 <Sparkles className="w-4 h-4 text-blue-600" />
                 <span>Our 8 Services</span>
               </button>
-            </div>
+            </motion.div>
 
             {/* Trust Pillars Checklist */}
-            <div className="pt-4 border-t border-sky-200 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm text-slate-800 font-semibold">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4, ease: 'easeOut' }}
+              className="pt-4 border-t border-sky-200 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm text-slate-800 font-semibold"
+            >
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
                 <span>Personalized Advising</span>
@@ -89,11 +115,16 @@ export const Hero: React.FC<HeroProps> = ({
                 <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
                 <span>End-to-End Visa Support</span>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Right Column: Clean Admissions Overview Card */}
-          <div className="lg:col-span-5 relative">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 25 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.25, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="lg:col-span-5 relative"
+          >
             <div className="relative mx-auto max-w-md lg:max-w-none">
               
               <div className="rounded-3xl border-2 border-white shadow-2xl bg-white p-6 sm:p-8 text-left space-y-6">
@@ -162,7 +193,7 @@ export const Hero: React.FC<HeroProps> = ({
               </div>
 
             </div>
-          </div>
+          </motion.div>
 
         </div>
       </div>

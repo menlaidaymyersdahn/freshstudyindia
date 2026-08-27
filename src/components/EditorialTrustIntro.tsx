@@ -1,5 +1,7 @@
 import React from 'react';
 import { ArrowRight, Compass, CheckCircle2 } from 'lucide-react';
+import { motion } from 'motion/react';
+import { ScrollReveal } from './ScrollReveal';
 
 interface EditorialTrustIntroProps {
   onOpenApplication: () => void;
@@ -15,7 +17,7 @@ export const EditorialTrustIntro: React.FC<EditorialTrustIntroProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="max-w-3xl mb-12 text-left">
+        <ScrollReveal className="max-w-3xl mb-12 text-left">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white border border-sky-300 text-blue-900 text-xs font-bold uppercase tracking-wider mb-4 shadow-xs">
             <Compass className="w-3.5 h-3.5 text-blue-600" />
             <span>Consultancy Overview</span>
@@ -24,13 +26,13 @@ export const EditorialTrustIntro: React.FC<EditorialTrustIntroProps> = ({
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight">
             Your Journey to India Starts With the Right Guidance.
           </h2>
-        </div>
+        </ScrollReveal>
 
         {/* Editorial Split Composition */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           
           {/* Left Column: Structured Advisory Commitments Panel */}
-          <div className="lg:col-span-5 relative order-2 lg:order-1">
+          <ScrollReveal direction="left" delay={0.1} className="lg:col-span-5 relative order-2 lg:order-1">
             <div className="rounded-3xl border-2 border-white shadow-xl bg-white p-6 sm:p-7 text-left space-y-4">
               <div className="border-b border-sky-100 pb-3">
                 <span className="text-[11px] font-extrabold uppercase tracking-wider text-blue-700">
@@ -91,10 +93,10 @@ export const EditorialTrustIntro: React.FC<EditorialTrustIntroProps> = ({
                 </div>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* Right Column: Editorial Narrative & Scope */}
-          <div className="lg:col-span-7 space-y-6 text-left order-1 lg:order-2">
+          <ScrollReveal direction="right" delay={0.2} className="lg:col-span-7 space-y-6 text-left order-1 lg:order-2">
             <p className="text-base sm:text-lg text-slate-700 leading-relaxed">
               Choosing a university and preparing to study in another country can be complicated. International applicants face varying entry prerequisites, unfamiliar academic calendars, documentation formatting standards, and student visa procedures.
             </p>
@@ -105,7 +107,10 @@ export const EditorialTrustIntro: React.FC<EditorialTrustIntroProps> = ({
 
             {/* Core Advisory Breakdown */}
             <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 rounded-2xl bg-white border border-sky-200 shadow-xs">
+              <motion.div 
+                whileHover={{ y: -2 }}
+                className="p-4 rounded-2xl bg-white border border-sky-200 shadow-xs"
+              >
                 <div className="flex items-center gap-2 mb-1.5">
                   <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
                   <h4 className="text-sm font-bold text-slate-900">Program & University Fit</h4>
@@ -113,9 +118,12 @@ export const EditorialTrustIntro: React.FC<EditorialTrustIntroProps> = ({
                 <p className="text-xs text-slate-600 leading-relaxed font-normal">
                   Careful assessment of your academic credentials and budget against recognized degree programs.
                 </p>
-              </div>
+              </motion.div>
 
-              <div className="p-4 rounded-2xl bg-white border border-sky-200 shadow-xs">
+              <motion.div 
+                whileHover={{ y: -2 }}
+                className="p-4 rounded-2xl bg-white border border-sky-200 shadow-xs"
+              >
                 <div className="flex items-center gap-2 mb-1.5">
                   <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
                   <h4 className="text-sm font-bold text-slate-900">Document & Visa Clarity</h4>
@@ -123,7 +131,7 @@ export const EditorialTrustIntro: React.FC<EditorialTrustIntroProps> = ({
                 <p className="text-xs text-slate-600 leading-relaxed font-normal">
                   Detailed checklists for transcript attestation, offer letters, and student visa submissions.
                 </p>
-              </div>
+              </motion.div>
             </div>
 
             {/* Action Buttons */}
@@ -143,7 +151,7 @@ export const EditorialTrustIntro: React.FC<EditorialTrustIntroProps> = ({
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
-          </div>
+          </ScrollReveal>
 
         </div>
       </div>

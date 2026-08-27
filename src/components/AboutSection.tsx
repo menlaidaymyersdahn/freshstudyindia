@@ -1,6 +1,7 @@
 import React from 'react';
 import { CORE_PRINCIPLES } from '../config/company';
 import { Compass, Target, CheckCircle2 } from 'lucide-react';
+import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem } from './ScrollReveal';
 
 export const AboutSection: React.FC = () => {
   return (
@@ -8,7 +9,7 @@ export const AboutSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="max-w-3xl mb-14 text-left">
+        <ScrollReveal className="max-w-3xl mb-14 text-left">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white border border-sky-300 text-blue-900 text-xs font-bold uppercase tracking-wider mb-3 shadow-xs">
             <Compass className="w-3.5 h-3.5 text-blue-600" />
             <span>About Myers Global Pathways</span>
@@ -21,13 +22,13 @@ export const AboutSection: React.FC = () => {
           <p className="text-base text-slate-700 mt-3 leading-relaxed font-normal">
             Myers Global Pathways is an international education consultancy committed to helping international students explore and access higher education opportunities in India through structured, transparent, and personalized advisory.
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* Editorial Split: Mission Highlight + Core Principles */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
           
           {/* Left Column: Our Mission Highlight Card */}
-          <div className="lg:col-span-5 relative">
+          <ScrollReveal direction="left" delay={0.1} className="lg:col-span-5 relative">
             <div className="p-7 sm:p-8 rounded-3xl bg-white border border-sky-200 shadow-lg text-left space-y-5">
               <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-sky-200 text-blue-700 flex items-center justify-center shadow-xs">
                 <Target className="w-6 h-6 text-blue-600" />
@@ -60,27 +61,28 @@ export const AboutSection: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* Right Column: 5 Core Advisory Principles */}
-          <div className="lg:col-span-7 space-y-4 text-left">
+          <ScrollStaggerContainer delayChildren={0.15} className="lg:col-span-7 space-y-4 text-left">
             {CORE_PRINCIPLES.map((principle, index) => (
-              <div 
-                key={principle.title}
-                className="p-5 rounded-2xl bg-white border border-sky-200 hover:border-blue-400 hover:shadow-md transition-all shadow-xs"
-              >
-                <div className="flex items-center gap-3 mb-1.5">
-                  <div className="w-7 h-7 rounded-lg bg-sky-100 border border-sky-200 flex items-center justify-center text-blue-800 text-xs font-bold shrink-0">
-                    0{index + 1}
+              <ScrollStaggerItem key={principle.title}>
+                <div 
+                  className="p-5 rounded-2xl bg-white border border-sky-200 hover:border-blue-400 hover:shadow-md transition-all shadow-xs"
+                >
+                  <div className="flex items-center gap-3 mb-1.5">
+                    <div className="w-7 h-7 rounded-lg bg-sky-100 border border-sky-200 flex items-center justify-center text-blue-800 text-xs font-bold shrink-0">
+                      0{index + 1}
+                    </div>
+                    <h3 className="text-base font-bold text-slate-950">{principle.title}</h3>
                   </div>
-                  <h3 className="text-base font-bold text-slate-950">{principle.title}</h3>
+                  <p className="text-xs sm:text-sm text-slate-600 pl-10 leading-relaxed font-normal">
+                    {principle.description}
+                  </p>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-600 pl-10 leading-relaxed font-normal">
-                  {principle.description}
-                </p>
-              </div>
+              </ScrollStaggerItem>
             ))}
-          </div>
+          </ScrollStaggerContainer>
 
         </div>
 
