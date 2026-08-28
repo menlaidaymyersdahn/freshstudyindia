@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowUpRight, Compass, CheckCircle2, ShieldCheck, Sparkles, Globe } from 'lucide-react';
 import { motion } from 'motion/react';
 import { getWhatsAppConfig } from '../config/company';
+import { CursorRingField } from './CursorRingField';
 
 interface HeroProps {
   onOpenApplication: () => void;
@@ -19,8 +20,20 @@ export const Hero: React.FC<HeroProps> = ({
   return (
     <section 
       id="home" 
-      className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 text-slate-900 overflow-hidden bg-gradient-to-b from-[#CDE2F8] via-[#E2EFFC] to-[#EBF3FC] border-b border-sky-300/60"
+      className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 text-slate-900 overflow-hidden bg-gradient-to-b from-[#CDE2F8]/70 via-[#E2EFFC]/60 to-[#EBF3FC]/80 border-b border-sky-300/60"
     >
+      {/* Interactive Cursor Ring Field Hero Canvas Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-80">
+        <CursorRingField
+          background="transparent"
+          colors={["#0284c7", "#2563eb", "#1d4ed8", "#38bdf8", "#1e3a8a"]}
+          density={300}
+          dotSize={125}
+          speed={6.5}
+          ring={{ push: 60, width: 11, radius: 14, turbulence: 75 }}
+        />
+      </div>
+
       {/* Subtle background ambient lighting */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-sky-400/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />

@@ -91,15 +91,21 @@ function saveEnquiriesToDisk(enquiries: any[]) {
   }
 }
 
-// Initialize server-side Gemini AI client
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  httpOptions: {
-    headers: {
-      'User-Agent': 'aistudio-build',
-    },
-  },
-});
+// Lazy initialization for server-side Gemini AI client
+let geminiClient: GoogleGenAI | null = null;
+function getGeminiClient(): GoogleGenAI | null {
+  if (!geminiClient && process.env.GEMINI_API_KEY) {
+    geminiClient = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        },
+      },
+    });
+  }
+  return geminiClient;
+}
 
 async function startServer() {
   const app = express();
@@ -207,6 +213,64 @@ async function startServer() {
     } catch (err: any) {
       console.error('Error submitting enquiry:', err);
       res.status(500).json({ success: false, error: 'Failed to process enquiry.' });
+    }
+  });
+
+  // 1b. BATCH SYNC LOCAL ENQUIRIES
+  app.post('/api/enquiries/sync-local', (req, res) => {
+    try {
+      const { enquiries: incomingEnquiries = [] } = req.body;
+      if (!Array.isArray(incomingEnquiries) || incomingEnquiries.length === 0) {
+        return res.json({ success: true, syncedCount: 0, message: 'No enquiries to sync' });
+      }
+
+      enquiries = loadEnquiriesFromDisk();
+      let addedCount = 0;
+
+      incomingEnquiries.forEach((item: any) => {
+        if (!item || !item.fullName || !item.email) return;
+
+        const exists = enquiries.some(e => 
+          (item.id && e.id === item.id) ||
+          (e.email?.toLowerCase() === item.email?.toLowerCase() && e.fullName?.toLowerCase() === item.fullName?.toLowerCase() && Math.abs(new Date(e.createdAt || 0).getTime() - new Date(item.createdAt || 0).getTime()) < 60000)
+        );
+
+        if (!exists) {
+          const enquiryId = item.id || `ENQ-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
+          const normalizedEnquiry = {
+            id: enquiryId,
+            fullName: String(item.fullName).trim(),
+            email: String(item.email).trim().toLowerCase(),
+            whatsapp: item.whatsapp ? String(item.whatsapp).trim() : '',
+            country: item.country ? String(item.country).trim() : '',
+            studyInterest: item.studyInterest ? String(item.studyInterest).trim() : '',
+            preferredCourse: item.preferredCourse ? String(item.preferredCourse).trim() : '',
+            preferredUniversity: item.preferredUniversity ? String(item.preferredUniversity).trim() : '',
+            message: item.message ? String(item.message).trim() : '',
+            status: item.status || 'NEW',
+            assignedTo: item.assignedTo || 'admissions@myersglobalpathways.com',
+            createdAt: item.createdAt || new Date().toISOString()
+          };
+
+          enquiries.unshift(normalizedEnquiry);
+          addedCount++;
+        }
+      });
+
+      if (addedCount > 0) {
+        saveEnquiriesToDisk(enquiries);
+        console.log(`[Myers Global Pathways] Synced ${addedCount} enquiry record(s) from client cache.`);
+      }
+
+      res.json({
+        success: true,
+        syncedCount: addedCount,
+        total: enquiries.length,
+        message: `Successfully synchronized ${addedCount} enquiry record(s).`
+      });
+    } catch (err: any) {
+      console.error('Error syncing enquiries:', err);
+      res.status(500).json({ success: false, error: err.message });
     }
   });
 
@@ -1530,6 +1594,14 @@ COMMUNICATION STYLE:
         role: msg.sender === 'user' || msg.role === 'user' ? 'user' : 'model',
         parts: [{ text: msg.text }],
       }));
+
+      const ai = getGeminiClient();
+      if (!ai) {
+        return res.json({
+          reply: "Welcome to Myers Global Pathways! For personalized guidance on studying in India, please contact our admissions team at admissions@myersglobalpathways.com or on WhatsApp at +231 889425645.",
+          timestamp: new Date().toISOString()
+        });
+      }
 
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',

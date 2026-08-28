@@ -18,6 +18,7 @@ import { StudentPortalModal } from './components/StudentPortalModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { WhatsAppFloatingButton } from './components/WhatsAppFloatingButton';
 import { AdmissionsAdvisorChat } from './components/AdmissionsAdvisorChat';
+import { CursorRingField } from './components/CursorRingField';
 import { ServiceItem, NavTab } from './types';
 
 // Map URL hash to Tab
@@ -89,8 +90,20 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#EBF3FC] text-slate-900 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950">
+    <div className="min-h-screen bg-[#EBF3FC] text-slate-900 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950 relative">
       
+      {/* Dynamic Cursor Ring Field Interactive Background */}
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden opacity-60">
+        <CursorRingField
+          background="transparent"
+          colors={["#38bdf8", "#3b82f6", "#1d4ed8", "#60a5fa", "#0369a1"]}
+          density={260}
+          dotSize={115}
+          speed={6}
+          ring={{ push: 45, width: 10, radius: 14, turbulence: 60 }}
+        />
+      </div>
+
       {/* 1. Header Navigation Bar */}
       <Navbar
         activeTab={activeTab}
