@@ -366,7 +366,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         fetchApplications();
         fetchEnquiries();
       } else {
-        setAuthError(data?.error || 'Invalid admissions passkey. (Use: myers2026)');
+        setAuthError(data?.error || 'Invalid admissions passkey. Access denied.');
       }
     } catch (_) {
       if (passcode.trim() === 'myers2026' || passcode.trim() === 'admissions2026') {
@@ -374,19 +374,11 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         fetchApplications();
         fetchEnquiries();
       } else {
-        setAuthError('Authentication service unreachable. Check passkey.');
+        setAuthError('Invalid admissions passkey. Access denied.');
       }
     } finally {
       setIsAuthenticating(false);
     }
-  };
-
-  // Quick Demo Login for instant testing
-  const handleQuickUnlock = () => {
-    setPasscode('myers2026');
-    setIsAuthenticated(true);
-    fetchApplications();
-    fetchEnquiries();
   };
 
   // Fetch real applications from API + merge & sync any client cached applications
