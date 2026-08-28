@@ -6,12 +6,69 @@ export const COMPANY = {
   tagline: 'Your Pathway to Global Education',
   description: 'Personalized guidance for international students seeking quality education, university opportunities, and a smoother journey to India.',
   year: 2026,
-  founder: 'Menlaiday Myers',
+  founder: 'Menlaiday Myers Dahn',
+  founderTitle: 'Founder & Managing Director',
+  founderDegree: 'B.Sc. in Computer Science (Shri Rawatpura Sarkar University, India)',
   primaryWhatsApp: '+231 889425645',
   primaryPhone: '+231 889425645',
   alternativePhone: '+91 93478 69324',
   alternativeWhatsApp: '+91 93478 69324',
   primaryLocation: 'Monrovia, Liberia & Hyderabad, India',
+};
+
+// Founder Full Biography and Background
+export const FOUNDER_PROFILE = {
+  name: 'Menlaiday Myers Dahn',
+  title: 'Founder & CEO, Myers Group of Companies',
+  roles: ['Digital Media Entrepreneur', 'Filmmaker & Visual Producer', 'Technology Professional (B.Sc. CS)', 'International Education Advisor'],
+  university: 'Shri Rawatpura Sarkar University, India',
+  degree: 'Bachelor of Science in Computer Science (Graduated 2026)',
+  audience: '600,000+ Social Media Reach',
+  bioParagraphs: [
+    'Menlaiday Myers Dahn is a Liberian blogger, filmmaker, digital media entrepreneur, and technology professional whose work spans digital media, entertainment, technology, and entrepreneurship. He is best known for his work in digital news and entertainment through Fresh Updates News, a media platform with a combined audience of more than 600,000 followers across social media platforms. Through Fresh Updates News, Menlaiday has built a strong digital presence by covering breaking news, current affairs, entertainment, trending stories, and issues of interest to Liberian and African audiences.',
+    'Beyond digital publishing, Menlaiday has a background in film and visual production. Through Classic Myers Filmwork, he has been involved in filmmaking and music-video production, developing experience in visual storytelling and creative content. His work across blogging, digital media, and film reflects his interest in using modern media platforms to tell stories and reach audiences beyond traditional media.',
+    'In 2026, Menlaiday graduated from Shri Rawatpura Sarkar University in India with a Bachelor of Science in Computer Science, adding a formal technology background to his experience in digital media and creative production. His combination of technology, media, and entrepreneurship has become an important part of his professional journey and the businesses he continues to develop.',
+    'Through these ventures, Menlaiday is building beyond his identity as a blogger and content creator, developing a broader entrepreneurial portfolio that connects media, technology, education, commerce, and digital innovation. His journey from digital media and filmmaking to completing a Computer Science degree and establishing multiple businesses reflects an expanding interest in building digital platforms and businesses that serve African and international audiences.',
+    'Today, Menlaiday Myers Dahn continues to work across media, technology, filmmaking, and entrepreneurship while developing the Myers Group of Companies and its individual ventures. His professional identity is increasingly defined not by one industry, but by the intersection of digital media, technology, creativity, education, and business development.'
+  ],
+  groupCompanies: [
+    {
+      name: 'Myers Global Pathways',
+      category: 'International Education & Student Support',
+      description: 'An international education and student-support company helping students access educational opportunities in India, including university and course selection, admissions, document guidance, scholarship guidance, student visa guidance, accommodation, and pre-departure support.',
+      badge: 'Flagship Education'
+    },
+    {
+      name: 'Fresh Updates News',
+      category: 'Digital News & Media Platform',
+      description: 'The group\'s digital media platform focused on news, entertainment, current affairs, and trending stories, with a combined social-media audience of more than 600,000 followers.',
+      badge: '600k+ Followers'
+    },
+    {
+      name: 'Myers FRESH Technologies',
+      category: 'Technology Solutions & Software',
+      description: 'A technology venture focused on digital products, technology solutions, and innovative online services across modern web and mobile platforms.',
+      badge: 'Tech & Innovation'
+    },
+    {
+      name: 'MyEdRives',
+      category: 'Education & Mobility Tech',
+      description: 'A technology-driven platform focused on driving education and mobility-related services, designed to make access to driving-related learning and services more convenient.',
+      badge: 'Mobility & Learning'
+    },
+    {
+      name: 'Fresh Marketplace',
+      category: 'E-Commerce & Digital Commerce',
+      description: 'An e-commerce and marketplace platform created to connect buyers and sellers and make products and services accessible through a seamless digital marketplace.',
+      badge: 'E-Commerce Hub'
+    },
+    {
+      name: 'Classic Myers Filmwork',
+      category: 'Film & Visual Media Production',
+      description: 'Visual storytelling, film production, creative video direction, and music-video production using modern cinematography.',
+      badge: 'Creative Media'
+    }
+  ]
 };
 
 // Official Myers Global Pathways Email Directory

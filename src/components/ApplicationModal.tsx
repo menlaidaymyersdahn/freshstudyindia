@@ -279,8 +279,8 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                 <p className="text-xl sm:text-2xl font-mono font-extrabold text-slate-950 mt-1 text-amber-700">
                   {submissionResult.trackingId}
                 </p>
-                <p className="text-[11px] text-slate-500 mt-2">
-                  Save this code to check your status in the Student Portal at any time.
+                <p className="text-[11px] text-slate-600 mt-2 leading-relaxed">
+                  Save this code to check your status and <span className="font-bold text-slate-900">upload additional documents</span> (transcripts, certificates, passport) anytime in the Student Portal.
                 </p>
               </div>
 
@@ -498,11 +498,16 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
 
               {/* 3. Document Uploads (Passport, Certificates, Transcripts, Other) */}
               <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                    3. Supporting Documents (Optional at this stage)
-                  </h4>
-                  <span className="text-[11px] text-slate-500">PDF, JPG, PNG (Max 10MB each)</span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-2 gap-1">
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                      3. Supporting Documents (Optional at this stage)
+                    </h4>
+                    <p className="text-[11px] text-emerald-700 font-medium">
+                      ✓ You can attach files now or upload required documents later anytime in the Student Portal.
+                    </p>
+                  </div>
+                  <span className="text-[11px] text-slate-500 font-mono">PDF, JPG, PNG (Max 10MB)</span>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-50 border border-dashed border-slate-300 space-y-3">
@@ -530,7 +535,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                       Click to attach {selectedDocCategory}
                     </span>
                     <span className="text-[10px] text-slate-500">
-                      Select file from your phone or computer
+                      Select file from your phone or computer (or skip to upload later)
                     </span>
                     <input
                       type="file"

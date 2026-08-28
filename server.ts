@@ -886,6 +886,120 @@ async function startServer() {
     }
   });
 
+  // 8a-2. STUDENT LATER DOCUMENT UPLOAD (Add required documents to existing dossier)
+  const handleStudentDocumentUpload = async (req: any, res: any) => {
+    try {
+      const targetParam = (req.params.id || req.body?.trackingId || req.body?.id || req.body?.email || '').trim().toLowerCase();
+      const { documents = [], document, studentNote } = req.body;
+
+      if (!targetParam) {
+        return res.status(400).json({ success: false, error: 'Application Reference or ID is required.' });
+      }
+
+      const incomingDocs = Array.isArray(documents) && documents.length > 0 
+        ? documents 
+        : document 
+        ? [document] 
+        : [];
+
+      if (incomingDocs.length === 0) {
+        return res.status(400).json({ success: false, error: 'No documents provided for upload.' });
+      }
+
+      applications = loadApplicationsFromDisk();
+      const appIndex = applications.findIndex(a => 
+        String(a.id || '').toLowerCase() === targetParam ||
+        String(a.trackingId || '').toLowerCase() === targetParam ||
+        String(a.email || '').toLowerCase() === targetParam
+      );
+
+      if (appIndex === -1) {
+        return res.status(404).json({ success: false, error: 'Application dossier not found. Please verify tracking reference.' });
+      }
+
+      const appItem = applications[appIndex];
+      const processedDocs: any[] = [];
+
+      for (let i = 0; i < incomingDocs.length; i++) {
+        const doc = incomingDocs[i];
+        const docId = doc.id || `doc-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 6)}`;
+        let storedFilePath = '';
+
+        if (doc.dataUrl && typeof doc.dataUrl === 'string') {
+          try {
+            const commaIndex = doc.dataUrl.indexOf(',');
+            if (commaIndex !== -1) {
+              const header = doc.dataUrl.slice(0, commaIndex);
+              const base64Data = doc.dataUrl.slice(commaIndex + 1);
+              let ext = 'pdf';
+              if (header.includes('image/jpeg') || header.includes('image/jpg')) ext = 'jpg';
+              else if (header.includes('image/png')) ext = 'png';
+              else if (header.includes('image/webp')) ext = 'webp';
+              else if (header.includes('application/pdf')) ext = 'pdf';
+              else if (doc.name && doc.name.includes('.')) ext = doc.name.split('.').pop() || 'bin';
+              
+              const filename = `${appItem.id}_${docId}.${ext}`;
+              const fullFilePath = path.join(DOCUMENTS_DIR, filename);
+              fs.writeFileSync(fullFilePath, Buffer.from(base64Data, 'base64'));
+              storedFilePath = filename;
+            }
+          } catch (fileErr) {
+            console.error('Error saving uploaded document file:', fileErr);
+          }
+        }
+
+        const formattedDoc = {
+          id: docId,
+          name: doc.name || `Document_${(appItem.documents?.length || 0) + i + 1}`,
+          size: doc.size || 0,
+          formattedSize: doc.formattedSize || `${((doc.size || 0) / (1024 * 1024)).toFixed(2)} MB`,
+          type: doc.type || 'application/octet-stream',
+          category: doc.category || 'Academic Transcripts',
+          storedFile: storedFilePath || undefined,
+          verified: false,
+          uploadedAt: new Date().toISOString()
+        };
+
+        processedDocs.push(formattedDoc);
+      }
+
+      if (!appItem.documents) {
+        appItem.documents = [];
+      }
+      appItem.documents.push(...processedDocs);
+      appItem.documentsCount = appItem.documents.length;
+      appItem.updatedAt = new Date().toISOString();
+
+      if (!appItem.notes) {
+        appItem.notes = [];
+      }
+      const fileNames = processedDocs.map(d => `${d.name} (${d.category})`).join(', ');
+      appItem.notes.unshift({
+        id: `note-${Date.now()}`,
+        author: 'Student (Portal Upload)',
+        text: `Student uploaded ${processedDocs.length} additional document(s): ${fileNames}.${studentNote ? ` Note: "${studentNote}"` : ''}`,
+        createdAt: new Date().toISOString()
+      });
+
+      saveApplicationsToDisk(applications);
+
+      console.log(`[Myers Global Pathways] ${processedDocs.length} document(s) uploaded for application ${appItem.trackingId} (${appItem.fullName})`);
+
+      res.json({
+        success: true,
+        message: `Successfully uploaded ${processedDocs.length} document(s) to your application dossier.`,
+        application: appItem,
+        uploadedDocuments: processedDocs
+      });
+    } catch (err: any) {
+      console.error('Error handling student document upload:', err);
+      res.status(500).json({ success: false, error: err.message || 'Failed to process document upload' });
+    }
+  };
+
+  app.post('/api/applications/:id/documents', handleStudentDocumentUpload);
+  app.post('/api/student/upload-document', handleStudentDocumentUpload);
+
   // 8b. GET ALL ENQUIRIES (Admin Lead Management)
   app.get('/api/enquiries', (req, res) => {
     try {

@@ -166,7 +166,7 @@ export const HomeFeatureHub: React.FC<HomeFeatureHubProps> = ({
               </div>
               <div>
                 <p className="text-sm font-bold text-slate-950 group-hover:text-blue-700 transition-colors">About Myers Global Pathways</p>
-                <p className="text-xs text-slate-600">Founder Menlaiday Myers & Our Vision</p>
+                <p className="text-xs text-slate-600">Founder Menlaiday Myers Dahn & Vision</p>
               </div>
             </div>
             <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-blue-700 transition-colors" />

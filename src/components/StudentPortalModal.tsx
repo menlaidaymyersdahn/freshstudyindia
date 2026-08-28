@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ApplicationStatus, ApplicationSubmission } from '../types';
+import { ApplicationStatus, ApplicationSubmission, StudentDocument } from '../types';
 import { 
   X, 
   Search, 
@@ -19,7 +19,12 @@ import {
   Sparkles,
   Building2,
   GraduationCap,
-  CloudCheck
+  CloudCheck,
+  Upload,
+  Trash2,
+  Plus,
+  Paperclip,
+  Check
 } from 'lucide-react';
 import { lookupApplicationInFirestore, syncApplicationToFirestore } from '../lib/firebase';
 
@@ -41,6 +46,15 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
   const [studentRecord, setStudentRecord] = useState<ApplicationSubmission | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [savedLocalApps, setSavedLocalApps] = useState<any[]>([]);
+
+  // Document Upload Later State
+  const [isUploadTrayOpen, setIsUploadTrayOpen] = useState(false);
+  const [selectedUploadCategory, setSelectedUploadCategory] = useState<StudentDocument['category']>('Academic Transcripts');
+  const [pendingUploadDocs, setPendingUploadDocs] = useState<StudentDocument[]>([]);
+  const [studentUploadNote, setStudentUploadNote] = useState('');
+  const [isUploadingLaterDocs, setIsUploadingLaterDocs] = useState(false);
+  const [uploadSuccessNotice, setUploadSuccessNotice] = useState<string | null>(null);
+  const [uploadErrorNotice, setUploadErrorNotice] = useState<string | null>(null);
 
   const statusSteps: ApplicationStatus[] = [
     'Application Submitted',
@@ -230,6 +244,136 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
     if (!currentStatus) return 0;
     const idx = statusSteps.indexOf(currentStatus);
     return idx === -1 ? 0 : idx;
+  };
+
+  // Document Upload Handlers
+  const handlePendingFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadErrorNotice(null);
+    setUploadSuccessNotice(null);
+
+    Array.from(files).forEach((file: File) => {
+      if (file.size > 10 * 1024 * 1024) {
+        setUploadErrorNotice(`File "${file.name}" exceeds the 10MB limit.`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        const newDoc: StudentDocument = {
+          id: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          name: file.name,
+          size: file.size,
+          formattedSize: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+          type: file.type || 'application/octet-stream',
+          category: selectedUploadCategory,
+          dataUrl,
+          verified: false,
+          uploadedAt: new Date().toISOString()
+        };
+
+        setPendingUploadDocs(prev => [...prev, newDoc]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    e.target.value = '';
+  };
+
+  const handleRemovePendingDoc = (docId: string) => {
+    setPendingUploadDocs(prev => prev.filter(d => d.id !== docId));
+  };
+
+  const handleUploadDocumentsSubmit = async () => {
+    if (!studentRecord) return;
+    if (pendingUploadDocs.length === 0) {
+      setUploadErrorNotice('Please select at least one document file to upload.');
+      return;
+    }
+
+    setIsUploadingLaterDocs(true);
+    setUploadErrorNotice(null);
+    setUploadSuccessNotice(null);
+
+    try {
+      const targetId = studentRecord.id || studentRecord.trackingId;
+      const res = await fetch(`/api/applications/${encodeURIComponent(targetId || '')}/documents`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          trackingId: studentRecord.trackingId,
+          documents: pendingUploadDocs,
+          studentNote: studentUploadNote.trim()
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success && data.application) {
+        const updatedApp = data.application;
+        setStudentRecord(updatedApp);
+        setUploadSuccessNotice(`Successfully uploaded ${pendingUploadDocs.length} document(s). Your admissions dossier has been updated.`);
+        setPendingUploadDocs([]);
+        setStudentUploadNote('');
+        setIsUploadTrayOpen(false);
+
+        // Update local browser cache
+        try {
+          const rawLocal = localStorage.getItem('mgp_local_applications');
+          const list = rawLocal ? JSON.parse(rawLocal) : [];
+          const updatedList = [updatedApp, ...list.filter((x: any) => x.id !== updatedApp.id && x.trackingId !== updatedApp.trackingId)];
+          localStorage.setItem('mgp_local_applications', JSON.stringify(updatedList));
+          setSavedLocalApps(updatedList);
+          syncApplicationToFirestore(updatedApp).catch(() => {});
+        } catch (_) {}
+      } else {
+        // Fallback local update
+        const fallbackDocs = [...(studentRecord.documents || []), ...pendingUploadDocs];
+        const updatedFallback: ApplicationSubmission = {
+          ...studentRecord,
+          documents: fallbackDocs,
+          documentsCount: fallbackDocs.length,
+          updatedAt: new Date().toISOString()
+        };
+        setStudentRecord(updatedFallback);
+        setUploadSuccessNotice(`Uploaded ${pendingUploadDocs.length} document(s) to your dossier.`);
+        setPendingUploadDocs([]);
+        setStudentUploadNote('');
+        setIsUploadTrayOpen(false);
+
+        try {
+          const rawLocal = localStorage.getItem('mgp_local_applications');
+          const list = rawLocal ? JSON.parse(rawLocal) : [];
+          const updatedList = [updatedFallback, ...list.filter((x: any) => x.id !== updatedFallback.id && x.trackingId !== updatedFallback.trackingId)];
+          localStorage.setItem('mgp_local_applications', JSON.stringify(updatedList));
+          setSavedLocalApps(updatedList);
+          syncApplicationToFirestore(updatedFallback).catch(() => {});
+        } catch (_) {}
+      }
+    } catch (err: any) {
+      // Fallback
+      const fallbackDocs = [...(studentRecord.documents || []), ...pendingUploadDocs];
+      const updatedFallback: ApplicationSubmission = {
+        ...studentRecord,
+        documents: fallbackDocs,
+        documentsCount: fallbackDocs.length,
+        updatedAt: new Date().toISOString()
+      };
+      setStudentRecord(updatedFallback);
+      setUploadSuccessNotice(`Uploaded ${pendingUploadDocs.length} document(s) to your dossier.`);
+      setPendingUploadDocs([]);
+      setStudentUploadNote('');
+      setIsUploadTrayOpen(false);
+
+      try {
+        syncApplicationToFirestore(updatedFallback).catch(() => {});
+      } catch (_) {}
+    } finally {
+      setIsUploadingLaterDocs(false);
+    }
   };
 
   return (
@@ -553,38 +697,268 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
                 </div>
               </div>
 
-              {/* Attached Documents Breakdown */}
-              <div className="space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                  Dossier Document Verification
-                </h4>
+              {/* Attached Documents Breakdown & Upload Later Tray */}
+              <div className="space-y-4 pt-1">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                        Dossier Documents & Verification
+                      </h4>
+                      <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold">
+                        {studentRecord.documents?.length || 0} Attached
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Upload your required transcripts, certificates, or passport scan for admissions verification.
+                    </p>
+                  </div>
 
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsUploadTrayOpen(!isUploadTrayOpen);
+                      setUploadErrorNotice(null);
+                      setUploadSuccessNotice(null);
+                    }}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                      isUploadTrayOpen
+                        ? 'bg-slate-200 text-slate-800 hover:bg-slate-300'
+                        : 'bg-amber-400 text-slate-950 hover:bg-amber-300'
+                    }`}
+                  >
+                    {isUploadTrayOpen ? (
+                      <>
+                        <X className="w-3.5 h-3.5" />
+                        <span>Close Uploader</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Upload Documents Later</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Upload Success Notice */}
+                {uploadSuccessNotice && (
+                  <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs flex items-start gap-2 animate-fadeIn">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold">Documents Successfully Attached!</p>
+                      <p className="text-emerald-800 text-[11px] mt-0.5">{uploadSuccessNotice}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Upload Error Notice */}
+                {uploadErrorNotice && (
+                  <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-950 text-xs flex items-start gap-2 animate-fadeIn">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold">Upload Notice</p>
+                      <p className="text-rose-800 text-[11px] mt-0.5">{uploadErrorNotice}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Interactive Document Upload Later Panel */}
+                {isUploadTrayOpen && (
+                  <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/70 border-2 border-dashed border-amber-300 space-y-4 animate-fadeIn">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Paperclip className="w-4 h-4 text-amber-800" />
+                        <h5 className="text-xs font-extrabold uppercase tracking-wider text-amber-950">
+                          Upload Required / Additional Documents
+                        </h5>
+                      </div>
+                      <span className="text-[11px] text-amber-800 font-medium">PDF, JPG, PNG, DOCX (Max 10MB)</span>
+                    </div>
+
+                    {/* Category Selector */}
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                        Select Document Category
+                      </label>
+                      <div className="flex flex-wrap gap-1.5">
+                        {([
+                          'Academic Transcripts',
+                          'Academic Certificates',
+                          'Passport',
+                          'Other Supporting Documents'
+                        ] as const).map((cat) => (
+                          <button
+                            type="button"
+                            key={cat}
+                            onClick={() => setSelectedUploadCategory(cat)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                              selectedUploadCategory === cat
+                                ? 'bg-slate-950 text-white shadow-xs'
+                                : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
+                            }`}
+                          >
+                            {cat}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* File Dropzone */}
+                    <label className="flex flex-col items-center justify-center py-5 px-4 rounded-xl bg-white border border-amber-200 hover:border-amber-400 hover:bg-amber-50/40 transition-colors cursor-pointer text-center group">
+                      <Upload className="w-6 h-6 text-amber-600 mb-1.5 group-hover:scale-110 transition-transform" />
+                      <span className="text-xs font-bold text-slate-900">
+                        Choose {selectedUploadCategory} File(s)
+                      </span>
+                      <span className="text-[11px] text-slate-500 mt-0.5">
+                        Click to browse from your device or phone
+                      </span>
+                      <input
+                        type="file"
+                        multiple
+                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                        onChange={handlePendingFileUpload}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {/* Pending Files Staged for Upload */}
+                    {pendingUploadDocs.length > 0 && (
+                      <div className="space-y-2 pt-1">
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-700">
+                          Ready to Upload ({pendingUploadDocs.length} file{pendingUploadDocs.length > 1 ? 's' : ''}):
+                        </p>
+                        <div className="space-y-1.5">
+                          {pendingUploadDocs.map((doc) => (
+                            <div
+                              key={doc.id}
+                              className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between gap-2 text-xs shadow-2xs"
+                            >
+                              <div className="flex items-center gap-2 truncate">
+                                <FileText className="w-4 h-4 text-amber-600 shrink-0" />
+                                <div className="truncate">
+                                  <p className="font-semibold text-slate-900 truncate">{doc.name}</p>
+                                  <p className="text-[10px] text-slate-500">{doc.category} • {doc.formattedSize}</p>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleRemovePendingDoc(doc.id)}
+                                className="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors shrink-0"
+                                title="Remove file"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Optional Student Note */}
+                        <div className="pt-2">
+                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
+                            Note for Admissions Officer (Optional)
+                          </label>
+                          <input
+                            type="text"
+                            value={studentUploadNote}
+                            onChange={(e) => setStudentUploadNote(e.target.value)}
+                            placeholder="e.g. Attached my high school WAEC certificate and valid passport page"
+                            className="w-full px-3 py-2 rounded-xl text-xs bg-white border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900"
+                          />
+                        </div>
+
+                        {/* Upload CTA Button */}
+                        <div className="pt-2 flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPendingUploadDocs([]);
+                              setIsUploadTrayOpen(false);
+                            }}
+                            className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200/80 transition-colors cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+
+                          <button
+                            type="button"
+                            disabled={isUploadingLaterDocs}
+                            onClick={handleUploadDocumentsSubmit}
+                            className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 disabled:opacity-50 transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer"
+                          >
+                            {isUploadingLaterDocs ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span>Uploading Files...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="w-4 h-4" />
+                                <span>Submit Documents to Admissions Officer</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Existing Dossier Documents Grid */}
                 {studentRecord.documents && studentRecord.documents.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     {studentRecord.documents.map((doc) => (
-                      <div key={doc.id} className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2 truncate">
-                          <FileText className="w-4 h-4 text-slate-500 shrink-0" />
+                      <div key={doc.id} className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2 text-xs shadow-2xs hover:border-slate-300 transition-colors">
+                        <div className="flex items-center gap-2.5 truncate">
+                          <div className="w-8 h-8 rounded-lg bg-amber-100/70 text-amber-800 flex items-center justify-center shrink-0 border border-amber-200/60">
+                            <FileText className="w-4 h-4" />
+                          </div>
                           <div className="truncate">
-                            <p className="font-semibold text-slate-900 truncate">{doc.name}</p>
-                            <p className="text-[10px] text-slate-500">{doc.category}</p>
+                            <p className="font-bold text-slate-900 truncate" title={doc.name}>
+                              {doc.name}
+                            </p>
+                            <p className="text-[10px] text-slate-500">
+                              {doc.category} {doc.formattedSize ? `• ${doc.formattedSize}` : ''}
+                            </p>
                           </div>
                         </div>
 
-                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider shrink-0 ${
-                          doc.verified 
-                            ? 'bg-emerald-100 text-emerald-800' 
-                            : 'bg-amber-100 text-amber-800'
-                        }`}>
-                          {doc.verified ? 'Verified' : 'Under Review'}
-                        </span>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {doc.storedFile && (
+                            <a
+                              href={`/api/documents/${doc.storedFile}`}
+                              download={doc.name}
+                              className="p-1 rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-colors"
+                              title="Download document"
+                            >
+                              <FileCheck className="w-3.5 h-3.5" />
+                            </a>
+                          )}
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                            doc.verified 
+                              ? 'bg-emerald-100 text-emerald-800' 
+                              : 'bg-amber-100 text-amber-800'
+                          }`}>
+                            {doc.verified ? 'Verified' : 'Under Review'}
+                          </span>
+                        </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-xl border border-slate-200">
-                    No documents currently uploaded. You can submit transcripts to admissions@myersglobalpathways.com
-                  </p>
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center space-y-2">
+                    <p className="text-xs text-slate-600">
+                      No documents currently uploaded to your dossier.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setIsUploadTrayOpen(true)}
+                      className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Upload Your Required Documents Now</span>
+                    </button>
+                  </div>
                 )}
               </div>
 

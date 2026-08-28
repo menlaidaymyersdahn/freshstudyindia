@@ -275,7 +275,7 @@ export function App() {
               badge="Our Vision & Leadership"
               title="About Myers Global"
               highlightedWord="Pathways"
-              description="Founded by Menlaiday Myers, Myers Global Pathways provides personalized, transparent guidance for international students pursuing higher education in India."
+              description="Founded by Menlaiday Myers Dahn (B.Sc. Computer Science, India), Myers Global Pathways provides personalized, transparent guidance for international students pursuing higher education in India."
               currentPage="About Us"
               onNavigateHome={() => handleSelectTab('home')}
               onOpenApplication={() => handleOpenApplication()}
