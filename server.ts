@@ -1,6 +1,8 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
+import * as archiverModule from 'archiver';
+const archiver: any = (archiverModule as any).default || archiverModule;
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
@@ -1640,6 +1642,59 @@ async function startServer() {
       res.status(500).json({ success: false, error: err.message });
     }
   });
+
+  // 9b. WORDPRESS THEME DOWNLOAD / EXPORT ENDPOINT (.ZIP)
+  const handleWordPressThemeDownload = (req: express.Request, res: express.Response) => {
+    try {
+      const publicZip = path.join(process.cwd(), 'public', 'myers-global-pathways-theme.zip');
+      if (fs.existsSync(publicZip)) {
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Content-Disposition', 'attachment; filename="myers-global-pathways-theme.zip"');
+        return res.sendFile(publicZip);
+      }
+
+      const themeDir = path.join(process.cwd(), 'wordpress-theme', 'myers-global-pathways');
+
+      if (!fs.existsSync(themeDir)) {
+        return res.status(404).json({
+          success: false,
+          error: 'WordPress theme source directory not found.'
+        });
+      }
+
+      const createZip = (options = { zlib: { level: 9 } }) => {
+        if (typeof archiver === 'function') return archiver('zip', options);
+        if ((archiver as any).ZipArchive) return new (archiver as any).ZipArchive(options);
+        if ((archiver as any).default && typeof (archiver as any).default === 'function') return (archiver as any).default('zip', options);
+        throw new Error('Archiver initialization failed.');
+      };
+
+      const archive = createZip();
+
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader('Content-Disposition', 'attachment; filename="myers-global-pathways-theme.zip"');
+      res.setHeader('Cache-Control', 'no-cache');
+
+      archive.on('error', (err: any) => {
+        console.error('Archiver error:', err);
+        if (!res.headersSent) {
+          res.status(500).json({ success: false, error: err.message });
+        }
+      });
+
+      archive.pipe(res);
+      archive.directory(themeDir, 'myers-global-pathways');
+      archive.finalize();
+    } catch (err: any) {
+      console.error('WordPress theme export failed:', err);
+      if (!res.headersSent) {
+        res.status(500).json({ success: false, error: 'Failed to generate theme zip package.' });
+      }
+    }
+  };
+
+  app.get('/api/download-wordpress-theme', handleWordPressThemeDownload);
+  app.get('/api/export-wordpress-theme', handleWordPressThemeDownload);
 
   // 10. GEMINI ADMISSIONS ADVISORY ENDPOINT
   app.post('/api/gemini/chat', async (req, res) => {

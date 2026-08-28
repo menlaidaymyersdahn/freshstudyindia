@@ -1,36 +1,36 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { COMPANY, OFFICIAL_EMAIL_DIRECTORY, getWhatsAppConfig } from '../config/company';
-import { NavTab } from '../types';
-import { Compass, MessageCircle, ArrowUpRight, ShieldCheck } from 'lucide-react';
+import { Compass, MessageCircle, ArrowUpRight, ShieldCheck, UserCheck } from 'lucide-react';
 
 interface FooterProps {
-  onSelectTab: (tab: NavTab) => void;
-  onOpenApplication: () => void;
-  onOpenStudentPortal: () => void;
-  onOpenAdminPortal: () => void;
+  onOpenApplication?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({
-  onSelectTab,
-  onOpenApplication,
-  onOpenStudentPortal,
-  onOpenAdminPortal
-}) => {
+export const Footer: React.FC<FooterProps> = ({ onOpenApplication }) => {
+  const navigate = useNavigate();
   const whatsappConfig = getWhatsAppConfig();
 
-  const quickLinks: Array<{ label: string; tab: NavTab }> = [
-    { label: 'Home', tab: 'home' },
-    { label: 'Study in India', tab: 'study-in-india' },
-    { label: 'Services', tab: 'services' },
-    { label: 'Universities', tab: 'universities' },
-    { label: 'FAQ', tab: 'faq' },
-    { label: 'About', tab: 'about' },
-    { label: 'Contact', tab: 'contact' },
+  const quickLinks: Array<{ label: string; path: string }> = [
+    { label: 'Home', path: '/' },
+    { label: 'Study in India', path: '/study-in-india' },
+    { label: 'Services', path: '/services' },
+    { label: 'Universities', path: '/universities' },
+    { label: 'FAQ', path: '/faq' },
+    { label: 'About', path: '/about' },
+    { label: 'Contact', path: '/contact' },
   ];
 
-  const handleLinkClick = (tab: NavTab) => {
-    onSelectTab(tab);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleNavigate = (path: string) => {
+    navigate(path);
+  };
+
+  const handleApplyClick = () => {
+    if (onOpenApplication) {
+      onOpenApplication();
+    } else {
+      navigate('/apply');
+    }
   };
 
   return (
@@ -62,7 +62,7 @@ export const Footer: React.FC<FooterProps> = ({
 
             <div className="pt-2">
               <button
-                onClick={onOpenApplication}
+                onClick={handleApplyClick}
                 className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-md"
               >
                 <span>Start Your Application</span>
@@ -78,9 +78,9 @@ export const Footer: React.FC<FooterProps> = ({
             </h4>
             <ul className="space-y-2 text-xs text-slate-700 font-medium">
               {quickLinks.map((link) => (
-                <li key={link.label}>
+                <li key={link.path}>
                   <button
-                    onClick={() => handleLinkClick(link.tab)}
+                    onClick={() => handleNavigate(link.path)}
                     className="hover:text-blue-900 transition-colors cursor-pointer block py-0.5 text-left"
                   >
                     {link.label}
@@ -89,11 +89,11 @@ export const Footer: React.FC<FooterProps> = ({
               ))}
               <li className="pt-2 border-t border-sky-300/80">
                 <button
-                  onClick={onOpenStudentPortal}
+                  onClick={() => handleNavigate('/student-portal')}
                   className="hover:text-blue-900 transition-colors cursor-pointer text-left py-0.5 font-bold text-blue-800 flex items-center gap-1"
                 >
+                  <UserCheck className="w-3.5 h-3.5 text-blue-700" />
                   <span>Student Portal (Track Application)</span>
-                  <ArrowUpRight className="w-3 h-3 text-blue-700" />
                 </button>
               </li>
             </ul>
@@ -141,7 +141,7 @@ export const Footer: React.FC<FooterProps> = ({
 
           <div className="flex items-center gap-4">
             <button
-              onClick={onOpenAdminPortal}
+              onClick={() => handleNavigate('/admin')}
               className="text-slate-600 hover:text-blue-900 transition-colors text-[11px] flex items-center gap-1 cursor-pointer font-semibold"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-blue-700" />
@@ -154,3 +154,5 @@ export const Footer: React.FC<FooterProps> = ({
     </footer>
   );
 };
+
+export default Footer;

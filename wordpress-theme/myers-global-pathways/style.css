@@ -1,0 +1,59 @@
+/*
+Theme Name: Myers Global Pathways
+Theme URI: https://myersglobalpathways.com
+Author: Menlaiday Myers Dahn
+Author URI: https://myersglobalpathways.com/about
+Description: Official WordPress theme for Myers Global Pathways — an international education consultancy helping students access higher education, admissions, scholarships, and student visas in India. Built by Menlaiday Myers Dahn (B.Sc. Computer Science, SRSU India).
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.7
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: myers-global-pathways
+Tags: education, university, study-abroad, consultancy, modern, responsive-layout, custom-menu, custom-logo, featured-images, translation-ready
+*/
+
+/* Reset & Base Variables */
+:root {
+  --primary-navy: #0A192F;
+  --navy-deep: #020C1B;
+  --accent-gold: #F59E0B;
+  --accent-gold-light: #FBBF24;
+  --sky-light: #EBF3FD;
+  --sky-mid: #DCEAFC;
+  --sky-border: #BAE6FD;
+  --slate-text: #334155;
+  --slate-dark: #0F172A;
+  --emerald-success: #059669;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--slate-dark);
+  background-color: #F8FAFC;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}

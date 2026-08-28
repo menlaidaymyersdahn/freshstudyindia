@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { COMPANY, getWhatsAppConfig } from '../config/company';
-import { NavTab } from '../types';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { COMPANY } from '../config/company';
 import { 
   Menu, 
   X, 
@@ -19,32 +19,23 @@ import {
 import { StarfieldButton } from './StarfieldButton';
 
 interface NavbarProps {
-  activeTab: NavTab;
-  onSelectTab: (tab: NavTab) => void;
-  onOpenApplication: () => void;
-  onOpenStudentPortal: () => void;
-  onOpenAdminPortal: () => void;
+  onOpenApplication?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({
-  activeTab,
-  onSelectTab,
-  onOpenApplication,
-  onOpenStudentPortal,
-  onOpenAdminPortal
-}) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const whatsappConfig = getWhatsAppConfig();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const navLinks: Array<{ id: NavTab; label: string; icon: React.ElementType; description: string }> = [
-    { id: 'home', label: 'Home', icon: Compass, description: 'Overview & introduction' },
-    { id: 'study-in-india', label: 'Study in India', icon: Globe, description: 'Academic landscape & benefits' },
-    { id: 'services', label: 'Services', icon: Sparkles, description: 'Our 8 end-to-end services' },
-    { id: 'universities', label: 'Universities', icon: GraduationCap, description: 'Program directory & finder' },
-    { id: 'faq', label: 'FAQ', icon: HelpCircle, description: 'Frequently asked questions' },
-    { id: 'about', label: 'About', icon: BookOpen, description: 'Our mission & core principles' },
-    { id: 'contact', label: 'Contact', icon: Mail, description: 'Admissions desk & directory' },
+  const navLinks: Array<{ path: string; label: string; icon: React.ElementType; description: string }> = [
+    { path: '/', label: 'Home', icon: Compass, description: 'Overview & introduction' },
+    { path: '/study-in-india', label: 'Study in India', icon: Globe, description: 'Academic landscape & benefits' },
+    { path: '/services', label: 'Services', icon: Sparkles, description: 'Our 8 end-to-end services' },
+    { path: '/universities', label: 'Universities', icon: GraduationCap, description: 'Program directory & finder' },
+    { path: '/faq', label: 'FAQ', icon: HelpCircle, description: 'Frequently asked questions' },
+    { path: '/about', label: 'About', icon: BookOpen, description: 'Our mission & core principles' },
+    { path: '/contact', label: 'Contact', icon: Mail, description: 'Admissions desk & directory' },
   ];
 
   useEffect(() => {
@@ -78,10 +69,25 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleLinkClick = (tabId: NavTab) => {
+  const handleNavigate = (path: string) => {
     setMobileMenuOpen(false);
-    onSelectTab(tabId);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate(path);
+  };
+
+  const handleApplyClick = () => {
+    setMobileMenuOpen(false);
+    if (onOpenApplication) {
+      onOpenApplication();
+    } else {
+      navigate('/apply');
+    }
+  };
+
+  const isCurrentPath = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
   };
 
   return (
@@ -98,7 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             
             {/* Brand Logo & Name */}
             <button 
-              onClick={() => handleLinkClick('home')}
+              onClick={() => handleNavigate('/')}
               className="flex items-center gap-3 group text-left cursor-pointer focus:outline-none"
             >
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform duration-200 shrink-0">
@@ -117,11 +123,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Desktop Navigation Links */}
             <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 bg-white/80 p-1.5 rounded-2xl border border-sky-200 shadow-xs backdrop-blur-sm">
               {navLinks.map((link) => {
-                const isActive = activeTab === link.id;
+                const isActive = isCurrentPath(link.path);
                 return (
                   <button
-                    key={link.id}
-                    onClick={() => handleLinkClick(link.id)}
+                    key={link.path}
+                    onClick={() => handleNavigate(link.path)}
                     className={`px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition-all cursor-pointer flex items-center gap-1.5 ${
                       isActive
                         ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-500'
@@ -138,8 +144,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="hidden md:flex items-center gap-2">
               {/* Admin Portal Trigger */}
               <button
-                onClick={onOpenAdminPortal}
-                className="px-3 py-2 rounded-xl text-xs font-bold text-slate-800 bg-white/80 hover:bg-white hover:text-blue-900 border border-sky-300 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                onClick={() => handleNavigate('/admin')}
+                className={`px-3 py-2 rounded-xl text-xs font-bold border shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer ${
+                  location.pathname === '/admin'
+                    ? 'bg-amber-500 text-slate-950 border-amber-600 shadow-sm'
+                    : 'text-slate-800 bg-white/80 hover:bg-white hover:text-blue-900 border-sky-300'
+                }`}
                 title="Admissions Staff & Admin Portal"
               >
                 <ShieldCheck className="w-4 h-4 text-amber-600" />
@@ -148,8 +158,12 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               {/* Student Portal Trigger */}
               <button
-                onClick={onOpenStudentPortal}
-                className="px-3.5 py-2 rounded-xl text-xs font-bold text-blue-900 bg-white/90 hover:bg-white border border-sky-300 shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                onClick={() => handleNavigate('/student-portal')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold border shadow-xs transition-all flex items-center gap-1.5 cursor-pointer ${
+                  location.pathname === '/student-portal'
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                    : 'text-blue-900 bg-white/90 hover:bg-white border-sky-300'
+                }`}
                 title="View your submitted application status"
               >
                 <UserCheck className="w-4 h-4 text-blue-600" />
@@ -158,7 +172,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               {/* Primary CTA Button */}
               <StarfieldButton
-                onClick={onOpenApplication}
+                onClick={handleApplyClick}
                 fill="#f59e0b"
                 textColor="#0f172a"
                 padding="10px 18px"
@@ -176,7 +190,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Mobile Menu & Quick Apply Trigger */}
             <div className="flex lg:hidden items-center gap-2">
               <button
-                onClick={onOpenApplication}
+                onClick={handleApplyClick}
                 className="px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 transition-colors cursor-pointer shadow-xs"
               >
                 Apply
@@ -244,17 +258,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Drawer Body (Scrollable) */}
           <div className="flex-1 overflow-y-auto px-4 sm:px-5 py-4 space-y-5 text-left">
             
-            {/* Primary Action Button */}
+            {/* Primary Action Button (Prominent Orange/Gold CTA at the Top) */}
             <div>
               <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenApplication();
-                }}
-                className="w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 transition-all flex items-center justify-between shadow-md shadow-amber-500/20 cursor-pointer"
+                onClick={handleApplyClick}
+                className="w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 transition-all flex items-center justify-between shadow-md shadow-amber-500/25 cursor-pointer"
               >
                 <span>Start Your Application</span>
-                <ArrowUpRight className="w-4 h-4 text-slate-950" />
+                <ArrowUpRight className="w-4 h-4 text-slate-950 stroke-[2.5]" />
               </button>
             </div>
 
@@ -266,11 +277,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               {navLinks.map((link) => {
                 const Icon = link.icon;
-                const isActive = activeTab === link.id;
+                const isActive = isCurrentPath(link.path);
                 return (
                   <button
-                    key={link.id}
-                    onClick={() => handleLinkClick(link.id)}
+                    key={link.path}
+                    onClick={() => handleNavigate(link.path)}
                     className={`w-full p-3 rounded-xl flex items-center justify-between transition-all cursor-pointer ${
                       isActive 
                         ? 'bg-blue-600 text-white font-bold shadow-sm' 
@@ -297,32 +308,42 @@ export const Navbar: React.FC<NavbarProps> = ({
               })}
             </div>
 
-            {/* Student & Admin Portal Options in Mobile Drawer */}
-            <div className="pt-2 border-t border-sky-200 space-y-2">
+            {/* Student & Admin Portal Options (Visually Separated) */}
+            <div className="pt-3 border-t border-sky-200 space-y-2">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-2">
+                Restricted & Authenticated Access
+              </div>
+
               <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenStudentPortal();
-                }}
-                className="w-full p-3 rounded-xl bg-white border border-sky-300 hover:border-blue-500 text-slate-800 flex items-center justify-between transition-all cursor-pointer shadow-xs"
+                onClick={() => handleNavigate('/student-portal')}
+                className={`w-full p-3 rounded-xl border flex items-center justify-between transition-all cursor-pointer shadow-xs ${
+                  location.pathname === '/student-portal'
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white border-sky-300 hover:border-blue-500 text-slate-800'
+                }`}
               >
                 <div className="flex items-center gap-3 text-left">
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                    location.pathname === '/student-portal' ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-700'
+                  }`}>
                     <UserCheck className="w-4 h-4" />
                   </div>
                   <div>
-                    <span className="block text-xs font-bold text-slate-900">Student Portal</span>
-                    <span className="block text-[11px] text-slate-500">Track application status</span>
+                    <span className="block text-xs font-bold">Student Portal</span>
+                    <span className={`block text-[11px] ${location.pathname === '/student-portal' ? 'text-blue-100' : 'text-slate-500'}`}>
+                      Track application status & letters
+                    </span>
                   </div>
                 </div>
               </button>
 
               <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenAdminPortal();
-                }}
-                className="w-full p-3 rounded-xl bg-amber-50 border border-amber-300 hover:border-amber-500 text-slate-900 flex items-center justify-between transition-all cursor-pointer shadow-xs"
+                onClick={() => handleNavigate('/admin')}
+                className={`w-full p-3 rounded-xl border flex items-center justify-between transition-all cursor-pointer shadow-xs ${
+                  location.pathname === '/admin'
+                    ? 'bg-amber-500 text-slate-950 border-amber-600 font-bold'
+                    : 'bg-amber-50/80 border-amber-300 hover:border-amber-500 text-slate-900'
+                }`}
               >
                 <div className="flex items-center gap-3 text-left">
                   <div className="w-8 h-8 rounded-lg bg-amber-200 text-amber-900 flex items-center justify-center shrink-0">
@@ -330,7 +351,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                   <div>
                     <span className="block text-xs font-bold text-slate-950">Admissions Admin Portal</span>
-                    <span className="block text-[11px] text-amber-800">Manage, contact & approve students</span>
+                    <span className="block text-[11px] text-amber-800 font-medium">Manage, review & approve students</span>
                   </div>
                 </div>
               </button>
@@ -352,10 +373,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="p-4 border-t border-sky-200 bg-white/80 text-[11px] text-slate-500 flex items-center justify-between">
             <span>© 2026 {COMPANY.shortName}</span>
             <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenAdminPortal();
-              }}
+              onClick={() => handleNavigate('/admin')}
               className="text-blue-700 hover:underline font-semibold cursor-pointer"
             >
               Admin Portal
@@ -367,3 +385,5 @@ export const Navbar: React.FC<NavbarProps> = ({
     </>
   );
 };
+
+export default Navbar;
