@@ -2,6 +2,7 @@ import React from 'react';
 import { APPLICATION_JOURNEY } from '../config/company';
 import { ArrowUpRight, CheckCircle, Compass } from 'lucide-react';
 import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem, TextScrollReveal } from './ScrollReveal';
+import { StarfieldButton } from './StarfieldButton';
 
 interface ApplicationJourneyProps {
   onOpenApplication: () => void;
@@ -81,13 +82,20 @@ export const ApplicationJourney: React.FC<ApplicationJourneyProps> = ({ onOpenAp
             </p>
           </div>
 
-          <button
+          <StarfieldButton
             onClick={onOpenApplication}
-            className="shrink-0 px-6 py-3 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+            fill="#f59e0b"
+            textColor="#0f172a"
+            padding="12px 22px"
+            rounded={100}
+            glow={{ color: '#fbbf24', size: 14, opacity: 100 }}
+            stroke={{ color: '#d97706', size: 75, count: 2, speed: 60, movement: 'continuous', direction: 'cw', thickness: 2 }}
+            pixel={{ color: '#b45309', size: 3, density: 50, brightness: 100 }}
+            border={{ borderColor: 'rgba(217, 119, 6, 0.4)', borderWidth: 1.5, borderStyle: 'solid' }}
           >
-            <span>Begin Step 01</span>
-            <ArrowUpRight className="w-4 h-4" />
-          </button>
+            <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">Begin Step 01</span>
+            <ArrowUpRight className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+          </StarfieldButton>
         </ScrollReveal>
 
       </div>

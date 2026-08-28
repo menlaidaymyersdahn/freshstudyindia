@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Filter, BookOpen, Building2, MapPin, GraduationCap, MessageSquare, Info } from 'lucide-react';
 import { ScrollReveal } from './ScrollReveal';
+import { StarfieldButton } from './StarfieldButton';
 
 interface StudyInIndiaExplorerProps {
   onOpenApplication: (preset?: { studyLevel?: string; field?: string }) => void;
@@ -143,23 +144,37 @@ export const StudyInIndiaExplorer: React.FC<StudyInIndiaExplorerProps> = ({
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <button
+            <StarfieldButton
               onClick={onContactAdmissions}
-              className="px-6 py-3 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+              fill="#f59e0b"
+              textColor="#0f172a"
+              padding="12px 22px"
+              rounded={100}
+              glow={{ color: '#fbbf24', size: 14, opacity: 100 }}
+              stroke={{ color: '#d97706', size: 75, count: 2, speed: 60, movement: 'continuous', direction: 'cw', thickness: 2 }}
+              pixel={{ color: '#b45309', size: 3, density: 50, brightness: 100 }}
+              border={{ borderColor: 'rgba(217, 119, 6, 0.4)', borderWidth: 1.5, borderStyle: 'solid' }}
             >
-              <MessageSquare className="w-4 h-4" />
-              <span>Talk to Admissions</span>
-            </button>
+              <MessageSquare className="w-4 h-4 text-slate-950" />
+              <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">Talk to Admissions</span>
+            </StarfieldButton>
 
-            <button
+            <StarfieldButton
               onClick={() => onOpenApplication({
                 studyLevel: selectedLevel !== 'All Levels' ? selectedLevel : undefined,
                 field: selectedField !== 'All Disciplines' ? selectedField : undefined
               })}
-              className="px-5 py-3 rounded-xl text-xs sm:text-sm font-bold text-blue-950 hover:bg-sky-50 border border-sky-300 transition-colors cursor-pointer bg-white"
+              fill="#ffffff"
+              textColor="#0f172a"
+              padding="12px 20px"
+              rounded={100}
+              glow={{ color: '#38bdf8', size: 12, opacity: 85 }}
+              stroke={{ color: '#38bdf8', size: 65, count: 1, speed: 45, movement: 'continuous', direction: 'cw', thickness: 1.5 }}
+              pixel={{ color: '#38bdf8', size: 3, density: 40, brightness: 90 }}
+              border={{ borderColor: 'rgba(125, 211, 252, 0.8)', borderWidth: 1.5, borderStyle: 'solid' }}
             >
-              Submit Profile for Evaluation
-            </button>
+              <span className="text-xs sm:text-sm font-bold tracking-wide">Submit Profile for Evaluation</span>
+            </StarfieldButton>
           </div>
 
           <div className="mt-6 pt-6 border-t border-sky-100 flex items-center justify-center gap-2 text-xs text-slate-500 font-medium">

@@ -16,6 +16,7 @@ import {
   Phone,
   ShieldCheck
 } from 'lucide-react';
+import { StarfieldButton } from './StarfieldButton';
 
 interface NavbarProps {
   activeTab: NavTab;
@@ -156,13 +157,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
 
               {/* Primary CTA Button */}
-              <button
+              <StarfieldButton
                 onClick={onOpenApplication}
-                className="px-4.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-md shadow-amber-500/20 hover:shadow-amber-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-1.5 cursor-pointer"
+                fill="#f59e0b"
+                textColor="#0f172a"
+                padding="10px 18px"
+                rounded={100}
+                glow={{ color: '#fbbf24', size: 14, opacity: 100 }}
+                stroke={{ color: '#d97706', size: 70, count: 2, speed: 60, movement: 'continuous', direction: 'cw', thickness: 2 }}
+                pixel={{ color: '#b45309', size: 3, density: 50, brightness: 100 }}
+                border={{ borderColor: 'rgba(217, 119, 6, 0.4)', borderWidth: 1.5, borderStyle: 'solid' }}
               >
-                <span>Start Application</span>
-                <ArrowUpRight className="w-4 h-4 text-slate-950" />
-              </button>
+                <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">Start Application</span>
+                <ArrowUpRight className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+              </StarfieldButton>
             </div>
 
             {/* Mobile Menu & Quick Apply Trigger */}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowUpRight, ChevronRight, Compass } from 'lucide-react';
 import { motion } from 'motion/react';
+import { StarfieldButton } from './StarfieldButton';
 
 interface PageHeaderProps {
   badge: string;
@@ -95,13 +96,20 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             transition={{ duration: 0.5, delay: 0.2 }}
             className="shrink-0 pt-2 lg:pt-0"
           >
-            <button
+            <StarfieldButton
               onClick={onOpenApplication}
-              className="px-6 py-3.5 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-md shadow-amber-500/20 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 cursor-pointer"
+              fill="#f59e0b"
+              textColor="#0f172a"
+              padding="12px 22px"
+              rounded={100}
+              glow={{ color: '#fbbf24', size: 14, opacity: 100 }}
+              stroke={{ color: '#d97706', size: 75, count: 2, speed: 60, movement: 'continuous', direction: 'cw', thickness: 2 }}
+              pixel={{ color: '#b45309', size: 3, density: 50, brightness: 100 }}
+              border={{ borderColor: 'rgba(217, 119, 6, 0.4)', borderWidth: 1.5, borderStyle: 'solid' }}
             >
-              <span>Start Application</span>
-              <ArrowUpRight className="w-4 h-4 text-slate-950" />
-            </button>
+              <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">Start Application</span>
+              <ArrowUpRight className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+            </StarfieldButton>
           </motion.div>
         </div>
       </div>

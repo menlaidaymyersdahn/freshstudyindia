@@ -3,6 +3,7 @@ import { ArrowUpRight, Compass, CheckCircle2, ShieldCheck, Sparkles, Globe } fro
 import { motion } from 'motion/react';
 import { getWhatsAppConfig } from '../config/company';
 import { CursorRingField } from './CursorRingField';
+import { StarfieldButton } from './StarfieldButton';
 
 interface HeroProps {
   onOpenApplication: () => void;
@@ -84,29 +85,50 @@ export const Hero: React.FC<HeroProps> = ({
               transition={{ duration: 0.6, delay: 0.3, ease: 'easeOut' }}
               className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4"
             >
-              <button
+              <StarfieldButton
                 onClick={onOpenApplication}
-                className="px-7 py-4 rounded-2xl text-sm sm:text-base font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/35 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2.5 cursor-pointer"
+                fill="#f59e0b"
+                textColor="#0f172a"
+                padding="14px 26px"
+                rounded={100}
+                glow={{ color: '#fbbf24', size: 16, opacity: 100 }}
+                stroke={{ color: '#d97706', size: 90, count: 2, speed: 60, movement: 'continuous', direction: 'cw', thickness: 2 }}
+                pixel={{ color: '#b45309', size: 4, density: 60, brightness: 100 }}
+                border={{ borderColor: 'rgba(217, 119, 6, 0.4)', borderWidth: 1.5, borderStyle: 'solid' }}
               >
-                <span>Start Your Application</span>
-                <ArrowUpRight className="w-5 h-5 text-slate-950" />
-              </button>
+                <span className="text-sm sm:text-base font-extrabold uppercase tracking-wider">Start Your Application</span>
+                <ArrowUpRight className="w-5 h-5 text-slate-950 stroke-[2.5]" />
+              </StarfieldButton>
 
-              <button
+              <StarfieldButton
                 onClick={onExploreStudyInIndia}
-                className="px-5 py-4 rounded-2xl text-xs sm:text-sm font-bold tracking-wide text-blue-950 bg-white/90 hover:bg-white border border-sky-300 shadow-xs backdrop-blur-sm transition-all flex items-center gap-2 cursor-pointer hover:border-blue-500"
+                fill="#ffffff"
+                textColor="#0f172a"
+                padding="12px 20px"
+                rounded={100}
+                glow={{ color: '#38bdf8', size: 12, opacity: 85 }}
+                stroke={{ color: '#38bdf8', size: 70, count: 1, speed: 45, movement: 'continuous', direction: 'cw', thickness: 1.5 }}
+                pixel={{ color: '#38bdf8', size: 3, density: 40, brightness: 90 }}
+                border={{ borderColor: 'rgba(125, 211, 252, 0.8)', borderWidth: 1.5, borderStyle: 'solid' }}
               >
                 <Globe className="w-4 h-4 text-blue-600" />
-                <span>Study in India</span>
-              </button>
+                <span className="text-xs sm:text-sm font-bold tracking-wide">Study in India</span>
+              </StarfieldButton>
 
-              <button
+              <StarfieldButton
                 onClick={onExploreServices}
-                className="px-5 py-4 rounded-2xl text-xs sm:text-sm font-bold tracking-wide text-blue-950 bg-white/90 hover:bg-white border border-sky-300 shadow-xs backdrop-blur-sm transition-all flex items-center gap-2 cursor-pointer hover:border-blue-500"
+                fill="#ffffff"
+                textColor="#0f172a"
+                padding="12px 20px"
+                rounded={100}
+                glow={{ color: '#38bdf8', size: 12, opacity: 85 }}
+                stroke={{ color: '#38bdf8', size: 70, count: 1, speed: 45, movement: 'continuous', direction: 'cw', thickness: 1.5 }}
+                pixel={{ color: '#38bdf8', size: 3, density: 40, brightness: 90 }}
+                border={{ borderColor: 'rgba(125, 211, 252, 0.8)', borderWidth: 1.5, borderStyle: 'solid' }}
               >
                 <Sparkles className="w-4 h-4 text-blue-600" />
-                <span>Our 8 Services</span>
-              </button>
+                <span className="text-xs sm:text-sm font-bold tracking-wide">Our 8 Services</span>
+              </StarfieldButton>
             </motion.div>
 
             {/* Trust Pillars Checklist */}

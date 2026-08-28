@@ -3,6 +3,7 @@ import { NavTab } from '../types';
 import { Globe, Sparkles, GraduationCap, HelpCircle, ArrowUpRight, CheckCircle2, BookOpen, Mail } from 'lucide-react';
 import { motion } from 'motion/react';
 import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem, TextScrollReveal } from './ScrollReveal';
+import { StarfieldButton } from './StarfieldButton';
 
 interface HomeFeatureHubProps {
   onSelectTab: (tab: NavTab) => void;
@@ -80,13 +81,20 @@ export const HomeFeatureHub: React.FC<HomeFeatureHubProps> = ({
           </div>
 
           <div className="shrink-0">
-            <button
+            <StarfieldButton
               onClick={onOpenApplication}
-              className="px-6 py-3.5 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-md shadow-amber-500/20 transition-all flex items-center gap-2 cursor-pointer"
+              fill="#f59e0b"
+              textColor="#0f172a"
+              padding="12px 22px"
+              rounded={100}
+              glow={{ color: '#fbbf24', size: 14, opacity: 100 }}
+              stroke={{ color: '#d97706', size: 75, count: 2, speed: 60, movement: 'continuous', direction: 'cw', thickness: 2 }}
+              pixel={{ color: '#b45309', size: 3, density: 50, brightness: 100 }}
+              border={{ borderColor: 'rgba(217, 119, 6, 0.4)', borderWidth: 1.5, borderStyle: 'solid' }}
             >
-              <span>Apply Directly</span>
-              <ArrowUpRight className="w-4 h-4" />
-            </button>
+              <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">Apply Directly</span>
+              <ArrowUpRight className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+            </StarfieldButton>
           </div>
         </ScrollReveal>
 

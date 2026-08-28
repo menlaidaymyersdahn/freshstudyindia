@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowUpRight, MessageSquare, ShieldCheck } from 'lucide-react';
 import { getWhatsAppConfig } from '../config/company';
 import { ScrollReveal } from './ScrollReveal';
+import { StarfieldButton } from './StarfieldButton';
 
 interface ApplicationCTAProps {
   onOpenApplication: () => void;
@@ -36,21 +37,35 @@ export const ApplicationCTA: React.FC<ApplicationCTAProps> = ({
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <button
+          <StarfieldButton
             onClick={onOpenApplication}
-            className="px-8 py-4 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-xl shadow-amber-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2.5 cursor-pointer"
+            fill="#f59e0b"
+            textColor="#0f172a"
+            padding="14px 28px"
+            rounded={100}
+            glow={{ color: '#fbbf24', size: 16, opacity: 100 }}
+            stroke={{ color: '#d97706', size: 90, count: 2, speed: 60, movement: 'continuous', direction: 'cw', thickness: 2 }}
+            pixel={{ color: '#b45309', size: 4, density: 60, brightness: 100 }}
+            border={{ borderColor: 'rgba(217, 119, 6, 0.5)', borderWidth: 1.5, borderStyle: 'solid' }}
           >
-            <span>Start Your Application</span>
-            <ArrowUpRight className="w-4 h-4 text-slate-950" />
-          </button>
+            <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">Start Your Application</span>
+            <ArrowUpRight className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+          </StarfieldButton>
 
-          <button
+          <StarfieldButton
             onClick={onContactClick}
-            className="px-7 py-4 rounded-2xl text-xs sm:text-sm font-bold tracking-wide text-white bg-white/10 hover:bg-white/20 border border-white/30 backdrop-blur-sm transition-colors flex items-center gap-2 cursor-pointer"
+            fill="rgba(255, 255, 255, 0.12)"
+            textColor="#ffffff"
+            padding="14px 24px"
+            rounded={100}
+            glow={{ color: '#38bdf8', size: 14, opacity: 90 }}
+            stroke={{ color: '#38bdf8', size: 70, count: 1, speed: 50, movement: 'continuous', direction: 'cw', thickness: 1.5 }}
+            pixel={{ color: '#38bdf8', size: 3, density: 45, brightness: 90 }}
+            border={{ borderColor: 'rgba(255, 255, 255, 0.3)', borderWidth: 1.5, borderStyle: 'solid' }}
           >
             <MessageSquare className="w-4 h-4 text-blue-200" />
-            <span>Speak With an Advisor</span>
-          </button>
+            <span className="text-xs sm:text-sm font-bold tracking-wide">Speak With an Advisor</span>
+          </StarfieldButton>
         </div>
 
       </ScrollReveal>

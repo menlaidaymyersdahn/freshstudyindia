@@ -4,6 +4,7 @@ import { ServiceItem } from '../types';
 import { ArrowUpRight, CheckCircle2, ChevronRight, Sparkles, Layers, Grid } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem, TextScrollReveal } from './ScrollReveal';
+import { StarfieldButton } from './StarfieldButton';
 
 interface ServicesSectionProps {
   onOpenApplication: (service?: ServiceItem) => void;
@@ -161,13 +162,20 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onOpenApplicat
                     <span className="text-xs sm:text-sm text-slate-600 font-medium">
                       Ready to proceed with this service?
                     </span>
-                    <button
+                    <StarfieldButton
                       onClick={() => onOpenApplication(activeService)}
-                      className="px-6 py-3.5 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-500 shadow-md shadow-amber-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      fill="#f59e0b"
+                      textColor="#0f172a"
+                      padding="12px 22px"
+                      rounded={100}
+                      glow={{ color: '#fbbf24', size: 14, opacity: 100 }}
+                      stroke={{ color: '#d97706', size: 75, count: 2, speed: 60, movement: 'continuous', direction: 'cw', thickness: 2 }}
+                      pixel={{ color: '#b45309', size: 3, density: 50, brightness: 100 }}
+                      border={{ borderColor: 'rgba(217, 119, 6, 0.4)', borderWidth: 1.5, borderStyle: 'solid' }}
                     >
-                      <span>Apply for {activeService.title}</span>
-                      <ArrowUpRight className="w-4 h-4" />
-                    </button>
+                      <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wider">Apply for {activeService.title}</span>
+                      <ArrowUpRight className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+                    </StarfieldButton>
                   </div>
 
                 </motion.div>
@@ -211,14 +219,21 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onOpenApplicat
                     </div>
                   </div>
 
-                  <div className="pt-5 mt-4 border-t border-sky-100">
-                    <button
+                  <div className="pt-5 mt-4 border-t border-sky-100 flex justify-center">
+                    <StarfieldButton
                       onClick={() => onOpenApplication(service)}
-                      className="w-full py-2.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                      fill="#f59e0b"
+                      textColor="#0f172a"
+                      padding="10px 18px"
+                      rounded={100}
+                      glow={{ color: '#fbbf24', size: 10, opacity: 90 }}
+                      stroke={{ color: '#d97706', size: 50, count: 1, speed: 50, movement: 'continuous', direction: 'cw', thickness: 1.5 }}
+                      pixel={{ color: '#b45309', size: 2.5, density: 40, brightness: 100 }}
+                      border={{ borderColor: 'rgba(217, 119, 6, 0.4)', borderWidth: 1, borderStyle: 'solid' }}
                     >
-                      <span>Select Service</span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
-                    </button>
+                      <span className="text-xs font-bold uppercase tracking-wider">Select Service</span>
+                      <ArrowUpRight className="w-3.5 h-3.5 text-slate-950 stroke-[2.5]" />
+                    </StarfieldButton>
                   </div>
                 </div>
               </ScrollStaggerItem>
