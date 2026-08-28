@@ -54,8 +54,12 @@ import {
   Sliders,
   CheckCircle,
   KeyRound,
-  LogOut
+  LogOut,
+  TrendingUp,
+  BarChart2,
+  PieChart
 } from 'lucide-react';
+import { ApplicationsAnalyticsChart } from './ApplicationsAnalyticsChart';
 
 interface AdminDashboardModalProps {
   isOpen: boolean;
@@ -73,8 +77,9 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   const [authError, setAuthError] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  // Active Admin View Tab: 'applications' | 'enquiries' | 'approvals'
-  const [adminTab, setAdminTab] = useState<'applications' | 'enquiries' | 'approvals'>('applications');
+  // Active Admin View Tab: 'applications' | 'enquiries' | 'approvals' | 'analytics'
+  const [adminTab, setAdminTab] = useState<'applications' | 'enquiries' | 'approvals' | 'analytics'>('applications');
+  const [showChartInApplicationsTab, setShowChartInApplicationsTab] = useState(true);
 
   // Applications State
   const [applications, setApplications] = useState<ApplicationSubmission[]>([]);
@@ -1706,6 +1711,23 @@ Website: https://myersglobalpathways.com`;
                       {applications.filter(a => a.status === 'Admission Decision' || a.status === 'Ready for India' || a.admissionDetails?.offerLetterIssued).length}
                     </span>
                   </button>
+
+                  <button
+                    onClick={() => { setAdminTab('analytics'); setSelectedAppDossier(null); }}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                      adminTab === 'analytics'
+                        ? 'bg-blue-700 text-white shadow-sm'
+                        : 'text-slate-700 hover:text-slate-950 hover:bg-slate-100'
+                    }`}
+                  >
+                    <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                    <span>30-Day Velocity & Analytics</span>
+                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                      adminTab === 'analytics' ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      30D
+                    </span>
+                  </button>
                 </div>
 
                 {/* Real-time Quick Stats Cards */}
@@ -1777,7 +1799,30 @@ Website: https://myersglobalpathways.com`;
               {/* TAB 1: ALL STUDENT APPLICATIONS */}
               {/* ===================================================================== */}
               {adminTab === 'applications' && (
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                <div className="space-y-5">
+                  
+                  {/* Integrated 30-Day Applications Chart (with toggle control) */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <TrendingUp className="w-4 h-4 text-blue-600" />
+                        <span>Student Intake & Application Trends</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowChartInApplicationsTab(!showChartInApplicationsTab)}
+                        className="text-[11px] font-semibold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 transition-colors cursor-pointer"
+                      >
+                        {showChartInApplicationsTab ? 'Hide 30-Day Chart' : 'Show 30-Day Chart'}
+                      </button>
+                    </div>
+
+                    {showChartInApplicationsTab && (
+                      <ApplicationsAnalyticsChart applications={applications} />
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                   
                   {/* Left Column: Applications Master List */}
                   <div className={`space-y-2.5 ${selectedAppDossier ? 'lg:col-span-6' : 'lg:col-span-12'}`}>
@@ -2659,6 +2704,7 @@ Website: https://myersglobalpathways.com`;
                     </div>
                   )}
 
+                  </div>
                 </div>
               )}
 
@@ -2891,6 +2937,144 @@ Website: https://myersglobalpathways.com`;
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ===================================================================== */}
+              {/* TAB 4: 30-DAY ANALYTICS & APPLICATION RECHARTS DASHBOARD */}
+              {/* ===================================================================== */}
+              {adminTab === 'analytics' && (
+                <div className="space-y-6 animate-fadeIn">
+                  {/* Full Recharts 30-Day Velocity Component */}
+                  <ApplicationsAnalyticsChart applications={applications} />
+
+                  {/* Summary Breakdown Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+                    {/* Qualification Level Breakdown */}
+                    <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h5 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                          <BarChart2 className="w-4 h-4 text-blue-600" />
+                          <span>Intake by Degree Level</span>
+                        </h5>
+                        <span className="text-[10px] font-bold text-slate-400">Total: {applications.length}</span>
+                      </div>
+                      <div className="space-y-2">
+                        {(() => {
+                          const ug = applications.filter(a => (a.preferredStudyLevel || '').toLowerCase().includes('undergraduate') || (a.preferredStudyLevel || '').toLowerCase().includes('bachelor')).length;
+                          const pg = applications.filter(a => (a.preferredStudyLevel || '').toLowerCase().includes('postgraduate') || (a.preferredStudyLevel || '').toLowerCase().includes('master')).length;
+                          const other = Math.max(0, applications.length - ug - pg);
+                          const ugPct = applications.length ? Math.round((ug / applications.length) * 100) : 0;
+                          const pgPct = applications.length ? Math.round((pg / applications.length) * 100) : 0;
+                          const othPct = applications.length ? Math.round((other / applications.length) * 100) : 0;
+
+                          return (
+                            <>
+                              <div className="space-y-1">
+                                <div className="flex justify-between text-xs font-semibold text-slate-700">
+                                  <span>Undergraduate (Bachelor's)</span>
+                                  <span>{ug} ({ugPct}%)</span>
+                                </div>
+                                <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                                  <div className="h-full bg-blue-600 rounded-full" style={{ width: `${ugPct}%` }} />
+                                </div>
+                              </div>
+
+                              <div className="space-y-1">
+                                <div className="flex justify-between text-xs font-semibold text-slate-700">
+                                  <span>Postgraduate (Master's)</span>
+                                  <span>{pg} ({pgPct}%)</span>
+                                </div>
+                                <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                                  <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${pgPct}%` }} />
+                                </div>
+                              </div>
+
+                              {other > 0 && (
+                                <div className="space-y-1">
+                                  <div className="flex justify-between text-xs font-semibold text-slate-700">
+                                    <span>Diplomas / Other</span>
+                                    <span>{other} ({othPct}%)</span>
+                                  </div>
+                                  <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                                    <div className="h-full bg-amber-500 rounded-full" style={{ width: `${othPct}%` }} />
+                                  </div>
+                                </div>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
+
+                    {/* Top Origin Countries */}
+                    <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h5 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                          <Globe className="w-4 h-4 text-emerald-600" />
+                          <span>Top Applicant Origins</span>
+                        </h5>
+                        <span className="text-[10px] font-bold text-slate-400">Demographics</span>
+                      </div>
+                      <div className="space-y-2">
+                        {(() => {
+                          const counts: Record<string, number> = {};
+                          applications.forEach(a => {
+                            const c = a.country || 'International';
+                            counts[c] = (counts[c] || 0) + 1;
+                          });
+                          const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 4);
+                          if (sorted.length === 0) return <p className="text-xs text-slate-400 italic">No country data recorded yet.</p>;
+
+                          return sorted.map(([country, cnt]) => {
+                            const pct = Math.round((cnt / applications.length) * 100);
+                            return (
+                              <div key={country} className="space-y-1">
+                                <div className="flex justify-between text-xs font-semibold text-slate-700">
+                                  <span>{country}</span>
+                                  <span>{cnt} ({pct}%)</span>
+                                </div>
+                                <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                                  <div className="h-full bg-emerald-600 rounded-full" style={{ width: `${pct}%` }} />
+                                </div>
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
+                    </div>
+
+                    {/* Top Popular Programs */}
+                    <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h5 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                          <Award className="w-4 h-4 text-amber-600" />
+                          <span>High-Demand Courses</span>
+                        </h5>
+                        <span className="text-[10px] font-bold text-slate-400">Preferences</span>
+                      </div>
+                      <div className="space-y-2">
+                        {(() => {
+                          const courses: Record<string, number> = {};
+                          applications.forEach(a => {
+                            const c = a.preferredCourse || 'General Academic';
+                            courses[c] = (courses[c] || 0) + 1;
+                          });
+                          const sorted = Object.entries(courses).sort((a, b) => b[1] - a[1]).slice(0, 4);
+                          if (sorted.length === 0) return <p className="text-xs text-slate-400 italic">No program data recorded yet.</p>;
+
+                          return sorted.map(([crs, cnt]) => (
+                            <div key={crs} className="p-2 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">
+                              <span className="text-xs font-semibold text-slate-800 truncate">{crs}</span>
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 shrink-0 font-mono">
+                                {cnt} {cnt === 1 ? 'applicant' : 'applicants'}
+                              </span>
+                            </div>
+                          ));
+                        })()}
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
