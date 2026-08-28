@@ -129,6 +129,34 @@ export async function saveEnquiryToFirestore(enquiryData: any): Promise<boolean>
   }
 }
 
+/**
+ * Delete an application from Firestore
+ */
+export async function deleteApplicationFromFirestore(id: string): Promise<boolean> {
+  try {
+    if (!id) return false;
+    await deleteDoc(doc(db, 'applications', id));
+    return true;
+  } catch (error) {
+    console.warn('Firestore application delete notice:', error);
+    return false;
+  }
+}
+
+/**
+ * Delete an enquiry from Firestore
+ */
+export async function deleteEnquiryFromFirestore(id: string): Promise<boolean> {
+  try {
+    if (!id) return false;
+    await deleteDoc(doc(db, 'enquiries', id));
+    return true;
+  } catch (error) {
+    console.warn('Firestore enquiry delete notice:', error);
+    return false;
+  }
+}
+
 export { 
   collection, 
   doc, 

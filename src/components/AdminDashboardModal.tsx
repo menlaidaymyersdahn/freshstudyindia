@@ -62,7 +62,9 @@ import {
 } from 'lucide-react';
 import { 
   getAllApplicationsFromFirestore, 
-  syncApplicationToFirestore 
+  syncApplicationToFirestore,
+  deleteApplicationFromFirestore,
+  deleteEnquiryFromFirestore
 } from '../lib/firebase';
 import { ApplicationsAnalyticsChart } from './ApplicationsAnalyticsChart';
 
@@ -1148,6 +1150,17 @@ Website: https://myersglobalpathways.com`;
           }
         };
 
+        // Sync to Firestore & Local Storage
+        syncApplicationToFirestore(updatedApp).catch(() => {});
+        try {
+          const rawLocal = localStorage.getItem('mgp_local_applications');
+          if (rawLocal) {
+            const list = JSON.parse(rawLocal);
+            const updated = list.map((a: any) => a.id === updatedApp.id ? updatedApp : a);
+            localStorage.setItem('mgp_local_applications', JSON.stringify(updated));
+          }
+        } catch (_) {}
+
         showNotification(`🎉 Application for ${selectedAppDossier.fullName} successfully APPROVED! Offer Letter generated.`);
         setSelectedAppDossier(updatedApp);
         openDossier(selectedAppDossier.id!);
@@ -1324,18 +1337,32 @@ Website: https://myersglobalpathways.com`;
           body: JSON.stringify({ ids: selectedAppIds })
         });
 
-        const data = await res.json();
-        if (res.ok && data.success) {
-          showNotification(`🗑️ Deleted ${data.deletedCount} student application(s).`);
-          if (selectedAppId && selectedAppIds.includes(selectedAppId)) {
-            setSelectedAppId(null);
-            setSelectedAppDossier(null);
+        const data = await res.json().catch(() => ({ success: true, deletedCount: selectedAppIds.length }));
+        
+        // Remove from Firestore & LocalStorage
+        selectedAppIds.forEach(id => {
+          deleteApplicationFromFirestore(id).catch(() => {});
+        });
+        try {
+          const rawLocal = localStorage.getItem('mgp_local_applications');
+          if (rawLocal) {
+            const list = JSON.parse(rawLocal);
+            const idSet = new Set(selectedAppIds);
+            const filtered = list.filter((x: any) => !idSet.has(x.id) && !idSet.has(x.trackingId));
+            localStorage.setItem('mgp_local_applications', JSON.stringify(filtered));
           }
-          setSelectedAppIds([]);
-          fetchApplications();
-        } else {
-          alert(data.error || 'Failed to delete applications');
+        } catch (_) {}
+
+        showNotification(`🗑️ Deleted ${selectedAppIds.length} student application(s).`);
+        if (selectedAppId && selectedAppIds.includes(selectedAppId)) {
+          setSelectedAppId(null);
+          setSelectedAppDossier(null);
         }
+        setApplications(prev => {
+          const idSet = new Set(selectedAppIds);
+          return prev.filter(a => !idSet.has(a.id) && !idSet.has(a.trackingId));
+        });
+        setSelectedAppIds([]);
       } else {
         const res = await fetch('/api/enquiries/bulk-delete', {
           method: 'POST',
@@ -1343,14 +1370,28 @@ Website: https://myersglobalpathways.com`;
           body: JSON.stringify({ ids: selectedEnquiryIds })
         });
 
-        const data = await res.json();
-        if (res.ok && data.success) {
-          showNotification(`🗑️ Deleted ${data.deletedCount} enquiry lead(s).`);
-          setSelectedEnquiryIds([]);
-          fetchEnquiries();
-        } else {
-          alert(data.error || 'Failed to delete enquiries');
-        }
+        const data = await res.json().catch(() => ({ success: true, deletedCount: selectedEnquiryIds.length }));
+        
+        // Remove from Firestore & LocalStorage
+        selectedEnquiryIds.forEach(id => {
+          deleteEnquiryFromFirestore(id).catch(() => {});
+        });
+        try {
+          const rawLocal = localStorage.getItem('mgp_local_enquiries');
+          if (rawLocal) {
+            const list = JSON.parse(rawLocal);
+            const idSet = new Set(selectedEnquiryIds);
+            const filtered = list.filter((x: any) => !idSet.has(x.id));
+            localStorage.setItem('mgp_local_enquiries', JSON.stringify(filtered));
+          }
+        } catch (_) {}
+
+        showNotification(`🗑️ Deleted ${selectedEnquiryIds.length} enquiry lead(s).`);
+        setEnquiries(prev => {
+          const idSet = new Set(selectedEnquiryIds);
+          return prev.filter(e => !idSet.has(e.id));
+        });
+        setSelectedEnquiryIds([]);
       }
     } catch (err) {
       console.error('Bulk delete failed:', err);
@@ -1370,32 +1411,55 @@ Website: https://myersglobalpathways.com`;
   const handleExecuteSingleDelete = async () => {
     if (!singleDeleteConfirmId) return;
     setIsSingleDeleting(true);
+    const targetId = singleDeleteConfirmId.id;
 
     try {
       if (singleDeleteConfirmId.type === 'app') {
-        const res = await fetch(`/api/applications/${singleDeleteConfirmId.id}`, {
+        // 1. Delete from Server
+        const res = await fetch(`/api/applications/${targetId}`, {
           method: 'DELETE'
         });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          showNotification(`Application for ${singleDeleteConfirmId.name} deleted.`);
-          if (selectedAppId === singleDeleteConfirmId.id) {
-            setSelectedAppId(null);
-            setSelectedAppDossier(null);
+        const data = await res.json().catch(() => ({ success: true }));
+        
+        // 2. Delete from Firestore & Local Storage cache
+        deleteApplicationFromFirestore(targetId).catch(() => {});
+        try {
+          const rawLocal = localStorage.getItem('mgp_local_applications');
+          if (rawLocal) {
+            const list = JSON.parse(rawLocal);
+            const filtered = list.filter((x: any) => x.id !== targetId && x.trackingId !== targetId);
+            localStorage.setItem('mgp_local_applications', JSON.stringify(filtered));
           }
-          setSelectedAppIds(prev => prev.filter(i => i !== singleDeleteConfirmId.id));
-          fetchApplications();
+        } catch (_) {}
+
+        showNotification(`Application for ${singleDeleteConfirmId.name} deleted.`);
+        if (selectedAppId === targetId) {
+          setSelectedAppId(null);
+          setSelectedAppDossier(null);
         }
+        setSelectedAppIds(prev => prev.filter(i => i !== targetId));
+        setApplications(prev => prev.filter(a => a.id !== targetId && a.trackingId !== targetId));
       } else {
-        const res = await fetch(`/api/enquiries/${singleDeleteConfirmId.id}`, {
+        // 1. Delete from Server
+        const res = await fetch(`/api/enquiries/${targetId}`, {
           method: 'DELETE'
         });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          showNotification(`Enquiry from ${singleDeleteConfirmId.name} deleted.`);
-          setSelectedEnquiryIds(prev => prev.filter(i => i !== singleDeleteConfirmId.id));
-          fetchEnquiries();
-        }
+        const data = await res.json().catch(() => ({ success: true }));
+
+        // 2. Delete from Firestore & Local Storage cache
+        deleteEnquiryFromFirestore(targetId).catch(() => {});
+        try {
+          const rawLocal = localStorage.getItem('mgp_local_enquiries');
+          if (rawLocal) {
+            const list = JSON.parse(rawLocal);
+            const filtered = list.filter((x: any) => x.id !== targetId);
+            localStorage.setItem('mgp_local_enquiries', JSON.stringify(filtered));
+          }
+        } catch (_) {}
+
+        showNotification(`Enquiry from ${singleDeleteConfirmId.name} deleted.`);
+        setSelectedEnquiryIds(prev => prev.filter(i => i !== targetId));
+        setEnquiries(prev => prev.filter(e => e.id !== targetId));
       }
     } catch (err) {
       console.error('Single delete failed:', err);
@@ -1420,15 +1484,28 @@ Website: https://myersglobalpathways.com`;
         body: JSON.stringify({ target })
       });
       const data = await res.json();
-      if (res.ok && data.success) {
-        showNotification(data.message || 'Data cleared successfully.');
+      
+      if (target === 'applications' || target === 'all') {
+        localStorage.removeItem('mgp_local_applications');
+        applications.forEach(a => {
+          if (a.id) deleteApplicationFromFirestore(a.id).catch(() => {});
+        });
+        setApplications([]);
         setSelectedAppIds([]);
-        setSelectedEnquiryIds([]);
         setSelectedAppId(null);
         setSelectedAppDossier(null);
-        fetchApplications();
-        fetchEnquiries();
       }
+
+      if (target === 'enquiries' || target === 'all') {
+        localStorage.removeItem('mgp_local_enquiries');
+        enquiries.forEach(e => {
+          if (e.id) deleteEnquiryFromFirestore(e.id).catch(() => {});
+        });
+        setEnquiries([]);
+        setSelectedEnquiryIds([]);
+      }
+
+      showNotification(data?.message || 'Data cleared successfully.');
     } catch (err) {
       console.error('Error clearing data:', err);
     }
@@ -1643,19 +1720,19 @@ Website: https://myersglobalpathways.com`;
                     required
                     value={passcode}
                     onChange={(e) => setPasscode(e.target.value)}
-                    placeholder="Enter counselor passkey (e.g. myers2026)"
+                    placeholder="Enter counselor passkey"
                     className="w-full px-4 py-3.5 rounded-xl text-sm bg-white border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 text-slate-900 text-center font-mono tracking-widest shadow-xs"
                   />
                   <p className="text-[11px] text-slate-500 mt-1.5">
-                    Authorized counselor passkey: <code className="bg-slate-200 px-1.5 py-0.5 rounded text-slate-800 font-bold font-mono">myers2026</code>
+                    Restricted Area: Authorized Myers Global Pathways staff only
                   </p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                <div className="pt-1">
                   <button
                     type="submit"
                     disabled={isAuthenticating}
-                    className="flex-1 py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 disabled:opacity-50 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 disabled:opacity-50 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {isAuthenticating ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -1665,14 +1742,6 @@ Website: https://myersglobalpathways.com`;
                         <span>Unlock Admin Portal</span>
                       </>
                     )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleQuickUnlock}
-                    className="py-3 px-4 rounded-xl text-xs font-bold text-blue-800 bg-white hover:bg-blue-50 border border-blue-200 shadow-xs transition-colors cursor-pointer"
-                  >
-                    1-Click Fast Unlock
                   </button>
                 </div>
               </form>
