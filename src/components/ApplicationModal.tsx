@@ -12,8 +12,10 @@ import {
   ArrowRight, 
   FileCheck,
   Lock,
-  MailCheck
+  MailCheck,
+  Cloud
 } from 'lucide-react';
+import { syncApplicationToFirestore } from '../lib/firebase';
 
 interface ApplicationModalProps {
   isOpen: boolean;
@@ -164,6 +166,9 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
       
       // Also broadcast application submission event to other components and open tabs
       window.dispatchEvent(new CustomEvent('mgp_application_submitted', { detail: fullAppRecord }));
+      
+      // Async sync to Cloud Firestore
+      syncApplicationToFirestore(fullAppRecord).catch(() => {});
     } catch (storageErr) {
       console.warn('Local storage write warning:', storageErr);
     }
@@ -189,13 +194,17 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
           fullName: formData.fullName
         });
 
-        // Update local cache with server assigned trackingId if different
+        // Update local cache and Firestore with server assigned trackingId if different
         try {
           const existingRaw = localStorage.getItem('mgp_local_applications');
           if (existingRaw) {
             const list = JSON.parse(existingRaw);
             const updated = list.map((a: any) => a.id === generatedAppId ? { ...a, trackingId: finalTrackingId } : a);
             localStorage.setItem('mgp_local_applications', JSON.stringify(updated));
+            const activeRecord = updated.find((a: any) => a.id === generatedAppId);
+            if (activeRecord) {
+              syncApplicationToFirestore(activeRecord).catch(() => {});
+            }
           }
         } catch (_) {}
 

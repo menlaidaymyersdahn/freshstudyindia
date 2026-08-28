@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { OFFICIAL_EMAIL_DIRECTORY, getWhatsAppConfig } from '../config/company';
-import { Mail, MessageCircle, Send, CheckCircle2, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
+import { Mail, MessageCircle, Send, CheckCircle2, AlertCircle, Loader2, ArrowRight, Cloud } from 'lucide-react';
 import { ScrollReveal } from './ScrollReveal';
+import { saveEnquiryToFirestore } from '../lib/firebase';
 
 export const ContactSection: React.FC = () => {
   const whatsappConfig = getWhatsAppConfig();
@@ -53,13 +54,14 @@ export const ContactSection: React.FC = () => {
       createdAt: new Date().toISOString()
     };
 
-    // Immediate local cache & real-time broadcast
+    // Immediate local cache, Cloud Firestore sync & real-time broadcast
     try {
       const rawLocal = localStorage.getItem('mgp_local_enquiries');
       const list = rawLocal ? JSON.parse(rawLocal) : [];
       localStorage.setItem('mgp_local_enquiries', JSON.stringify([clientEnquiryRecord, ...list]));
       window.dispatchEvent(new CustomEvent('mgp_enquiry_submitted', { detail: clientEnquiryRecord }));
       window.dispatchEvent(new Event('storage'));
+      saveEnquiryToFirestore(clientEnquiryRecord).catch(() => {});
     } catch (_) {}
 
     try {

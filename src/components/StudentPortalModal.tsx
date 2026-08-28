@@ -18,8 +18,10 @@ import {
   RefreshCw,
   Sparkles,
   Building2,
-  GraduationCap
+  GraduationCap,
+  CloudCheck
 } from 'lucide-react';
+import { lookupApplicationInFirestore, syncApplicationToFirestore } from '../lib/firebase';
 
 interface StudentPortalModalProps {
   isOpen: boolean;
@@ -56,13 +58,20 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
       let localList: any[] = [];
       try {
         const rawLocal = localStorage.getItem('mgp_local_applications');
+        const rawLast = localStorage.getItem('mgp_last_submitted_app');
         if (rawLocal) {
           const parsed = JSON.parse(rawLocal);
           if (Array.isArray(parsed)) {
             localList = parsed;
-            setSavedLocalApps(parsed);
           }
         }
+        if (rawLast) {
+          const parsedLast = JSON.parse(rawLast);
+          if (parsedLast && !localList.some(item => (item.id && item.id === parsedLast.id) || (item.trackingId && item.trackingId === parsedLast.trackingId))) {
+            localList.unshift(parsedLast);
+          }
+        }
+        setSavedLocalApps(localList);
       } catch (_) {}
 
       // 2. Determine target lookup query
@@ -70,20 +79,6 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
         setSearchInput(initialTrackingId);
         performLookup(initialTrackingId);
       } else if (!studentRecord) {
-        // Check if there is a recently submitted app
-        try {
-          const rawLast = localStorage.getItem('mgp_last_submitted_app');
-          if (rawLast) {
-            const parsedLast = JSON.parse(rawLast);
-            if (parsedLast && (parsedLast.trackingId || parsedLast.email)) {
-              const target = parsedLast.trackingId || parsedLast.email;
-              setSearchInput(target);
-              performLookup(target);
-              return;
-            }
-          }
-        } catch (_) {}
-
         if (localList.length > 0) {
           const first = localList[0];
           const target = first.trackingId || first.email;
@@ -98,6 +93,72 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
 
   if (!isOpen) return null;
 
+  // Safe JSON Fetch helper that never throws on non-JSON or HTML 404
+  const safeFetchLookup = async (queryParam: string) => {
+    try {
+      const encoded = encodeURIComponent(queryParam);
+      const url = `/api/student/lookup?query=${encoded}&trackingId=${encoded}&email=${encoded}&q=${encoded}`;
+      const res = await fetch(url);
+      const text = await res.text();
+      try {
+        const json = JSON.parse(text);
+        return { ok: res.ok, status: res.status, data: json };
+      } catch {
+        return { ok: false, status: res.status, data: null };
+      }
+    } catch (err: any) {
+      return { ok: false, status: 0, error: err.message, data: null };
+    }
+  };
+
+  // Resilient Local Finder across all client caches
+  const findInLocalStorage = (q: string) => {
+    try {
+      const rawLocal = localStorage.getItem('mgp_local_applications');
+      const rawLast = localStorage.getItem('mgp_last_submitted_app');
+      const list: any[] = [];
+      if (rawLast) {
+        try { list.push(JSON.parse(rawLast)); } catch (_) {}
+      }
+      if (rawLocal) {
+        try { 
+          const parsed = JSON.parse(rawLocal);
+          if (Array.isArray(parsed)) list.push(...parsed);
+        } catch (_) {}
+      }
+
+      // Standardize search tokens
+      const targetLower = q.toLowerCase().trim();
+      const targetClean = targetLower.replace(/[^a-z0-9]/gi, '');
+      const targetDigits = q.replace(/\D/g, '');
+
+      return list.find((a: any) => {
+        if (!a) return false;
+        const aTrack = String(a.trackingId || '').toLowerCase().trim();
+        const aCleanTrack = aTrack.replace(/[^a-z0-9]/gi, '');
+        const aId = String(a.id || '').toLowerCase().trim();
+        const aEmail = String(a.email || '').toLowerCase().trim();
+        const aName = String(a.fullName || '').toLowerCase().trim();
+        const aPhone = String(a.whatsapp || '').replace(/\D/g, '');
+
+        // Exact match
+        if (aTrack === targetLower || aId === targetLower || aEmail === targetLower || aName === targetLower) return true;
+        // Clean tracking match (ignoring dashes/spaces)
+        if (targetClean.length >= 4 && (aCleanTrack.includes(targetClean) || targetClean.includes(aCleanTrack))) return true;
+        // Numeric suffix match
+        if (targetDigits.length >= 4 && (aTrack.includes(targetDigits) || aId.includes(targetDigits))) return true;
+        // Email & Name partial
+        if (targetLower.length >= 3 && (aEmail.includes(targetLower) || aName.includes(targetLower))) return true;
+        // Phone match
+        if (targetDigits.length >= 6 && aPhone.includes(targetDigits)) return true;
+
+        return false;
+      });
+    } catch (_) {
+      return null;
+    }
+  };
+
   const performLookup = async (query: string) => {
     const q = (query || '').trim();
     if (!q) {
@@ -108,65 +169,56 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
     setIsLoading(true);
     setErrorMessage(null);
 
-    // Check local storage for quick match
-    const findInLocalStorage = () => {
+    // 1. Try server API lookup first
+    const { ok, data } = await safeFetchLookup(q);
+
+    if (ok && data?.success && data?.application) {
+      setStudentRecord(data.application);
+      setIsLoading(false);
+
+      // Save to local cache so user can re-access instantly and sync to Firestore
       try {
         const rawLocal = localStorage.getItem('mgp_local_applications');
-        const rawLast = localStorage.getItem('mgp_last_submitted_app');
-        const list: any[] = [];
-        if (rawLast) list.push(JSON.parse(rawLast));
-        if (rawLocal) list.push(...JSON.parse(rawLocal));
-
-        const targetLower = q.toLowerCase();
-        const targetDigits = q.replace(/\D/g, '');
-
-        return list.find((a: any) => {
-          if (!a) return false;
-          const aTrack = String(a.trackingId || '').toLowerCase().trim();
-          const aId = String(a.id || '').toLowerCase().trim();
-          const aEmail = String(a.email || '').toLowerCase().trim();
-          const aName = String(a.fullName || '').toLowerCase().trim();
-
-          if (aTrack === targetLower || aId === targetLower || aEmail === targetLower || aName === targetLower) return true;
-          if (targetDigits.length >= 4 && aTrack.includes(targetDigits)) return true;
-          if (aEmail.includes(targetLower) || aName.includes(targetLower)) return true;
-          return false;
-        });
-      } catch (_) {
-        return null;
-      }
-    };
-
-    try {
-      const encoded = encodeURIComponent(q);
-      const url = `/api/student/lookup?query=${encoded}&trackingId=${encoded}&email=${encoded}&q=${encoded}`;
-      
-      const res = await fetch(url);
-      const data = await res.json();
-
-      if (res.ok && data.success && data.application) {
-        setStudentRecord(data.application);
-      } else {
-        const localMatch = findInLocalStorage();
-        if (localMatch) {
-          setStudentRecord(localMatch);
-        } else {
-          setStudentRecord(null);
-          setErrorMessage(data.error || `No application dossier found matching "${q}". Please verify your reference code or registered email.`);
-        }
-      }
-    } catch (err) {
-      // Local fallback in case of connection lag or offline mode
-      const localMatch = findInLocalStorage();
-      if (localMatch) {
-        setStudentRecord(localMatch);
-      } else {
-        setStudentRecord(null);
-        setErrorMessage(`Unable to connect to the admissions database. Please check your connection or search by the email you used when applying.`);
-      }
-    } finally {
-      setIsLoading(false);
+        const list = rawLocal ? JSON.parse(rawLocal) : [];
+        const updated = [data.application, ...list.filter((x: any) => x.id !== data.application.id && x.trackingId !== data.application.trackingId)];
+        localStorage.setItem('mgp_local_applications', JSON.stringify(updated));
+        setSavedLocalApps(updated);
+        syncApplicationToFirestore(data.application).catch(() => {});
+      } catch (_) {}
+      return;
     }
+
+    // 2. Direct Cloud Firestore Lookup fallback
+    try {
+      const cloudRecord = await lookupApplicationInFirestore(q);
+      if (cloudRecord) {
+        setStudentRecord(cloudRecord);
+        setIsLoading(false);
+        try {
+          const rawLocal = localStorage.getItem('mgp_local_applications');
+          const list = rawLocal ? JSON.parse(rawLocal) : [];
+          const updated = [cloudRecord, ...list.filter((x: any) => x.id !== cloudRecord.id && x.trackingId !== cloudRecord.trackingId)];
+          localStorage.setItem('mgp_local_applications', JSON.stringify(updated));
+          setSavedLocalApps(updated);
+        } catch (_) {}
+        return;
+      }
+    } catch (_) {}
+
+    // 3. Fallback to Local Browser Storage (for offline, static preview, or recently created apps)
+    const localMatch = findInLocalStorage(q);
+    if (localMatch) {
+      setStudentRecord(localMatch);
+      setIsLoading(false);
+      // Attempt background Firestore sync for this found local item
+      syncApplicationToFirestore(localMatch).catch(() => {});
+      return;
+    }
+
+    // 4. Record not found
+    setStudentRecord(null);
+    setIsLoading(false);
+    setErrorMessage(data?.error || `No application dossier found matching "${q}". Please verify your reference code or registered email.`);
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -268,33 +320,63 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
           </form>
 
           {errorMessage && (
-            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold">Admissions Record Search Notice</p>
-                <p className="mt-0.5">{errorMessage}</p>
-                <div className="mt-2.5 flex flex-wrap gap-2">
+            <div className="p-4 rounded-2xl bg-amber-50/90 border border-amber-200 text-amber-950 text-xs flex flex-col gap-3 shadow-xs">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-bold text-amber-950">Application Record Search Notice</p>
+                  <p className="mt-0.5 text-amber-900 leading-relaxed">{errorMessage}</p>
+                </div>
+              </div>
+
+              {/* If there are saved applications in browser, offer 1-click restore */}
+              {savedLocalApps.length > 0 && (
+                <div className="pt-2 border-t border-amber-200/70">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-amber-900 mb-1.5">
+                    Found saved application(s) on your browser:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {savedLocalApps.slice(0, 4).map((appItem) => (
+                      <button
+                        key={appItem.id || appItem.trackingId}
+                        type="button"
+                        onClick={() => {
+                          const target = appItem.trackingId || appItem.email;
+                          setSearchInput(target);
+                          performLookup(target);
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-amber-200/90 hover:bg-amber-300 text-amber-950 font-bold text-[11px] inline-flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                      >
+                        <UserCheck className="w-3.5 h-3.5 text-amber-900" />
+                        <span>Open {appItem.fullName}</span>
+                        <span className="font-mono text-[10px] text-amber-800">({appItem.trackingId})</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => performLookup(searchInput)}
+                  className="px-3 py-1.5 rounded-xl bg-amber-950 text-amber-100 hover:bg-amber-900 font-semibold text-[11px] inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  <span>Retry Search</span>
+                </button>
+                {onOpenNewApplication && (
                   <button
                     type="button"
-                    onClick={() => performLookup(searchInput)}
-                    className="px-3 py-1 rounded-md bg-amber-200/70 hover:bg-amber-200 text-amber-950 font-semibold text-[11px] inline-flex items-center gap-1 cursor-pointer"
+                    onClick={() => {
+                      onClose();
+                      onOpenNewApplication();
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-white border border-amber-300 text-amber-950 hover:bg-amber-100 font-semibold text-[11px] inline-flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
-                    <RefreshCw className="w-3 h-3" />
-                    <span>Retry Search</span>
+                    <span>Submit New Application</span>
                   </button>
-                  {onOpenNewApplication && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onClose();
-                        onOpenNewApplication();
-                      }}
-                      className="px-3 py-1 rounded-md bg-white border border-amber-300 text-amber-900 font-semibold text-[11px] inline-flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>Submit New Application</span>
-                    </button>
-                  )}
-                </div>
+                )}
               </div>
             </div>
           )}
@@ -316,21 +398,36 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
                     <p className="text-xs text-slate-500">{studentRecord.email} {studentRecord.whatsapp ? `• ${studentRecord.whatsapp}` : ''}</p>
                   </div>
 
-                  <div className="text-right flex flex-col items-end">
+                  <div className="text-right flex flex-col items-end gap-1">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                       Tracking Code
                     </span>
-                    <p className="text-sm font-mono font-bold text-amber-800 bg-amber-100/60 px-2 py-0.5 rounded-md border border-amber-200/80 mt-0.5">
+                    <p className="text-sm font-mono font-bold text-amber-800 bg-amber-100/60 px-2.5 py-0.5 rounded-md border border-amber-200/80">
                       {studentRecord.trackingId}
                     </p>
-                    <button
-                      type="button"
-                      onClick={() => performLookup(studentRecord.trackingId || studentRecord.email)}
-                      className="mt-1.5 text-[10px] text-blue-700 hover:underline inline-flex items-center gap-1 font-semibold cursor-pointer"
-                    >
-                      <RefreshCw className="w-2.5 h-2.5" />
-                      <span>Refresh Status</span>
-                    </button>
+                    <div className="flex items-center gap-2 mt-1">
+                      <button
+                        type="button"
+                        onClick={() => performLookup(studentRecord.trackingId || studentRecord.email)}
+                        className="text-[11px] text-blue-700 hover:underline inline-flex items-center gap-1 font-semibold cursor-pointer"
+                      >
+                        <RefreshCw className="w-3 h-3" />
+                        <span>Refresh</span>
+                      </button>
+                      <span className="text-slate-300">•</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setStudentRecord(null);
+                          setErrorMessage(null);
+                          setSearchInput('');
+                        }}
+                        className="text-[11px] text-slate-600 hover:text-slate-950 hover:underline inline-flex items-center gap-1 font-semibold cursor-pointer"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        <span>Search Another</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 

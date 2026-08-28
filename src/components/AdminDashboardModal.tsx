@@ -57,8 +57,13 @@ import {
   LogOut,
   TrendingUp,
   BarChart2,
-  PieChart
+  PieChart,
+  Cloud
 } from 'lucide-react';
+import { 
+  getAllApplicationsFromFirestore, 
+  syncApplicationToFirestore 
+} from '../lib/firebase';
 import { ApplicationsAnalyticsChart } from './ApplicationsAnalyticsChart';
 
 interface AdminDashboardModalProps {
@@ -406,8 +411,29 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         serverApps = result.data.applications || [];
       }
 
+      // Also try fetching from Cloud Firestore to ensure 100% data sync
+      try {
+        const cloudApps = await getAllApplicationsFromFirestore();
+        if (Array.isArray(cloudApps) && cloudApps.length > 0) {
+          // Merge cloud applications with server applications
+          const combined = [...serverApps];
+          cloudApps.forEach(cloudApp => {
+            const existingIdx = combined.findIndex(item => 
+              item.id === cloudApp.id || 
+              (cloudApp.trackingId && item.trackingId === cloudApp.trackingId)
+            );
+            if (existingIdx >= 0) {
+              combined[existingIdx] = { ...combined[existingIdx], ...cloudApp };
+            } else {
+              combined.push(cloudApp);
+            }
+          });
+          serverApps = combined;
+        }
+      } catch (_) {}
+
       // 3. If server responded, check if any local submissions need synchronization to server
-      if (result.ok && Array.isArray(localApps) && localApps.length > 0) {
+      if (Array.isArray(localApps) && localApps.length > 0) {
         const missingOnServer = localApps.filter((localItem: any) => 
           !serverApps.some((serverItem: any) => 
             (localItem.id && serverItem.id === localItem.id) || 
@@ -424,6 +450,11 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
               body: JSON.stringify({ applications: missingOnServer })
             });
 
+            // Sync missing to Firestore as well
+            missingOnServer.forEach(appItem => {
+              syncApplicationToFirestore(appItem).catch(() => {});
+            });
+
             // Re-fetch updated list from server
             const recheck = await safeFetchJson('/api/applications');
             if (recheck.ok && recheck.data?.success) {
@@ -435,8 +466,8 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         }
       }
 
-      // If server returned data, use it and update local cache
-      if (result.ok) {
+      // If server returned data or merged cloud apps, use it and update local cache
+      if (serverApps.length > 0 || result.ok) {
         setApplications(serverApps);
         try {
           localStorage.setItem('mgp_local_applications', JSON.stringify(serverApps));
@@ -577,6 +608,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         const updatedApp = data.application;
         setSelectedAppDossier(updatedApp);
         fetchApplications();
+        syncApplicationToFirestore(updatedApp).catch(() => {});
         
         if (data.emailNotification?.success) {
           showNotification(`🚀 Status changed to "${newStatus}" & automated email dispatched to ${updatedApp.email} via Google Workspace!`);
@@ -1529,6 +1561,10 @@ Website: https://myersglobalpathways.com`;
                     <span>admissions@myersglobalpathways.com (Ready to authenticate)</span>
                   </span>
                 )}
+                <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                  <Cloud className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Cloud Firestore Sync</span>
+                </span>
               </div>
             </div>
 

@@ -1,116 +1,59 @@
 {
   "entities": {
-    "users": {
-      "title": "Users",
-      "description": "Student, counselor, and admin profiles",
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "name": { "type": "string" },
-        "email": { "type": "string" },
-        "role": { "type": "string" },
-        "phone": { "type": "string" },
-        "createdAt": { "type": "string" }
+    "Application": {
+      "description": "Student admissions application dossiers submitted to Myers Global Pathways / Study in India",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "trackingId": { "type": "string" },
+          "fullName": { "type": "string" },
+          "email": { "type": "string" },
+          "whatsapp": { "type": "string" },
+          "currentCountry": { "type": "string" },
+          "intendedDegree": { "type": "string" },
+          "desiredMajor": { "type": "string" },
+          "budget": { "type": "string" },
+          "status": { "type": "string" },
+          "stageIndex": { "type": "number" },
+          "priority": { "type": "string" },
+          "adminNotes": { "type": "string" },
+          "universityMatch": { "type": "string" },
+          "submittedAt": { "type": "string" },
+          "updatedAt": { "type": "string" },
+          "documents": {
+            "type": "array",
+            "items": { "type": "object" }
+          }
+        },
+        "required": ["trackingId", "fullName", "email", "intendedDegree", "desiredMajor", "status"]
       },
-      "required": ["id", "email", "role"]
+      "security": {
+        "read": "public",
+        "write": "public"
+      }
     },
-    "applications": {
-      "title": "Applications",
-      "description": "Student university applications with document attachments and status tracking",
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "trackingId": { "type": "string" },
-        "fullName": { "type": "string" },
-        "phone": { "type": "string" },
-        "email": { "type": "string" },
-        "country": { "type": "string" },
-        "studyField": { "type": "string" },
-        "qualification": { "type": "string" },
-        "status": { "type": "string" },
-        "notes": { "type": "string" },
-        "documentsCount": { "type": "number" },
-        "documents": { "type": "array" },
-        "submittedAt": { "type": "string" },
-        "updatedAt": { "type": "string" }
+    "Enquiry": {
+      "description": "Student admission inquiries, leads, and contact submissions",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "fullName": { "type": "string" },
+          "email": { "type": "string" },
+          "phone": { "type": "string" },
+          "country": { "type": "string" },
+          "interestedProgram": { "type": "string" },
+          "message": { "type": "string" },
+          "createdAt": { "type": "string" },
+          "status": { "type": "string" }
+        },
+        "required": ["fullName", "email", "message"]
       },
-      "required": ["id", "fullName", "phone", "country", "studyField"]
-    },
-    "documents": {
-      "title": "Documents",
-      "description": "Student uploaded academic and identity documents",
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "applicationId": { "type": "string" },
-        "name": { "type": "string" },
-        "category": { "type": "string" },
-        "type": { "type": "string" },
-        "size": { "type": "number" },
-        "formattedSize": { "type": "string" },
-        "dataUrl": { "type": "string" },
-        "uploadedAt": { "type": "string" },
-        "status": { "type": "string" }
-      },
-      "required": ["id", "applicationId", "name", "category"]
-    },
-    "inquiries": {
-      "title": "Inquiries",
-      "description": "Contact messages and advisor inquiries",
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "name": { "type": "string" },
-        "email": { "type": "string" },
-        "phone": { "type": "string" },
-        "country": { "type": "string" },
-        "studyField": { "type": "string" },
-        "message": { "type": "string" },
-        "createdAt": { "type": "string" }
-      },
-      "required": ["name", "phone", "message"]
-    },
-    "communityPhotos": {
-      "title": "Community Photos",
-      "description": "Student life, campus moments, graduations, arrivals, and admissions gallery photos",
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "title": { "type": "string" },
-        "caption": { "type": "string" },
-        "imageUrl": { "type": "string" },
-        "uploaderName": { "type": "string" },
-        "uploaderRole": { "type": "string" },
-        "country": { "type": "string" },
-        "category": { "type": "string" },
-        "university": { "type": "string" },
-        "likesCount": { "type": "number" },
-        "createdAt": { "type": "string" },
-        "isApproved": { "type": "boolean" }
-      },
-      "required": ["id", "imageUrl", "uploaderName", "category"]
-    }
-  },
-  "firestore": {
-    "/communityPhotos/{photoId}": {
-      "schema": { "$ref": "#/entities/communityPhotos" },
-      "description": "Public student and campus photo gallery viewable by all visitors"
-    },
-    "/applications/{appId}": {
-      "schema": { "$ref": "#/entities/applications" },
-      "description": "University admission applications submitted by students"
-    },
-    "/documents/{docId}": {
-      "schema": { "$ref": "#/entities/documents" },
-      "description": "Academic certificates, passports, transcripts, and photos"
-    },
-    "/inquiries/{inquiryId}": {
-      "schema": { "$ref": "#/entities/inquiries" },
-      "description": "Student inquiries from contact forms"
-    },
-    "/users/{userId}": {
-      "schema": { "$ref": "#/entities/users" },
-      "description": "Admissions counselor and staff records"
+      "security": {
+        "read": "public",
+        "write": "public"
+      }
     }
   }
 }
