@@ -156,16 +156,23 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
       updatedAt: new Date().toISOString()
     };
 
-    // 1. Immediately cache application locally so it is never lost under any circumstance
+    // 1. Immediately cache application locally and sync to cloud
     try {
       const existingRaw = localStorage.getItem('mgp_local_applications');
       const existingList = existingRaw ? JSON.parse(existingRaw) : [];
       const updatedList = [fullAppRecord, ...existingList.filter((a: any) => a.id !== generatedAppId && a.trackingId !== generatedTrackingId)];
       localStorage.setItem('mgp_local_applications', JSON.stringify(updatedList));
+
+      const standardRaw = localStorage.getItem('mgp_applications');
+      const standardList = standardRaw ? JSON.parse(standardRaw) : [];
+      const updatedStandard = [fullAppRecord, ...standardList.filter((a: any) => a.id !== generatedAppId && a.trackingId !== generatedTrackingId)];
+      localStorage.setItem('mgp_applications', JSON.stringify(updatedStandard));
+
       localStorage.setItem('mgp_last_submitted_app', JSON.stringify(fullAppRecord));
       
       // Also broadcast application submission event to other components and open tabs
       window.dispatchEvent(new CustomEvent('mgp_application_submitted', { detail: fullAppRecord }));
+      window.dispatchEvent(new Event('storage'));
       
       // Async sync to Cloud Firestore
       syncApplicationToFirestore(fullAppRecord).catch(() => {});
@@ -175,6 +182,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
 
     try {
       const payload = {
+        ...fullAppRecord,
         ...formData,
         documents
       };
@@ -201,6 +209,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
             const list = JSON.parse(existingRaw);
             const updated = list.map((a: any) => a.id === generatedAppId ? { ...a, trackingId: finalTrackingId } : a);
             localStorage.setItem('mgp_local_applications', JSON.stringify(updated));
+            localStorage.setItem('mgp_applications', JSON.stringify(updated));
             const activeRecord = updated.find((a: any) => a.id === generatedAppId);
             if (activeRecord) {
               syncApplicationToFirestore(activeRecord).catch(() => {});

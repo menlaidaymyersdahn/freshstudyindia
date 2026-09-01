@@ -116,6 +116,7 @@ export const ApplyPage: React.FC = () => {
     const generatedTrackingId = `MGP-2026-${Math.floor(1000 + Math.random() * 9000)}`;
 
     const applicationPayload = {
+      id: generatedTrackingId,
       trackingId: generatedTrackingId,
       fullName: formData.fullName.trim(),
       email: formData.email.trim().toLowerCase(),
@@ -146,33 +147,46 @@ export const ApplyPage: React.FC = () => {
     };
 
     try {
-      // 1. Sync to local Express storage and trigger automated notification
-      let backendSuccess = false;
-      try {
-        const response = await fetch('/api/applications', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(applicationPayload)
-        });
-        if (response.ok) {
-          backendSuccess = true;
-        }
-      } catch (err) {
-        console.warn('Local express api submission error:', err);
-      }
-
-      // 2. Sync to Firebase Firestore cloud database
-      let firestoreId = null;
+      // 1. Sync to Firebase Firestore cloud database immediately
+      let firestoreId: string | null = null;
       try {
         firestoreId = await syncApplicationToFirestore(applicationPayload);
       } catch (err) {
         console.warn('Firestore sync error:', err);
       }
 
-      // 3. Store in client-side persistence as backup
-      const localStore = JSON.parse(localStorage.getItem('mgp_applications') || '[]');
-      localStore.push({ ...applicationPayload, id: firestoreId || generatedTrackingId });
-      localStorage.setItem('mgp_applications', JSON.stringify(localStore));
+      const finalAppRecord = {
+        ...applicationPayload,
+        id: firestoreId || generatedTrackingId
+      };
+
+      // 2. Sync to local Express storage and trigger automated notification
+      try {
+        await fetch('/api/applications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(finalAppRecord)
+        });
+      } catch (err) {
+        console.warn('Local express api submission error:', err);
+      }
+
+      // 3. Store in client-side persistence (both standard keys for seamless dashboard detection)
+      try {
+        const localStore = JSON.parse(localStorage.getItem('mgp_applications') || '[]');
+        localStore.unshift(finalAppRecord);
+        localStorage.setItem('mgp_applications', JSON.stringify(localStore));
+
+        const localApps = JSON.parse(localStorage.getItem('mgp_local_applications') || '[]');
+        localApps.unshift(finalAppRecord);
+        localStorage.setItem('mgp_local_applications', JSON.stringify(localApps));
+
+        // 4. Broadcast live events so any active Admin Dashboard immediately displays the new application
+        window.dispatchEvent(new CustomEvent('mgp_application_submitted', { detail: finalAppRecord }));
+        window.dispatchEvent(new Event('storage'));
+      } catch (storageErr) {
+        console.warn('Local storage write warning:', storageErr);
+      }
 
       setSubmissionResult({
         trackingId: generatedTrackingId,

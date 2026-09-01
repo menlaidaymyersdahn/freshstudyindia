@@ -62,6 +62,8 @@ import {
 } from 'lucide-react';
 import { 
   getAllApplicationsFromFirestore, 
+  subscribeToApplicationsInFirestore,
+  subscribeToEnquiriesInFirestore,
   syncApplicationToFirestore,
   deleteApplicationFromFirestore,
   deleteEnquiryFromFirestore
@@ -285,19 +287,123 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     'Bangalore University Affiliated Health & Tech Institutes'
   ];
 
+  // Helper to read all local storage applications across all keys
+  const readAllLocalApplications = () => {
+    const list: any[] = [];
+    try {
+      const r1 = localStorage.getItem('mgp_local_applications');
+      if (r1) {
+        const p1 = JSON.parse(r1);
+        if (Array.isArray(p1)) list.push(...p1);
+      }
+    } catch (_) {}
+    try {
+      const r2 = localStorage.getItem('mgp_applications');
+      if (r2) {
+        const p2 = JSON.parse(r2);
+        if (Array.isArray(p2)) list.push(...p2);
+      }
+    } catch (_) {}
+    try {
+      const r3 = localStorage.getItem('mgp_last_submitted_app');
+      if (r3) {
+        const p3 = JSON.parse(r3);
+        if (p3 && typeof p3 === 'object') list.push(p3);
+      }
+    } catch (_) {}
+
+    const uniqueMap = new Map<string, any>();
+    list.forEach(item => {
+      if (!item || !item.fullName) return;
+      const key = item.id || item.trackingId || `${item.email || ''}_${item.fullName}`;
+      if (!uniqueMap.has(key)) {
+        uniqueMap.set(key, item);
+      }
+    });
+    return Array.from(uniqueMap.values());
+  };
+
+  // Helper to read all local enquiries across all keys
+  const readAllLocalEnquiries = () => {
+    const list: any[] = [];
+    try {
+      const r1 = localStorage.getItem('mgp_local_enquiries');
+      if (r1) {
+        const p1 = JSON.parse(r1);
+        if (Array.isArray(p1)) list.push(...p1);
+      }
+    } catch (_) {}
+    try {
+      const r2 = localStorage.getItem('mgp_enquiries');
+      if (r2) {
+        const p2 = JSON.parse(r2);
+        if (Array.isArray(p2)) list.push(...p2);
+      }
+    } catch (_) {}
+
+    const uniqueMap = new Map<string, any>();
+    list.forEach(item => {
+      if (!item || !item.fullName) return;
+      const key = item.id || `${item.email || ''}_${item.fullName}_${item.createdAt || ''}`;
+      if (!uniqueMap.has(key)) {
+        uniqueMap.set(key, item);
+      }
+    });
+    return Array.from(uniqueMap.values());
+  };
+
   // Auto-fetch data on open or authentication & subscribe to live student submissions
   useEffect(() => {
     if (isOpen && isAuthenticated) {
       fetchApplications();
       fetchEnquiries();
 
-      // Background real-time poller (every 6 seconds while dashboard is open)
+      // Real-time Firestore Cloud Database subscriptions
+      const unsubFirestoreApps = subscribeToApplicationsInFirestore((cloudApps) => {
+        if (Array.isArray(cloudApps) && cloudApps.length > 0) {
+          setApplications(prev => {
+            const combined = [...prev];
+            cloudApps.forEach(cloudApp => {
+              const idx = combined.findIndex(item => 
+                item.id === cloudApp.id || 
+                (cloudApp.trackingId && item.trackingId === cloudApp.trackingId) ||
+                (cloudApp.email && item.email?.toLowerCase() === cloudApp.email.toLowerCase() && item.fullName?.toLowerCase() === cloudApp.fullName?.toLowerCase())
+              );
+              if (idx >= 0) {
+                combined[idx] = { ...combined[idx], ...cloudApp };
+              } else {
+                combined.unshift(cloudApp);
+              }
+            });
+            return combined;
+          });
+        }
+      });
+
+      const unsubFirestoreEnqs = subscribeToEnquiriesInFirestore((cloudEnqs) => {
+        if (Array.isArray(cloudEnqs) && cloudEnqs.length > 0) {
+          setEnquiries(prev => {
+            const combined = [...prev];
+            cloudEnqs.forEach(cloudEnq => {
+              const idx = combined.findIndex(item => item.id === cloudEnq.id);
+              if (idx >= 0) {
+                combined[idx] = { ...combined[idx], ...cloudEnq };
+              } else {
+                combined.unshift(cloudEnq);
+              }
+            });
+            return combined;
+          });
+        }
+      });
+
+      // Background real-time poller (every 4 seconds while dashboard is open)
       const pollInterval = setInterval(() => {
         fetchApplications(true);
         fetchEnquiries(true);
-      }, 6000);
+      }, 4000);
 
-      // Instant live notification when an application or enquiry is submitted in current window or across browser tabs
+      // Instant live notification when an application or enquiry is submitted anywhere in the window
       const handleSubmissionEvent = () => {
         fetchApplications();
         fetchEnquiries();
@@ -309,6 +415,8 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 
       return () => {
         clearInterval(pollInterval);
+        unsubFirestoreApps();
+        unsubFirestoreEnqs();
         window.removeEventListener('mgp_application_submitted', handleSubmissionEvent);
         window.removeEventListener('mgp_enquiry_submitted', handleSubmissionEvent);
         window.removeEventListener('storage', handleSubmissionEvent);
@@ -387,14 +495,8 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
       setIsLoading(true);
     }
 
-    // 1. Read local storage cache for instant rendering & offline protection
-    let localApps: any[] = [];
-    try {
-      const rawLocal = localStorage.getItem('mgp_local_applications');
-      if (rawLocal) {
-        localApps = JSON.parse(rawLocal);
-      }
-    } catch (_) {}
+    // 1. Read all local storage caches across all potential client keys
+    const localApps = readAllLocalApplications();
 
     try {
       // 2. Fetch from server API using safe fetch
@@ -405,28 +507,28 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         serverApps = result.data.applications || [];
       }
 
-      // Also try fetching from Cloud Firestore to ensure 100% data sync
+      // Also fetch from Cloud Firestore to ensure 100% data sync
       try {
         const cloudApps = await getAllApplicationsFromFirestore();
         if (Array.isArray(cloudApps) && cloudApps.length > 0) {
-          // Merge cloud applications with server applications
           const combined = [...serverApps];
           cloudApps.forEach(cloudApp => {
             const existingIdx = combined.findIndex(item => 
               item.id === cloudApp.id || 
-              (cloudApp.trackingId && item.trackingId === cloudApp.trackingId)
+              (cloudApp.trackingId && item.trackingId === cloudApp.trackingId) ||
+              (cloudApp.email && item.email?.toLowerCase() === cloudApp.email.toLowerCase() && item.fullName?.toLowerCase() === cloudApp.fullName?.toLowerCase())
             );
             if (existingIdx >= 0) {
               combined[existingIdx] = { ...combined[existingIdx], ...cloudApp };
             } else {
-              combined.push(cloudApp);
+              combined.unshift(cloudApp);
             }
           });
           serverApps = combined;
         }
       } catch (_) {}
 
-      // 3. If server responded, check if any local submissions need synchronization to server
+      // 3. Merge with local submissions and sync any missing to server & Firestore
       if (Array.isArray(localApps) && localApps.length > 0) {
         const missingOnServer = localApps.filter((localItem: any) => 
           !serverApps.some((serverItem: any) => 
@@ -460,20 +562,20 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         }
       }
 
-      // If server returned data or merged cloud apps, use it and update local cache
+      // If server returned data or merged cloud apps, use it and update local caches
       if (serverApps.length > 0 || result.ok) {
         setApplications(serverApps);
         try {
           localStorage.setItem('mgp_local_applications', JSON.stringify(serverApps));
+          localStorage.setItem('mgp_applications', JSON.stringify(serverApps));
         } catch (_) {}
       } else if (localApps.length > 0) {
-        // Fallback to local storage
         setApplications(localApps);
       }
 
       // Refresh active dossier if one is open
       if (selectedAppId) {
-        const appList = result.ok ? serverApps : localApps;
+        const appList = serverApps.length > 0 ? serverApps : localApps;
         const updated = appList.find((a: any) => a.id === selectedAppId || a.trackingId === selectedAppId);
         if (updated) {
           openDossier(selectedAppId);
@@ -493,13 +595,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 
   // Fetch enquiries with safe fetch & offline recovery
   const fetchEnquiries = async (isBackgroundPoll = false) => {
-    let localEnquiries: any[] = [];
-    try {
-      const rawLocal = localStorage.getItem('mgp_local_enquiries');
-      if (rawLocal) {
-        localEnquiries = JSON.parse(rawLocal);
-      }
-    } catch (_) {}
+    const localEnquiries = readAllLocalEnquiries();
 
     try {
       const result = await safeFetchJson('/api/enquiries');
@@ -534,6 +630,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         setEnquiries(serverEnquiries);
         try {
           localStorage.setItem('mgp_local_enquiries', JSON.stringify(serverEnquiries));
+          localStorage.setItem('mgp_enquiries', JSON.stringify(serverEnquiries));
         } catch (_) {}
       } else if (localEnquiries.length > 0) {
         setEnquiries(localEnquiries);

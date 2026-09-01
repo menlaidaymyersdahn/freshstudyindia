@@ -298,8 +298,8 @@ async function startServer() {
         return res.status(400).json({ success: false, error: 'Full name and email address are required.' });
       }
 
-      const appId = `MGP-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
-      const trackingRef = `MGP-IND-${Math.floor(100000 + Math.random() * 900000)}`;
+      const appId = req.body.id || req.body.trackingId || `MGP-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const trackingRef = req.body.trackingId || req.body.id || `MGP-IND-${Math.floor(100000 + Math.random() * 900000)}`;
 
       // Process and store each document file securely
       const savedDocs = (Array.isArray(documents) ? documents : []).map((doc: any, index: number) => {

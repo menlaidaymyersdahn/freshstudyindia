@@ -38,18 +38,22 @@ export const enquiriesCollection = collection(db, 'enquiries');
 /**
  * Save or sync an application document to Firestore
  */
-export async function syncApplicationToFirestore(appData: any): Promise<boolean> {
+export async function syncApplicationToFirestore(appData: any): Promise<string | null> {
   try {
-    if (!appData || !appData.id) return false;
-    const docRef = doc(db, 'applications', appData.id);
-    await setDoc(docRef, {
+    if (!appData) return null;
+    const docId = appData.id || appData.trackingId || `app_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+    const docRef = doc(db, 'applications', docId);
+    const payload = {
       ...appData,
+      id: docId,
+      trackingId: appData.trackingId || docId,
       updatedAt: new Date().toISOString()
-    }, { merge: true });
-    return true;
+    };
+    await setDoc(docRef, payload, { merge: true });
+    return docId;
   } catch (error) {
     console.warn('Firestore application sync notice:', error);
-    return false;
+    return null;
   }
 }
 
@@ -112,20 +116,59 @@ export async function getAllApplicationsFromFirestore(): Promise<any[]> {
 }
 
 /**
+ * Subscribe to real-time application updates from Firestore
+ */
+export function subscribeToApplicationsInFirestore(callback: (apps: any[]) => void): () => void {
+  try {
+    const unsubscribe = onSnapshot(applicationsCollection, (snapshot) => {
+      const apps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      callback(apps);
+    }, (error) => {
+      console.warn('Firestore applications subscription error:', error);
+    });
+    return unsubscribe;
+  } catch (err) {
+    console.warn('Could not initialize real-time applications listener:', err);
+    return () => {};
+  }
+}
+
+/**
  * Save an enquiry to Firestore
  */
-export async function saveEnquiryToFirestore(enquiryData: any): Promise<boolean> {
+export async function saveEnquiryToFirestore(enquiryData: any): Promise<string | null> {
   try {
-    if (!enquiryData || !enquiryData.id) return false;
-    const docRef = doc(db, 'enquiries', enquiryData.id);
-    await setDoc(docRef, {
+    if (!enquiryData) return null;
+    const docId = enquiryData.id || `enq_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+    const docRef = doc(db, 'enquiries', docId);
+    const payload = {
       ...enquiryData,
+      id: docId,
       createdAt: enquiryData.createdAt || new Date().toISOString()
-    }, { merge: true });
-    return true;
+    };
+    await setDoc(docRef, payload, { merge: true });
+    return docId;
   } catch (error) {
     console.warn('Firestore enquiry save notice:', error);
-    return false;
+    return null;
+  }
+}
+
+/**
+ * Subscribe to real-time enquiry updates from Firestore
+ */
+export function subscribeToEnquiriesInFirestore(callback: (enquiries: any[]) => void): () => void {
+  try {
+    const unsubscribe = onSnapshot(enquiriesCollection, (snapshot) => {
+      const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      callback(list);
+    }, (error) => {
+      console.warn('Firestore enquiries subscription error:', error);
+    });
+    return unsubscribe;
+  } catch (err) {
+    console.warn('Could not initialize real-time enquiries listener:', err);
+    return () => {};
   }
 }
 
