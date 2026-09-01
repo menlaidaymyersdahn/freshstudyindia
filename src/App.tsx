@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -25,6 +25,19 @@ import { ServiceItem } from './types';
 export function App() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Restore path if redirected from 404 static fallback
+  useEffect(() => {
+    try {
+      const redirectPath = sessionStorage.getItem('mgp_redirect_path');
+      if (redirectPath) {
+        sessionStorage.removeItem('mgp_redirect_path');
+        if (redirectPath !== '/' && redirectPath !== location.pathname) {
+          navigate(redirectPath, { replace: true });
+        }
+      }
+    } catch (_) {}
+  }, [navigate, location.pathname]);
 
   // Modal States
   const [isApplicationOpen, setIsApplicationOpen] = useState(false);
@@ -95,46 +108,150 @@ export function App() {
       {/* 2. Main Dedicated Viewport with Clean Routes */}
       <main className="flex-1">
         <Routes>
+          {/* Home */}
           <Route 
             path="/" 
             element={<HomePage onOpenApplication={handleOpenApplication} />} 
           />
+
+          {/* Study in India */}
           <Route 
             path="/study-in-india" 
             element={<StudyInIndiaPage onOpenApplication={handleOpenApplication} />} 
           />
           <Route 
+            path="/study-in-india/*" 
+            element={<StudyInIndiaPage onOpenApplication={handleOpenApplication} />} 
+          />
+
+          {/* Services */}
+          <Route 
             path="/services" 
             element={<ServicesPage onOpenApplication={handleOpenApplication} />} 
           />
+          <Route 
+            path="/services/*" 
+            element={<ServicesPage onOpenApplication={handleOpenApplication} />} 
+          />
+
+          {/* Universities */}
           <Route 
             path="/universities" 
             element={<UniversitiesPage onOpenApplication={handleOpenApplication} />} 
           />
           <Route 
+            path="/universities/*" 
+            element={<UniversitiesPage onOpenApplication={handleOpenApplication} />} 
+          />
+
+          {/* FAQ */}
+          <Route 
             path="/faq" 
             element={<FAQPage onOpenApplication={handleOpenApplication} />} 
           />
+          <Route 
+            path="/faq/*" 
+            element={<FAQPage onOpenApplication={handleOpenApplication} />} 
+          />
+
+          {/* About */}
           <Route 
             path="/about" 
             element={<AboutPage onOpenApplication={handleOpenApplication} />} 
           />
           <Route 
+            path="/about/*" 
+            element={<AboutPage onOpenApplication={handleOpenApplication} />} 
+          />
+
+          {/* Contact */}
+          <Route 
             path="/contact" 
             element={<ContactPage onOpenApplication={handleOpenApplication} />} 
           />
+          <Route 
+            path="/contact/*" 
+            element={<ContactPage onOpenApplication={handleOpenApplication} />} 
+          />
+
+          {/* Apply Portal & Common Direct Links */}
           <Route 
             path="/apply" 
             element={<ApplyPage />} 
           />
           <Route 
+            path="/apply/*" 
+            element={<ApplyPage />} 
+          />
+          <Route 
+            path="/Apply" 
+            element={<ApplyPage />} 
+          />
+          <Route 
+            path="/Apply/*" 
+            element={<ApplyPage />} 
+          />
+          <Route 
+            path="/apply-now" 
+            element={<ApplyPage />} 
+          />
+          <Route 
+            path="/apply-now/*" 
+            element={<ApplyPage />} 
+          />
+          <Route 
+            path="/application" 
+            element={<ApplyPage />} 
+          />
+          <Route 
+            path="/application/*" 
+            element={<ApplyPage />} 
+          />
+          <Route 
+            path="/applications" 
+            element={<ApplyPage />} 
+          />
+          <Route 
+            path="/applications/*" 
+            element={<ApplyPage />} 
+          />
+
+          {/* Student Portal & Tracking */}
+          <Route 
             path="/student-portal" 
             element={<StudentPortalPage />} 
           />
           <Route 
+            path="/student-portal/*" 
+            element={<StudentPortalPage />} 
+          />
+          <Route 
+            path="/portal" 
+            element={<StudentPortalPage />} 
+          />
+          <Route 
+            path="/portal/*" 
+            element={<StudentPortalPage />} 
+          />
+          <Route 
+            path="/track" 
+            element={<StudentPortalPage />} 
+          />
+          <Route 
+            path="/track/*" 
+            element={<StudentPortalPage />} 
+          />
+
+          {/* Admin Management */}
+          <Route 
             path="/admin" 
             element={<AdminPage />} 
           />
+          <Route 
+            path="/admin/*" 
+            element={<AdminPage />} 
+          />
+
           {/* Fallback redirect */}
           <Route 
             path="*" 

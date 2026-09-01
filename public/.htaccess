@@ -1,0 +1,33 @@
+# Myers Global Pathways - Apache / LiteSpeed / cPanel SPA Routing Rules
+# Enables direct URL access for /apply/, /student-portal/, /universities/, etc. without 404
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. Do not rewrite existing physical files, directories, or symlinks
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d [OR]
+  RewriteCond %{REQUEST_FILENAME} -l
+  RewriteRule ^ - [L]
+
+  # 2. Do not rewrite backend API requests if reverse proxied
+  RewriteRule ^api/ - [L]
+
+  # 3. Route all other requests to index.html for Single Page Application routing
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Custom 404 Fallback
+ErrorDocument 404 /index.html
+
+# Security & Caching Headers
+<IfModule mod_headers.c>
+  # Prevent MIME type sniffing
+  Header set X-Content-Type-Options "nosniff"
+  
+  # Enable CORS for fonts & assets
+  <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|font.css|css|js|svg|png|jpg|jpeg|webp)$">
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
+</IfModule>

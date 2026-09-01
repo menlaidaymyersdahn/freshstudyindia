@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Myers Global Pathways | Redirecting...</title>
+    <script>
+      // Single Page Application redirect script for static hosts (GitHub Pages, S3, etc.)
+      (function() {
+        var path = window.location.pathname;
+        var search = window.location.search;
+        var hash = window.location.hash;
+        
+        // Store path in session storage or redirect to index.html with query path
+        sessionStorage.setItem('mgp_redirect_path', path + search + hash);
+        window.location.replace('/' + (search ? search : '') + (hash ? hash : ''));
+      })();
+    </script>
+  </head>
+  <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #EBF3FC; color: #0F172A;">
+    <div style="text-align: center; padding: 2rem;">
+      <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Loading Myers Global Pathways...</h2>
+      <p style="color: #64748B;">Connecting to admissions portal...</p>
+    </div>
+  </body>
+</html>
