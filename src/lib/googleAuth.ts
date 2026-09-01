@@ -79,6 +79,16 @@ export const googleSignIn = async (): Promise<{ user: User; accessToken: string 
       accessToken: cachedAccessToken
     };
   } catch (error: any) {
+    // Gracefully handle standard user cancellation / popup closure
+    if (
+      error?.code === 'auth/popup-closed-by-user' ||
+      error?.code === 'auth/cancelled-popup-request' ||
+      error?.message?.includes('auth/popup-closed-by-user') ||
+      error?.message?.includes('popup-closed-by-user')
+    ) {
+      console.warn('Google Workspace sign-in popup closed by user.');
+      return null;
+    }
     console.error('Google Workspace Sign-in error:', error);
     throw error;
   } finally {

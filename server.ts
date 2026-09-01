@@ -62,6 +62,17 @@ function saveApplicationsToDisk(apps: any[]) {
   }
 }
 
+// Resilient application lookup helper
+function findAppIndex(apps: any[], identifier: string): number {
+  if (!identifier || !Array.isArray(apps)) return -1;
+  const cleanId = String(identifier).trim().toLowerCase();
+  return apps.findIndex(a => 
+    (a.id && String(a.id).trim().toLowerCase() === cleanId) ||
+    (a.trackingId && String(a.trackingId).trim().toLowerCase() === cleanId) ||
+    (a.email && String(a.email).trim().toLowerCase() === cleanId)
+  );
+}
+
 // Helper to load persistent enquiries
 function loadEnquiriesFromDisk(): any[] {
   try {
@@ -668,15 +679,15 @@ async function startServer() {
   app.get('/api/applications/:id', (req, res) => {
     try {
       applications = loadApplicationsFromDisk();
-      const appRecord = applications.find(a => a.id === req.params.id);
+      const index = findAppIndex(applications, req.params.id);
 
-      if (!appRecord) {
+      if (index === -1) {
         return res.status(404).json({ success: false, error: 'Application not found' });
       }
 
       res.json({
         success: true,
-        application: appRecord
+        application: applications[index]
       });
     } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });
@@ -686,12 +697,26 @@ async function startServer() {
   // 6. UPDATE APPLICATION STATUS & TRIGGER AUTOMATED EMAIL NOTIFICATION
   app.patch('/api/applications/:id/status', async (req, res) => {
     try {
-      const { status, noteText, author = 'Admissions Officer', sendEmail = true } = req.body;
+      const { application: providedApp, status, noteText, author = 'Admissions Officer', sendEmail = true } = req.body;
       applications = loadApplicationsFromDisk();
-      const index = applications.findIndex(a => a.id === req.params.id);
+      let index = findAppIndex(applications, req.params.id);
 
       if (index === -1) {
-        return res.status(404).json({ success: false, error: 'Application not found' });
+        const targetId = req.params.id || `MGP-${Date.now()}`;
+        const newRecord = {
+          id: targetId,
+          trackingId: (providedApp && providedApp.trackingId) || targetId,
+          fullName: (providedApp && providedApp.fullName) || 'Student Applicant',
+          email: (providedApp && providedApp.email) || '',
+          whatsapp: (providedApp && providedApp.whatsapp) || '',
+          preferredCourse: (providedApp && providedApp.preferredCourse) || 'Degree Program',
+          preferredUniversity: (providedApp && providedApp.preferredUniversity) || 'SRM Institute of Science & Technology',
+          ...(providedApp || {}),
+          status: status || 'Application Submitted',
+          createdAt: new Date().toISOString()
+        };
+        applications.unshift(newRecord);
+        index = 0;
       }
 
       const oldStatus = applications[index].status;
@@ -1047,6 +1072,7 @@ async function startServer() {
   app.post('/api/applications/:id/approve', async (req, res) => {
     try {
       const { 
+        application: providedApp,
         approvedUniversity, 
         approvedProgram, 
         tuitionFeeUsd = '2,800', 
@@ -1058,15 +1084,31 @@ async function startServer() {
       } = req.body;
 
       applications = loadApplicationsFromDisk();
-      const index = applications.findIndex(a => a.id === req.params.id);
+      let index = findAppIndex(applications, req.params.id);
+
       if (index === -1) {
-        return res.status(404).json({ success: false, error: 'Application not found' });
+        // If not present in local file but provided in payload or valid ID, insert it
+        const targetId = req.params.id || `MGP-${Date.now()}`;
+        const newRecord = {
+          id: targetId,
+          trackingId: (providedApp && providedApp.trackingId) || targetId,
+          fullName: (providedApp && providedApp.fullName) || 'Student Applicant',
+          email: (providedApp && providedApp.email) || '',
+          whatsapp: (providedApp && providedApp.whatsapp) || '',
+          preferredCourse: (providedApp && providedApp.preferredCourse) || approvedProgram || 'Degree Program',
+          preferredUniversity: (providedApp && providedApp.preferredUniversity) || approvedUniversity || 'SRM Institute of Science & Technology',
+          ...(providedApp || {}),
+          status: 'Application Submitted',
+          createdAt: new Date().toISOString()
+        };
+        applications.unshift(newRecord);
+        index = 0;
       }
 
       const appItem = applications[index];
       const admissionDetails = {
         approvedUniversity: approvedUniversity || appItem.preferredUniversity || 'SRM Institute of Science & Technology / Anna University',
-        approvedProgram: approvedProgram || appItem.preferredCourse || appItem.preferredStudyLevel,
+        approvedProgram: approvedProgram || appItem.preferredCourse || appItem.preferredStudyLevel || 'Undergraduate Degree Program',
         tuitionFeeUsd: String(tuitionFeeUsd),
         scholarshipPercentage: String(scholarshipPercentage),
         intakeSemester: String(intakeSemester),
@@ -1093,7 +1135,7 @@ async function startServer() {
       const offerDocId = `doc-offer-${Date.now()}`;
       appItem.documents.unshift({
         id: offerDocId,
-        name: `Official_Provisional_Admission_Letter_${appItem.fullName.replace(/\s+/g, '_')}.pdf`,
+        name: `Official_Provisional_Admission_Letter_${(appItem.fullName || 'Student').replace(/\s+/g, '_')}.pdf`,
         size: 850000,
         formattedSize: '850 KB',
         type: 'application/pdf',
@@ -1160,12 +1202,15 @@ async function startServer() {
       applications = loadApplicationsFromDisk();
       let approvedCount = 0;
       let emailsDispatchedCount = 0;
-      const idSet = new Set(ids);
+      const idSet = new Set(ids.map((id: any) => String(id).trim().toLowerCase()));
       const baseUrl = `${req.protocol}://${req.get('host')}`;
 
       for (let i = 0; i < applications.length; i++) {
         const appItem = applications[i];
-        if (idSet.has(appItem.id)) {
+        const appIdClean = appItem.id ? String(appItem.id).trim().toLowerCase() : '';
+        const appTrackClean = appItem.trackingId ? String(appItem.trackingId).trim().toLowerCase() : '';
+        
+        if (idSet.has(appIdClean) || idSet.has(appTrackClean)) {
           approvedCount++;
           const targetUni = approvedUniversity || appItem.preferredUniversity || 'SRM Institute of Science & Technology / Anna University';
           const targetProg = appItem.preferredCourse || appItem.preferredStudyLevel || 'Undergraduate Degree Program';
@@ -1193,7 +1238,7 @@ async function startServer() {
           const updatedDocs = appItem.documents ? [...appItem.documents] : [];
           updatedDocs.unshift({
             id: `doc-offer-${Date.now()}-${approvedCount}`,
-            name: `Official_Provisional_Admission_Letter_${appItem.fullName.replace(/\s+/g, '_')}.pdf`,
+            name: `Official_Provisional_Admission_Letter_${(appItem.fullName || 'Student').replace(/\s+/g, '_')}.pdf`,
             size: 850000,
             formattedSize: '850 KB',
             type: 'application/pdf',
