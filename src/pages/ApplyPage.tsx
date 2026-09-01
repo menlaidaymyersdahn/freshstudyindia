@@ -22,6 +22,8 @@ import {
 import { syncApplicationToFirestore } from '../lib/firebase';
 import { useSEO } from '../hooks/useSEO';
 import { COMPANY } from '../config/company';
+import { PhoneInputField } from '../components/PhoneInputField';
+import { validatePhoneNumber } from '../config/countryCodes';
 
 export const ApplyPage: React.FC = () => {
   const navigate = useNavigate();
@@ -110,8 +112,16 @@ export const ApplyPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setErrorMessage(null);
+
+    // Validate Phone Number with Country Code Requirement
+    const phoneValidation = validatePhoneNumber(formData.whatsapp);
+    if (!phoneValidation.isValid) {
+      setErrorMessage(phoneValidation.error || 'A valid phone number with country calling code (e.g. +231) is required.');
+      return;
+    }
+
+    setIsSubmitting(true);
 
     const generatedTrackingId = `MGP-2026-${Math.floor(1000 + Math.random() * 9000)}`;
 
@@ -346,19 +356,18 @@ export const ApplyPage: React.FC = () => {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">
-                      WhatsApp / Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      value={formData.whatsapp}
-                      onChange={e => setFormData({ ...formData, whatsapp: e.target.value })}
-                      placeholder="e.g. +231 88 123 4567"
-                      className="w-full p-3 rounded-xl bg-slate-50 border border-sky-200 focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-slate-900 transition-all font-medium"
-                    />
-                  </div>
+                  <PhoneInputField
+                    id="apply-whatsapp-input"
+                    label="WhatsApp / Phone Number"
+                    required
+                    value={formData.whatsapp}
+                    onChange={(val) => setFormData(prev => ({ ...prev, whatsapp: val }))}
+                    onCountrySelect={(countryName) => {
+                      if (!formData.country) {
+                        setFormData(prev => ({ ...prev, country: countryName }));
+                      }
+                    }}
+                  />
 
                   <div>
                     <label className="block text-slate-700 font-bold mb-1">

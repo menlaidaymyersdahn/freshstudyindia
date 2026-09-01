@@ -16,6 +16,8 @@ import {
   Cloud
 } from 'lucide-react';
 import { syncApplicationToFirestore } from '../lib/firebase';
+import { PhoneInputField } from './PhoneInputField';
+import { validatePhoneNumber } from '../config/countryCodes';
 
 interface ApplicationModalProps {
   isOpen: boolean;
@@ -110,6 +112,13 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
     }
     if (!formData.email.trim() || !formData.email.includes('@')) {
       setErrorMessage('A valid email address is required.');
+      return;
+    }
+
+    // Country code required validation
+    const phoneValidation = validatePhoneNumber(formData.whatsapp);
+    if (!phoneValidation.isValid) {
+      setErrorMessage(phoneValidation.error || 'A valid phone number with country calling code (e.g. +231) is required.');
       return;
     }
 
@@ -385,43 +394,45 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      WhatsApp Number
-                    </label>
-                    <input
-                      type="tel"
-                      value={formData.whatsapp}
-                      onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
-                      placeholder="+231 88 123 4567"
-                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900"
-                    />
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <PhoneInputField
+                    id="modal-whatsapp-input"
+                    label="WhatsApp Number"
+                    required
+                    value={formData.whatsapp}
+                    onChange={(val) => setFormData(prev => ({ ...prev, whatsapp: val }))}
+                    onCountrySelect={(countryName) => {
+                      if (!formData.country) {
+                        setFormData(prev => ({ ...prev, country: countryName }));
+                      }
+                    }}
+                  />
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Country of Origin / Residence
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.country}
-                      onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                      placeholder="e.g. Liberia, Ghana..."
-                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900"
-                    />
-                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Country of Origin *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.country}
+                        onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                        placeholder="e.g. Liberia, Ghana..."
+                        className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Date of Birth
-                    </label>
-                    <input
-                      type="date"
-                      value={formData.dateOfBirth}
-                      onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900"
-                    />
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Date of Birth *
+                      </label>
+                      <input
+                        type="date"
+                        value={formData.dateOfBirth}
+                        onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-slate-900"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

@@ -55,8 +55,29 @@ get_header();
             <input type="email" id="mgp-email" name="email" required placeholder="student@example.com" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 0.5rem; border: 1px solid #CBD5E1; font-size: 0.95rem;" />
           </div>
           <div>
-            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 0.25rem;">WhatsApp Number *</label>
-            <input type="text" id="mgp-whatsapp" name="whatsapp" required placeholder="+231 88 123 4567" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 0.5rem; border: 1px solid #CBD5E1; font-size: 0.95rem;" />
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+              <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #334155;">WhatsApp / Phone Number *</label>
+              <span style="font-size: 0.75rem; font-weight: 700; color: #1E40AF; background: #DBEAFE; padding: 0.1rem 0.4rem; border-radius: 4px;">Country Code Required</span>
+            </div>
+            <div style="display: flex; gap: 0.35rem;">
+              <select id="mgp-country-code" style="width: 140px; padding: 0.65rem 0.5rem; border-radius: 0.5rem; border: 1px solid #CBD5E1; font-size: 0.85rem; background: #F8FAFC; font-weight: 700;">
+                <option value="+231" data-country="Liberia" selected>🇱🇷 +231 (LR)</option>
+                <option value="+233" data-country="Ghana">🇬🇭 +233 (GH)</option>
+                <option value="+234" data-country="Nigeria">🇳🇬 +234 (NG)</option>
+                <option value="+232" data-country="Sierra Leone">🇸🇱 +232 (SL)</option>
+                <option value="+224" data-country="Guinea">🇬🇳 +224 (GN)</option>
+                <option value="+225" data-country="Ivory Coast">🇨🇮 +225 (CI)</option>
+                <option value="+220" data-country="Gambia">🇬🇲 +220 (GM)</option>
+                <option value="+254" data-country="Kenya">🇰🇪 +254 (KE)</option>
+                <option value="+250" data-country="Rwanda">🇷🇼 +250 (RW)</option>
+                <option value="+256" data-country="Uganda">🇺🇬 +256 (UG)</option>
+                <option value="+91" data-country="India">🇮🇳 +91 (IN)</option>
+                <option value="+1" data-country="United States">🇺🇸 +1 (US)</option>
+                <option value="+44" data-country="United Kingdom">🇬🇧 +44 (UK)</option>
+              </select>
+              <input type="tel" id="mgp-local-phone" required placeholder="e.g. 88 942 5645" style="flex: 1; padding: 0.65rem 0.85rem; border-radius: 0.5rem; border: 1px solid #CBD5E1; font-size: 0.95rem;" />
+            </div>
+            <span id="mgp-phone-error" style="display: none; color: #DC2626; font-size: 0.75rem; font-weight: 600; margin-top: 0.25rem;"></span>
           </div>
           <div>
             <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 0.25rem;">Country of Citizenship *</label>
@@ -125,17 +146,42 @@ document.addEventListener('DOMContentLoaded', function() {
   const form = document.getElementById('mgp-wp-apply-form');
   if (!form) return;
 
+  const codeSelect = document.getElementById('mgp-country-code');
+  if (codeSelect) {
+    codeSelect.addEventListener('change', function() {
+      const selectedOption = codeSelect.options[codeSelect.selectedIndex];
+      const countryName = selectedOption.getAttribute('data-country');
+      const countryInput = document.getElementById('mgp-country');
+      if (countryInput && countryName) {
+        countryInput.value = countryName;
+      }
+    });
+  }
+
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
     const btn = document.getElementById('mgp-submit-btn');
     btn.disabled = true;
     btn.innerText = 'Submitting Application...';
 
+    const dialCode = document.getElementById('mgp-country-code').value;
+    const localNumber = document.getElementById('mgp-local-phone').value.trim();
+    const fullPhone = `${dialCode} ${localNumber}`;
+
+    if (!localNumber || localNumber.length < 5) {
+      const errEl = document.getElementById('mgp-phone-error');
+      errEl.innerText = 'Please enter a valid phone number with your country calling code.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.innerText = 'Submit Application Dossier';
+      return;
+    }
+
     const payload = {
       fullName: document.getElementById('mgp-fullName').value,
       email: document.getElementById('mgp-email').value,
-      phone: document.getElementById('mgp-whatsapp').value,
-      whatsapp: document.getElementById('mgp-whatsapp').value,
+      phone: fullPhone,
+      whatsapp: fullPhone,
       country: document.getElementById('mgp-country').value,
       intendedDegree: document.getElementById('mgp-intendedDegree').value,
       intendedCourse: document.getElementById('mgp-intendedCourse').value,

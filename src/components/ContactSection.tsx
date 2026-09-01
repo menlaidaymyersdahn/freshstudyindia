@@ -3,6 +3,8 @@ import { OFFICIAL_EMAIL_DIRECTORY, getWhatsAppConfig } from '../config/company';
 import { Mail, MessageCircle, Send, CheckCircle2, AlertCircle, Loader2, ArrowRight, Cloud } from 'lucide-react';
 import { ScrollReveal } from './ScrollReveal';
 import { saveEnquiryToFirestore } from '../lib/firebase';
+import { PhoneInputField } from './PhoneInputField';
+import { validatePhoneNumber } from '../config/countryCodes';
 
 export const ContactSection: React.FC = () => {
   const whatsappConfig = getWhatsAppConfig();
@@ -35,6 +37,14 @@ export const ContactSection: React.FC = () => {
     if (!formData.email.trim() || !formData.email.includes('@')) {
       setErrorMessage('Please enter a valid email address.');
       return;
+    }
+
+    if (formData.whatsapp.trim()) {
+      const phoneValidation = validatePhoneNumber(formData.whatsapp);
+      if (!phoneValidation.isValid) {
+        setErrorMessage(phoneValidation.error || 'A valid phone number with country calling code (e.g. +231) is required.');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -291,18 +301,18 @@ export const ContactSection: React.FC = () => {
 
                 {/* WhatsApp & Country */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1">
-                      WhatsApp Number
-                    </label>
-                    <input
-                      type="tel"
-                      value={formData.whatsapp}
-                      onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
-                      placeholder="e.g. +231 88 123 4567"
-                      className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-sky-50/50 border border-sky-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900"
-                    />
-                  </div>
+                  <PhoneInputField
+                    id="contact-whatsapp-input"
+                    label="WhatsApp / Phone Number"
+                    required={false}
+                    value={formData.whatsapp}
+                    onChange={(val) => setFormData(prev => ({ ...prev, whatsapp: val }))}
+                    onCountrySelect={(countryName) => {
+                      if (!formData.country) {
+                        setFormData(prev => ({ ...prev, country: countryName }));
+                      }
+                    }}
+                  />
 
                   <div>
                     <label className="block text-xs font-bold text-slate-800 mb-1">
