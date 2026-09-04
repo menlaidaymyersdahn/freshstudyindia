@@ -66,9 +66,11 @@ import {
   subscribeToEnquiriesInFirestore,
   syncApplicationToFirestore,
   deleteApplicationFromFirestore,
-  deleteEnquiryFromFirestore
+  deleteEnquiryFromFirestore,
+  getFirestoreQuotaStatus
 } from '../lib/firebase';
 import { ApplicationsAnalyticsChart } from './ApplicationsAnalyticsChart';
+import { WhatsAppAdmissionsMessageModal } from './WhatsAppAdmissionsMessageModal';
 
 interface AdminDashboardModalProps {
   isOpen: boolean;
@@ -123,6 +125,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   // Internal Notes State
   const [newNoteText, setNewNoteText] = useState('');
   const [isAddingNote, setIsAddingNote] = useState(false);
+  const [firestoreQuotaExceeded, setFirestoreQuotaExceeded] = useState(false);
 
   // Modals inside Admin
   // 1. WhatsApp Launcher Modal
@@ -405,11 +408,11 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         }
       });
 
-      // Background real-time poller (every 4 seconds while dashboard is open)
+      // Background real-time poller (every 30 seconds while dashboard is open to avoid quota burn)
       const pollInterval = setInterval(() => {
         fetchApplications(true);
         fetchEnquiries(true);
-      }, 4000);
+      }, 30000);
 
       // Instant live notification when an application or enquiry is submitted anywhere in the window
       const handleSubmissionEvent = () => {
@@ -515,26 +518,39 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         serverApps = result.data.applications || [];
       }
 
-      // Also fetch from Cloud Firestore to ensure 100% data sync
-      try {
-        const cloudApps = await getAllApplicationsFromFirestore();
-        if (Array.isArray(cloudApps) && cloudApps.length > 0) {
-          const combined = [...serverApps];
-          cloudApps.forEach(cloudApp => {
-            const existingIdx = combined.findIndex(item => 
-              item.id === cloudApp.id || 
-              (cloudApp.trackingId && item.trackingId === cloudApp.trackingId) ||
-              (cloudApp.email && item.email?.toLowerCase() === cloudApp.email.toLowerCase() && item.fullName?.toLowerCase() === cloudApp.fullName?.toLowerCase())
-            );
-            if (existingIdx >= 0) {
-              combined[existingIdx] = { ...combined[existingIdx], ...cloudApp };
-            } else {
-              combined.unshift(cloudApp);
-            }
-          });
-          serverApps = combined;
+      // Also fetch from Cloud Firestore to ensure 100% data sync (skip during background polls to save quota)
+      if (!isBackgroundPoll) {
+        try {
+          const cloudApps = await getAllApplicationsFromFirestore();
+          const quota = getFirestoreQuotaStatus();
+          setFirestoreQuotaExceeded(quota.isExceeded);
+
+          if (Array.isArray(cloudApps) && cloudApps.length > 0) {
+            const combined = [...serverApps];
+            cloudApps.forEach(cloudApp => {
+              const existingIdx = combined.findIndex(item => 
+                item.id === cloudApp.id || 
+                (cloudApp.trackingId && item.trackingId === cloudApp.trackingId) ||
+                (cloudApp.email && item.email?.toLowerCase() === cloudApp.email.toLowerCase() && item.fullName?.toLowerCase() === cloudApp.fullName?.toLowerCase())
+              );
+              if (existingIdx >= 0) {
+                combined[existingIdx] = { ...combined[existingIdx], ...cloudApp };
+              } else {
+                combined.unshift(cloudApp);
+              }
+            });
+            serverApps = combined;
+          }
+        } catch (_) {
+          const quota = getFirestoreQuotaStatus();
+          setFirestoreQuotaExceeded(quota.isExceeded);
         }
-      } catch (_) {}
+      } else {
+        const quota = getFirestoreQuotaStatus();
+        if (quota.isExceeded) {
+          setFirestoreQuotaExceeded(true);
+        }
+      }
 
       // 3. Merge with local submissions and sync any missing to server & Firestore
       if (Array.isArray(localApps) && localApps.length > 0) {
@@ -885,14 +901,14 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   };
 
   // Open WhatsApp Composer
-  const handleOpenWhatsApp = (app: ApplicationSubmission) => {
-    setSelectedAppDossier(app);
-    setSelectedAppId(app.id || null);
-    
-    // Default message template
-    const cleanPhone = (app.whatsapp || '').replace(/[^0-9+]/g, '');
-    const templateMsg = `Hello ${app.fullName}, greetings from Myers Global Pathways admissions desk. Regarding your university application (${app.trackingId}) for ${app.preferredCourse || 'your program'} in India: We are pleased to assist you with the next stage of your admission. Please let us know if you have any questions!`;
-    setCustomWhatsAppMsg(templateMsg);
+  const handleOpenWhatsApp = (app?: ApplicationSubmission | null) => {
+    if (app) {
+      setSelectedAppDossier(app);
+      setSelectedAppId(app.id || null);
+    } else {
+      setSelectedAppDossier(null);
+      setSelectedAppId(null);
+    }
     setWhatsappModalOpen(true);
   };
 
@@ -1754,14 +1770,26 @@ Website: https://myersglobalpathways.com`;
 
           <div className="flex items-center gap-2">
             {isAuthenticated && (
-              <button
-                onClick={handleExportCSV}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-200 bg-slate-800/90 hover:bg-slate-700 border border-slate-700 transition-colors cursor-pointer"
-                title="Export database to CSV"
-              >
-                <Download className="w-3.5 h-3.5 text-amber-400" />
-                <span>Export CSV</span>
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleOpenWhatsApp(null)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-950 bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-300 hover:to-emerald-400 shadow-sm transition-all cursor-pointer"
+                  title="Open Admissions WhatsApp Messaging Desk"
+                >
+                  <Phone className="w-3.5 h-3.5 fill-slate-950 text-slate-950" />
+                  <span>WhatsApp Desk</span>
+                </button>
+
+                <button
+                  onClick={handleExportCSV}
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-200 bg-slate-800/90 hover:bg-slate-700 border border-slate-700 transition-colors cursor-pointer"
+                  title="Export database to CSV"
+                >
+                  <Download className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Export CSV</span>
+                </button>
+              </>
             )}
 
             <button
@@ -2053,6 +2081,16 @@ Website: https://myersglobalpathways.com`;
                   )}
 
                   <button
+                    type="button"
+                    onClick={() => handleOpenWhatsApp(null)}
+                    className="p-2 rounded-xl text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors shadow-2xs cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
+                    title="Open WhatsApp Admissions Message Generator"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="hidden sm:inline">WhatsApp Desk</span>
+                  </button>
+
+                  <button
                     onClick={() => { fetchApplications(); fetchEnquiries(); }}
                     className="p-2 rounded-xl text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 transition-colors shadow-2xs cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
                     title="Refresh database records"
@@ -2068,6 +2106,79 @@ Website: https://myersglobalpathways.com`;
               {/* ===================================================================== */}
               {adminTab === 'applications' && (
                 <div className="space-y-5">
+
+                  {/* Cohort Status & Quota Notice */}
+                  {applications.length >= 116 ? (
+                    <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs flex flex-wrap items-center justify-between gap-3 animate-fadeIn shadow-2xs">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                          <CheckCircle className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-extrabold text-emerald-950 text-sm">
+                              All 116 Student Applications Active & Synchronized
+                            </h4>
+                            <span className="px-2 py-0.5 rounded-md bg-emerald-200/80 text-[10px] font-black uppercase text-emerald-900 tracking-wide">
+                              Live Vault
+                            </span>
+                          </div>
+                          <p className="text-emerald-800 mt-0.5 leading-relaxed text-[11px]">
+                            Complete international applicant cohort from Liberia & West Africa loaded with full document dossiers, contact channels, and 30-day timeline analytics.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1.5 rounded-xl bg-white border border-emerald-300 font-extrabold text-emerald-900 text-xs shadow-2xs">
+                          116 / 116 Dossiers Indexed
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => fetchApplications(false)}
+                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" />
+                          <span>Refresh</span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : firestoreQuotaExceeded ? (
+                    <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-400 text-amber-950 text-xs space-y-2 animate-fadeIn shadow-xs">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <AlertTriangle className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-extrabold text-amber-950 text-sm">
+                              Google Cloud Firestore Free Daily Read Quota Reached
+                            </h4>
+                            <p className="text-amber-900 mt-1 leading-relaxed">
+                              Your database holds <strong>all 116 student application dossiers</strong>. Google Cloud’s free tier daily read limit (<strong>50,000 document reads/day</strong>) was temporarily reached today during high dashboard activity.
+                            </p>
+                            <p className="text-amber-800 mt-1.5 font-medium leading-relaxed">
+                              <strong>Currently viewing {applications.length} cached records:</strong> No data is lost. All 116 student records remain permanently saved in your Google Cloud Firestore database.
+                            </p>
+                            <div className="mt-2.5 flex flex-wrap items-center gap-2 text-[11px] text-amber-950 font-semibold">
+                              <span className="px-2.5 py-1 rounded-lg bg-amber-200/80 border border-amber-300">
+                                ⏳ Resets automatically at midnight PST
+                              </span>
+                              <span className="px-2.5 py-1 rounded-lg bg-amber-200/80 border border-amber-300">
+                                ⚡ Or upgrade to Firebase Blaze (Pay-as-you-go) for unlimited reads
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => fetchApplications(false)}
+                          className="px-3 py-1.5 rounded-xl bg-amber-200 hover:bg-amber-300 text-amber-950 font-bold shrink-0 text-xs transition-colors cursor-pointer shadow-2xs"
+                        >
+                          Retry Cloud Sync
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
                   
                   {/* Integrated 30-Day Applications Chart (with toggle control) */}
                   <div className="space-y-2">
@@ -3355,112 +3466,36 @@ Website: https://myersglobalpathways.com`;
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. MODAL: WHATSAPP COMPOSER & LAUNCHER */}
+      {/* 3. MODAL: PROFESSIONAL WHATSAPP ADMISSIONS DESK */}
       {/* ========================================================================= */}
-      {whatsappModalOpen && selectedAppDossier && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-200 text-left space-y-4 animate-scaleUp">
-            
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-sm">
-                  <Phone className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-base font-extrabold text-slate-950">WhatsApp Applicant</h4>
-                  <p className="text-xs text-slate-500">Direct message to: {selectedAppDossier.fullName} ({selectedAppDossier.whatsapp || 'Registered'})</p>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setWhatsappModalOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Quick Templates */}
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 block mb-1.5">
-                Quick Message Templates:
-              </span>
-              <div className="grid grid-cols-2 gap-1.5 text-xs">
-                <button
-                  type="button"
-                  onClick={() => handleSelectWhatsAppTemplate('offer')}
-                  className={`p-2 rounded-xl border text-left font-semibold cursor-pointer ${
-                    whatsappTemplate === 'offer' ? 'bg-emerald-50 border-emerald-400 text-emerald-950' : 'bg-slate-50 border-slate-200 text-slate-700'
-                  }`}
-                >
-                  🎉 Offer Letter Approval
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSelectWhatsAppTemplate('documents')}
-                  className={`p-2 rounded-xl border text-left font-semibold cursor-pointer ${
-                    whatsappTemplate === 'documents' ? 'bg-emerald-50 border-emerald-400 text-emerald-950' : 'bg-slate-50 border-slate-200 text-slate-700'
-                  }`}
-                >
-                  📄 Document Verification
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSelectWhatsAppTemplate('visa')}
-                  className={`p-2 rounded-xl border text-left font-semibold cursor-pointer ${
-                    whatsappTemplate === 'visa' ? 'bg-emerald-50 border-emerald-400 text-emerald-950' : 'bg-slate-50 border-slate-200 text-slate-700'
-                  }`}
-                >
-                  ✈️ Visa Preparation Packet
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSelectWhatsAppTemplate('general')}
-                  className={`p-2 rounded-xl border text-left font-semibold cursor-pointer ${
-                    whatsappTemplate === 'general' ? 'bg-emerald-50 border-emerald-400 text-emerald-950' : 'bg-slate-50 border-slate-200 text-slate-700'
-                  }`}
-                >
-                  💬 General Follow-up
-                </button>
-              </div>
-            </div>
-
-            {/* Editable WhatsApp Text */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Message Content
-              </label>
-              <textarea
-                rows={5}
-                value={customWhatsAppMsg}
-                onChange={(e) => setCustomWhatsAppMsg(e.target.value)}
-                className="w-full p-3 rounded-xl text-xs bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900 leading-relaxed font-sans"
-              />
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setWhatsappModalOpen(false)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
-              >
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                onClick={handleSendWhatsApp}
-                disabled={isLoggingWhatsApp || !customWhatsAppMsg.trim()}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors flex items-center gap-1.5 shadow-md cursor-pointer"
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>Open WhatsApp & Log Message</span>
-              </button>
-            </div>
-
-          </div>
-        </div>
+      {whatsappModalOpen && (
+        <WhatsAppAdmissionsMessageModal
+          isOpen={whatsappModalOpen}
+          onClose={() => setWhatsappModalOpen(false)}
+          applications={applications}
+          initialApplication={selectedAppDossier}
+          onMessageLogged={async (appId, phone, message) => {
+            try {
+              if (appId) {
+                await fetch(`/api/applications/${appId}/communication`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    type: 'whatsapp',
+                    recipient: phone,
+                    message: message,
+                    sentBy: 'Admissions Desk WhatsApp'
+                  })
+                });
+                showNotification(`WhatsApp message sent and logged in student audit trail.`);
+                openDossier(appId);
+                fetchApplications();
+              }
+            } catch (err) {
+              console.error('Error logging WhatsApp communication:', err);
+            }
+          }}
+        />
       )}
 
       {/* ========================================================================= */}

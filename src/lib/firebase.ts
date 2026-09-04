@@ -102,14 +102,42 @@ export async function lookupApplicationInFirestore(queryStr: string): Promise<an
   }
 }
 
+export interface FirestoreQuotaStatus {
+  isExceeded: boolean;
+  message: string | null;
+  lastChecked: string | null;
+}
+
+export let firestoreQuotaStatus: FirestoreQuotaStatus = {
+  isExceeded: false,
+  message: null,
+  lastChecked: null
+};
+
+export function getFirestoreQuotaStatus(): FirestoreQuotaStatus {
+  return firestoreQuotaStatus;
+}
+
 /**
  * Get all applications from Firestore (for Admin Dashboard)
  */
 export async function getAllApplicationsFromFirestore(): Promise<any[]> {
   try {
     const snapshot = await getDocs(applicationsCollection);
+    firestoreQuotaStatus = {
+      isExceeded: false,
+      message: null,
+      lastChecked: new Date().toISOString()
+    };
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  } catch (error) {
+  } catch (error: any) {
+    const msg = error?.message || String(error);
+    const isQuota = msg.includes('Quota limit exceeded') || msg.toLowerCase().includes('quota') || error?.code === 'resource-exhausted';
+    firestoreQuotaStatus = {
+      isExceeded: isQuota,
+      message: msg,
+      lastChecked: new Date().toISOString()
+    };
     console.warn('Firestore fetch all notice:', error);
     return [];
   }
@@ -121,13 +149,26 @@ export async function getAllApplicationsFromFirestore(): Promise<any[]> {
 export function subscribeToApplicationsInFirestore(callback: (apps: any[]) => void): () => void {
   try {
     const unsubscribe = onSnapshot(applicationsCollection, (snapshot) => {
+      firestoreQuotaStatus = {
+        isExceeded: false,
+        message: null,
+        lastChecked: new Date().toISOString()
+      };
       const apps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       callback(apps);
-    }, (error) => {
+    }, (error: any) => {
+      const msg = error?.message || String(error);
+      if (msg.includes('Quota limit exceeded') || msg.toLowerCase().includes('quota') || error?.code === 'resource-exhausted') {
+        firestoreQuotaStatus = {
+          isExceeded: true,
+          message: msg,
+          lastChecked: new Date().toISOString()
+        };
+      }
       console.warn('Firestore applications subscription error:', error);
     });
     return unsubscribe;
-  } catch (err) {
+  } catch (err: any) {
     console.warn('Could not initialize real-time applications listener:', err);
     return () => {};
   }
