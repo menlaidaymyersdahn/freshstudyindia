@@ -49,17 +49,24 @@ export function useSEO({
     }
 
     // 4. Open Graph Meta Tags
-    const fullUrl = `https://myersglobalpathways.com${canonicalPath}`;
+    const cleanPath = canonicalPath.startsWith('/') ? canonicalPath : (canonicalPath ? `/${canonicalPath}` : '/');
+    const fullUrl = `https://myersglobalpathways.com${cleanPath === '/' ? '/' : cleanPath}`;
+    const fullOgImage = ogImage.startsWith('http') ? ogImage : `https://myersglobalpathways.com${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
+
+    updateMetaTag('meta[property="og:site_name"]', 'property', 'og:site_name', 'Myers Global Pathways');
     updateMetaTag('meta[property="og:title"]', 'property', 'og:title', title);
     updateMetaTag('meta[property="og:description"]', 'property', 'og:description', description);
     updateMetaTag('meta[property="og:url"]', 'property', 'og:url', fullUrl);
     updateMetaTag('meta[property="og:type"]', 'property', 'og:type', ogType);
-    updateMetaTag('meta[property="og:image"]', 'property', 'og:image', ogImage);
+    updateMetaTag('meta[property="og:image"]', 'property', 'og:image', fullOgImage);
+    updateMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', fullOgImage);
+    updateMetaTag('meta[property="og:locale"]', 'property', 'og:locale', 'en_US');
 
     // 5. Twitter Meta Tags
+    updateMetaTag('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
     updateMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', title);
     updateMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', description);
-    updateMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', ogImage);
+    updateMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', fullOgImage);
 
     // 6. Canonical Link
     let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;

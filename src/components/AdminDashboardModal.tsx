@@ -280,9 +280,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     'Application Submitted',
     'Documents Review',
     'University Review',
-    'Admission Decision',
-    'Visa Preparation',
-    'Ready for India'
+    'Admission Decision'
   ];
 
   const universitySuggestions = [
@@ -298,7 +296,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     'Bangalore University Affiliated Health & Tech Institutes'
   ];
 
-  // Helper to read all local storage applications across all keys
+  // Helper to read all local storage applications across all keys and clean cache
   const readAllLocalApplications = () => {
     const list: any[] = [];
     try {
@@ -323,15 +321,60 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
       }
     } catch (_) {}
 
+    const droppedDuplicates = new Set([
+      'MGP-2026-8427', 'MGP-2026-2026', 'MGP-2026-9302', 'MGP-2026-4301',
+      'MGP-2026-5569', 'MGP-2026-5012', 'MGP-2026-6029', 'MGP-2026-7305',
+      'MGP-2026-9942', 'MGP-2026-8409', 'MGP-1787943210312-9084', 'MGP-1787948018674-5424'
+    ]);
+
+    const isTestItem = (item: any) => {
+      const t = String(item.trackingId || '');
+      const course = String(item.preferredCourse || '').toLowerCase();
+      const name = String(item.fullName || '').toLowerCase();
+      if (t === 'MGP-2026-1335' && course.includes('tttt')) return true;
+      if (t === 'MGP-2026-4237' && name === 'myers' && course === 'liberia') return true;
+      if (t === 'MGP-2026-7546' && name.includes('daisy') && course === 'liberia') return true;
+      return false;
+    };
+
     const uniqueMap = new Map<string, any>();
     list.forEach(item => {
       if (!item || !item.fullName) return;
-      const key = item.id || item.trackingId || `${item.email || ''}_${item.fullName}`;
+      const t = String(item.trackingId || item.id || '');
+      // Filter out synthetic dummy records, test records, and duplicates
+      if (/^MGP-2026-1(1[0-9]{2}|20[0-6])$/.test(t) || droppedDuplicates.has(t) || isTestItem(item)) {
+        return;
+      }
+      
+      const cleanItem = { ...item };
+      // Normalize fake statuses
+      if (cleanItem.status === 'Visa Preparation' || cleanItem.status === 'Ready for India') {
+        if (cleanItem.admissionDetails && cleanItem.admissionDetails.offerLetterIssued) {
+          cleanItem.status = 'Admission Decision';
+        } else if ((cleanItem.documents && cleanItem.documents.length > 0) || (cleanItem.documentsCount && cleanItem.documentsCount > 0)) {
+          cleanItem.status = 'Documents Review';
+        } else {
+          cleanItem.status = 'Application Submitted';
+        }
+      }
+
+      if (cleanItem.trackingId === 'MGP-2026-6541' && cleanItem.fullName === 'alieuskonneh6@gamil.com') {
+        cleanItem.fullName = 'Alieu S. Konneh';
+      }
+
+      const key = cleanItem.trackingId || cleanItem.id || `${cleanItem.email || ''}_${cleanItem.fullName}`;
       if (!uniqueMap.has(key)) {
-        uniqueMap.set(key, item);
+        uniqueMap.set(key, cleanItem);
       }
     });
-    return Array.from(uniqueMap.values());
+
+    const cleanedList = Array.from(uniqueMap.values());
+    try {
+      localStorage.setItem('mgp_local_applications', JSON.stringify(cleanedList));
+      localStorage.setItem('mgp_applications', JSON.stringify(cleanedList));
+    } catch (_) {}
+
+    return cleanedList;
   };
 
   // Helper to read all local enquiries across all keys
@@ -746,8 +789,8 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
           showNotification(`✓ Status updated to "${newStatus}"`);
         }
 
-        // Automated Trigger: If status is set to 'Admission Decision' or 'Ready for India', auto-trigger notification modal
-        if (newStatus === 'Admission Decision' || newStatus === 'Ready for India') {
+        // Automated Trigger: If status is set to 'Admission Decision', auto-trigger notification modal
+        if (newStatus === 'Admission Decision') {
           handleOpenInstantNotificationTrigger(updatedApp);
         }
       } else {
@@ -2004,7 +2047,7 @@ Website: https://myersglobalpathways.com`;
                     <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
                       adminTab === 'approvals' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-800'
                     }`}>
-                      {applications.filter(a => a.status === 'Admission Decision' || a.status === 'Ready for India' || a.admissionDetails?.offerLetterIssued).length}
+                      {applications.filter(a => a.status === 'Admission Decision' || a.admissionDetails?.offerLetterIssued).length}
                     </span>
                   </button>
 
@@ -2032,8 +2075,14 @@ Website: https://myersglobalpathways.com`;
                     <span className="text-[9px] font-bold uppercase text-slate-500 block">Total Students</span>
                     <span className="text-base font-extrabold text-slate-950 font-mono">{applications.length}</span>
                   </div>
+                  <div className="px-3 py-2 rounded-xl bg-blue-50/80 border border-blue-200 shadow-2xs">
+                    <span className="text-[9px] font-bold uppercase text-blue-800 block">Submitted</span>
+                    <span className="text-base font-extrabold text-blue-900 font-mono">
+                      {applications.filter(a => a.status === 'Application Submitted').length}
+                    </span>
+                  </div>
                   <div className="px-3 py-2 rounded-xl bg-amber-50/80 border border-amber-200 shadow-2xs">
-                    <span className="text-[9px] font-bold uppercase text-amber-800 block">Reviewing</span>
+                    <span className="text-[9px] font-bold uppercase text-amber-800 block">Under Review</span>
                     <span className="text-base font-extrabold text-amber-900 font-mono">
                       {applications.filter(a => a.status === 'Documents Review' || a.status === 'University Review').length}
                     </span>
@@ -2041,13 +2090,7 @@ Website: https://myersglobalpathways.com`;
                   <div className="px-3 py-2 rounded-xl bg-emerald-50/80 border border-emerald-200 shadow-2xs">
                     <span className="text-[9px] font-bold uppercase text-emerald-800 block">Approved</span>
                     <span className="text-base font-extrabold text-emerald-900 font-mono">
-                      {applications.filter(a => a.status === 'Admission Decision' || a.status === 'Ready for India').length}
-                    </span>
-                  </div>
-                  <div className="px-3 py-2 rounded-xl bg-indigo-50/80 border border-indigo-200 shadow-2xs">
-                    <span className="text-[9px] font-bold uppercase text-indigo-800 block">Visa Stage</span>
-                    <span className="text-base font-extrabold text-indigo-900 font-mono">
-                      {applications.filter(a => a.status === 'Visa Preparation').length}
+                      {applications.filter(a => a.status === 'Admission Decision' || a.admissionDetails?.offerLetterIssued).length}
                     </span>
                   </div>
                 </div>
@@ -2108,7 +2151,7 @@ Website: https://myersglobalpathways.com`;
                 <div className="space-y-5">
 
                   {/* Cohort Status & Quota Notice */}
-                  {applications.length >= 116 ? (
+                  {applications.length > 0 ? (
                     <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs flex flex-wrap items-center justify-between gap-3 animate-fadeIn shadow-2xs">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
@@ -2117,20 +2160,20 @@ Website: https://myersglobalpathways.com`;
                         <div>
                           <div className="flex items-center gap-2">
                             <h4 className="font-extrabold text-emerald-950 text-sm">
-                              All 116 Student Applications Active & Synchronized
+                              All {applications.length} Verified Student Applications Active & Synchronized
                             </h4>
                             <span className="px-2 py-0.5 rounded-md bg-emerald-200/80 text-[10px] font-black uppercase text-emerald-900 tracking-wide">
                               Live Vault
                             </span>
                           </div>
                           <p className="text-emerald-800 mt-0.5 leading-relaxed text-[11px]">
-                            Complete international applicant cohort from Liberia & West Africa loaded with full document dossiers, contact channels, and 30-day timeline analytics.
+                            Complete international applicant cohort from Liberia & West Africa loaded with full document dossiers, verified contact channels, and timeline analytics.
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="px-3 py-1.5 rounded-xl bg-white border border-emerald-300 font-extrabold text-emerald-900 text-xs shadow-2xs">
-                          116 / 116 Dossiers Indexed
+                          {applications.length} / {applications.length} Dossiers Indexed
                         </span>
                         <button
                           type="button"
@@ -2154,10 +2197,10 @@ Website: https://myersglobalpathways.com`;
                               Google Cloud Firestore Free Daily Read Quota Reached
                             </h4>
                             <p className="text-amber-900 mt-1 leading-relaxed">
-                              Your database holds <strong>all 116 student application dossiers</strong>. Google Cloud’s free tier daily read limit (<strong>50,000 document reads/day</strong>) was temporarily reached today during high dashboard activity.
+                              Your database holds <strong>all {applications.length} student application dossiers</strong>. Google Cloud’s free tier daily read limit (<strong>50,000 document reads/day</strong>) was temporarily reached today during high dashboard activity.
                             </p>
                             <p className="text-amber-800 mt-1.5 font-medium leading-relaxed">
-                              <strong>Currently viewing {applications.length} cached records:</strong> No data is lost. All 116 student records remain permanently saved in your Google Cloud Firestore database.
+                              <strong>Currently viewing {applications.length} cached records:</strong> No data is lost. All {applications.length} student records remain permanently saved in your Google Cloud Firestore database.
                             </p>
                             <div className="mt-2.5 flex flex-wrap items-center gap-2 text-[11px] text-amber-950 font-semibold">
                               <span className="px-2.5 py-1 rounded-lg bg-amber-200/80 border border-amber-300">
@@ -2373,7 +2416,7 @@ Website: https://myersglobalpathways.com`;
                           const isSelected = selectedAppId === app.id;
                           const isChecked = selectedAppIds.includes(app.id!);
                           const docsCount = app.documents?.length || app.documentsCount || 0;
-                          const isApproved = app.status === 'Admission Decision' || app.status === 'Ready for India' || app.admissionDetails?.offerLetterIssued;
+                          const isApproved = app.status === 'Admission Decision' || app.admissionDetails?.offerLetterIssued;
 
                           return (
                             <div
@@ -2424,7 +2467,7 @@ Website: https://myersglobalpathways.com`;
                                       ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
                                       : app.status === 'Documents Review'
                                       ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                                      : app.status === 'Visa Preparation'
+                                      : app.status === 'University Review'
                                       ? 'bg-indigo-100 text-indigo-900 border border-indigo-300'
                                       : 'bg-slate-100 text-slate-800 border border-slate-200'
                                   }`}>
@@ -2578,7 +2621,7 @@ Website: https://myersglobalpathways.com`;
                       </div>
 
                       {/* Automated Notification Hub Banner (When application is approved / admission decision) */}
-                      {(selectedAppDossier.status === 'Admission Decision' || selectedAppDossier.status === 'Ready for India' || selectedAppDossier.admissionDetails) && (
+                      {(selectedAppDossier.status === 'Admission Decision' || selectedAppDossier.admissionDetails) && (
                         <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-blue-500/10 border border-amber-300 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3 text-left">
                           <div className="flex items-start gap-3">
                             <div className="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center shrink-0 shadow-xs mt-0.5">
@@ -2668,7 +2711,7 @@ Website: https://myersglobalpathways.com`;
                           </button>
 
                           {/* Approve */}
-                          {selectedAppDossier.status !== 'Admission Decision' && selectedAppDossier.status !== 'Ready for India' && (
+                          {selectedAppDossier.status !== 'Admission Decision' && (
                             <button
                               onClick={() => handleOpenApproveModal(selectedAppDossier)}
                               className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 shadow-xs transition-colors flex items-center gap-1 cursor-pointer"
@@ -2784,11 +2827,10 @@ Website: https://myersglobalpathways.com`;
                         </div>
 
                         {/* Quick Status Stage Transition Buttons */}
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                           {statusOptions.map((st) => {
                             const isCurrent = selectedAppDossier.status === st;
                             const isDecision = st === 'Admission Decision';
-                            const isReady = st === 'Ready for India';
                             
                             return (
                               <button
@@ -2799,9 +2841,7 @@ Website: https://myersglobalpathways.com`;
                                 className={`px-2.5 py-2 rounded-xl text-[11px] font-bold text-left transition-all flex items-center justify-between border cursor-pointer ${
                                   isCurrent
                                     ? isDecision
-                                      ? 'bg-amber-100 border-amber-300 text-amber-950 ring-1 ring-amber-400 font-extrabold'
-                                      : isReady
-                                      ? 'bg-emerald-100 border-emerald-300 text-emerald-950 ring-1 ring-emerald-400 font-extrabold'
+                                      ? 'bg-emerald-600 border-emerald-600 text-white font-extrabold shadow-xs'
                                       : 'bg-blue-700 border-blue-700 text-white shadow-xs'
                                     : 'bg-white border-slate-200 text-slate-700 hover:border-blue-300 hover:bg-blue-50/50'
                                 }`}
@@ -3273,7 +3313,7 @@ Website: https://myersglobalpathways.com`;
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {applications.filter(a => a.status === 'Admission Decision' || a.status === 'Ready for India' || a.admissionDetails?.offerLetterIssued).map((app) => (
+                    {applications.filter(a => a.status === 'Admission Decision' || a.admissionDetails?.offerLetterIssued).map((app) => (
                       <div key={app.id} className="p-4 rounded-2xl bg-white border border-emerald-300 shadow-xs space-y-3 text-left">
                         <div className="flex items-center justify-between">
                           <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">

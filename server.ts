@@ -29,6 +29,39 @@ if (!fs.existsSync(DOCUMENTS_DIR)) {
   fs.mkdirSync(DOCUMENTS_DIR, { recursive: true });
 }
 
+// Known synthetic and duplicate tracking IDs to filter out
+const SYNTHETIC_TRACKING_REGEX = /^MGP-2026-1(1[0-9]{2}|20[0-6])$/;
+const DROPPED_DUPLICATE_TRACKING_IDS = new Set([
+  'MGP-2026-8427', 'MGP-2026-2026', 'MGP-2026-9302', 'MGP-2026-4301',
+  'MGP-2026-5569', 'MGP-2026-5012', 'MGP-2026-6029', 'MGP-2026-7305',
+  'MGP-2026-9942', 'MGP-2026-8409', 'MGP-1787943210312-9084', 'MGP-1787948018674-5424'
+]);
+
+function isTestSubmission(item: any): boolean {
+  if (!item) return true;
+  const t = String(item.trackingId || '');
+  const course = String(item.preferredCourse || '').toLowerCase();
+  const name = String(item.fullName || '').toLowerCase();
+  if (t === 'MGP-2026-1335' && course.includes('tttt')) return true;
+  if (t === 'MGP-2026-4237' && name === 'myers' && course === 'liberia') return true;
+  if (t === 'MGP-2026-7546' && name.includes('daisy') && course === 'liberia') return true;
+  return false;
+}
+
+function normalizeApplicationStatus(item: any): string {
+  const current = String(item.status || 'Application Submitted');
+  if (current === 'Visa Preparation' || current === 'Ready for India') {
+    if (item.admissionDetails && item.admissionDetails.offerLetterIssued) {
+      return 'Admission Decision';
+    }
+    if ((item.documents && item.documents.length > 0) || (item.documentsCount && item.documentsCount > 0)) {
+      return 'Documents Review';
+    }
+    return 'Application Submitted';
+  }
+  return current;
+}
+
 // Persistent data loader for real applications
 function loadApplicationsFromDisk(): any[] {
   try {
@@ -36,14 +69,27 @@ function loadApplicationsFromDisk(): any[] {
       const raw = fs.readFileSync(APPS_FILE, 'utf-8');
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        // Filter out any legacy dummy/seed data
-        const realData = parsed.filter((item: any) => 
-          item && 
-          item.id !== 'MGP-2026-0814' && 
-          item.id !== 'MGP-2026-0925' && 
-          item.id !== 'MGP-2026-1044' && 
-          item.id !== 'MGP-2026-1188'
-        );
+        // Filter out any legacy dummy/seed data, synthetic records, and duplicates
+        const realData = parsed
+          .filter((item: any) => 
+            item && 
+            item.id !== 'MGP-2026-0814' && 
+            item.id !== 'MGP-2026-0925' && 
+            item.id !== 'MGP-2026-1044' && 
+            item.id !== 'MGP-2026-1188' &&
+            !SYNTHETIC_TRACKING_REGEX.test(item.trackingId || '') &&
+            !DROPPED_DUPLICATE_TRACKING_IDS.has(item.trackingId || '') &&
+            !DROPPED_DUPLICATE_TRACKING_IDS.has(item.id || '') &&
+            !isTestSubmission(item)
+          )
+          .map((item: any) => {
+            const clean = { ...item };
+            clean.status = normalizeApplicationStatus(clean);
+            if (clean.trackingId === 'MGP-2026-6541' && clean.fullName === 'alieuskonneh6@gamil.com') {
+              clean.fullName = 'Alieu S. Konneh';
+            }
+            return clean;
+          });
         return realData;
       }
     }
@@ -443,11 +489,19 @@ async function startServer() {
       incomingApps.forEach((item: any) => {
         if (!item || !item.fullName || !item.email) return;
 
+        // Reject synthetic Turn 2 records, test submissions, and known duplicate submissions
+        if (SYNTHETIC_TRACKING_REGEX.test(item.trackingId || '') || 
+            DROPPED_DUPLICATE_TRACKING_IDS.has(item.trackingId || '') || 
+            DROPPED_DUPLICATE_TRACKING_IDS.has(item.id || '') ||
+            isTestSubmission(item)) {
+          return;
+        }
+
         // Check if application already exists by ID, trackingId, or exact (email + submittedAt)
         const exists = applications.some(a => 
           (item.id && a.id === item.id) ||
           (item.trackingId && a.trackingId === item.trackingId) ||
-          (a.email?.toLowerCase() === item.email?.toLowerCase() && a.fullName?.toLowerCase() === item.fullName?.toLowerCase() && Math.abs(new Date(a.submittedAt).getTime() - new Date(item.submittedAt || 0).getTime()) < 60000)
+          (a.email?.toLowerCase() === item.email?.toLowerCase() && a.fullName?.toLowerCase() === item.fullName?.toLowerCase())
         );
 
         if (!exists) {
@@ -468,7 +522,7 @@ async function startServer() {
             preferredCourse: item.preferredCourse ? String(item.preferredCourse).trim() : '',
             preferredUniversity: item.preferredUniversity ? String(item.preferredUniversity).trim() : '',
             message: item.message ? String(item.message).trim() : '',
-            status: item.status || 'Application Submitted',
+            status: normalizeApplicationStatus(item),
             documentsCount: Array.isArray(item.documents) ? item.documents.length : (item.documentsCount || 0),
             documents: Array.isArray(item.documents) ? item.documents : [],
             notes: Array.isArray(item.notes) && item.notes.length > 0 ? item.notes : [
@@ -1837,6 +1891,29 @@ COMMUNICATION STYLE:
         reply: "Our admissions advisors are available to help. Please reach out to admissions@myersglobalpathways.com or submit your enquiry through our portal."
       });
     }
+  });
+
+  // SEO Static Endpoints (Robots.txt & Sitemap.xml)
+  app.get('/robots.txt', (req, res) => {
+    const robotsPath = process.env.NODE_ENV === 'production'
+      ? path.join(process.cwd(), 'dist', 'robots.txt')
+      : path.join(process.cwd(), 'public', 'robots.txt');
+    if (fs.existsSync(robotsPath)) {
+      res.type('text/plain');
+      return res.sendFile(robotsPath);
+    }
+    res.type('text/plain').send("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nSitemap: https://myersglobalpathways.com/sitemap.xml\n");
+  });
+
+  app.get('/sitemap.xml', (req, res) => {
+    const sitemapPath = process.env.NODE_ENV === 'production'
+      ? path.join(process.cwd(), 'dist', 'sitemap.xml')
+      : path.join(process.cwd(), 'public', 'sitemap.xml');
+    if (fs.existsSync(sitemapPath)) {
+      res.type('application/xml');
+      return res.sendFile(sitemapPath);
+    }
+    res.status(404).send('Sitemap not found');
   });
 
   // Vite middleware for development vs static build in production

@@ -63,9 +63,7 @@ export const StudentPortalPage: React.FC = () => {
     'Application Submitted',
     'Documents Review',
     'University Review',
-    'Admission Decision',
-    'Visa Preparation',
-    'Ready for India'
+    'Admission Decision'
   ];
 
   // Load saved local applications on mount

@@ -60,9 +60,7 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
     'Application Submitted',
     'Documents Review',
     'University Review',
-    'Admission Decision',
-    'Visa Preparation',
-    'Ready for India'
+    'Admission Decision'
   ];
 
   // On open: check for existing submissions and auto-load if available
@@ -596,7 +594,7 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
               </div>
 
               {/* Official Admission Offer Letter Banner (If Approved) */}
-              {(studentRecord.admissionDetails || studentRecord.status === 'Admission Decision' || studentRecord.status === 'Ready for India' || studentRecord.status === 'Visa Preparation') && (
+              {(studentRecord.admissionDetails || studentRecord.status === 'Admission Decision') && (
                 <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-300 text-slate-900 space-y-3 shadow-xs">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">

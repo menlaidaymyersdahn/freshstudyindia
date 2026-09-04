@@ -2,9 +2,7 @@ export type ApplicationStatus =
   | 'Application Submitted'
   | 'Documents Review'
   | 'University Review'
-  | 'Admission Decision'
-  | 'Visa Preparation'
-  | 'Ready for India';
+  | 'Admission Decision';
 
 export interface StudentDocument {
   id: string;

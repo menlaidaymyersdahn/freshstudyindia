@@ -1,0 +1,10 @@
+# robots.txt for Myers Global Pathways
+# Production Canonical Domain: https://myersglobalpathways.com
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Sitemap index reference
+Sitemap: https://myersglobalpathways.com/sitemap.xml
