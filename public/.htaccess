@@ -5,11 +5,7 @@
   RewriteEngine On
   RewriteBase /
 
-  # 1. Permanent 301 Redirect www to non-www canonical domain
-  RewriteCond %{HTTP_HOST} ^www\.myersglobalpathways\.com$ [NC]
-  RewriteRule ^(.*)$ https://myersglobalpathways.com/$1 [R=301,L]
-
-  # 2. Do not rewrite existing physical files, directories, or symlinks
+  # 1. Do not rewrite existing physical files, directories, or symlinks
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d [OR]
   RewriteCond %{REQUEST_FILENAME} -l

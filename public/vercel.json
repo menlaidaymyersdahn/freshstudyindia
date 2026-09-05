@@ -1,18 +1,5 @@
 {
   "cleanUrls": false,
-  "redirects": [
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.myersglobalpathways.com"
-        }
-      ],
-      "destination": "https://myersglobalpathways.com/:path*",
-      "permanent": true
-    }
-  ],
   "headers": [
     {
       "source": "/robots.txt",
