@@ -170,6 +170,17 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // 1. Permanent 301 Canonical Redirect: Enforce non-www domain
+  app.use((req, res, next) => {
+    const rawHost = req.headers.host || '';
+    const host = rawHost.split(':')[0].toLowerCase();
+    if (host === 'www.myersglobalpathways.com') {
+      const targetUrl = `https://myersglobalpathways.com${req.originalUrl || '/'}`;
+      return res.redirect(301, targetUrl);
+    }
+    next();
+  });
+
   // Support JSON payloads including uploaded document attachments
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
