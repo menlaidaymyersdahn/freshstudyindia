@@ -12,8 +12,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onOpenApplication }) =
   const navigate = useNavigate();
 
   useSEO({
-    title: 'Contact Admissions Desk & Directory | Myers Global Pathways',
-    description: 'Connect directly with Myers Global Pathways admissions desk via WhatsApp (+231 889425645), official email directory, or submit an enquiry.',
+    title: 'Contact Admissions Desk & Regional Offices | Myers Global Pathways',
+    description: 'Reach Myers Global Pathways through our official admissions desk, email directory, or direct WhatsApp support (+231 889425645) for prompt application guidance.',
     canonicalPath: '/contact',
     keywords: 'Contact Myers Global Pathways, Study in India Liberia Office, India Admissions Desk, International Education Contact'
   });

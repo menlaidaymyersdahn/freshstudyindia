@@ -15,8 +15,8 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({ onOpenApplication })
   const navigate = useNavigate();
 
   useSEO({
-    title: 'Our Complete 8 End-to-End Services | Myers Global Pathways',
-    description: 'Personalized guidance from program discovery and documentation to university admission letters, student visas, and campus settlement in India.',
+    title: 'Admissions & Student Visa Support Services | Myers Global Pathways',
+    description: 'Comprehensive end-to-end guidance for international applicants: profile assessment, application submission, document attestation, visa preparation, and arrival orientation.',
     canonicalPath: '/services',
     keywords: 'Study in India Services, Indian Student Visa Guidance, University Selection India, Document Attestation, International Student Support India'
   });

@@ -14,8 +14,8 @@ export const StudyInIndiaPage: React.FC<StudyInIndiaPageProps> = ({ onOpenApplic
   const navigate = useNavigate();
 
   useSEO({
-    title: 'Study Higher Education in India | Myers Global Pathways',
-    description: 'Discover why thousands of international students choose India for higher education: globally recognized degrees, cutting-edge technology hubs, and affordable tuition.',
+    title: 'Study in India Guide & Higher Education Opportunities | Myers Global Pathways',
+    description: 'Explore academic benefits, globally recognized degrees taught in English, and affordable tuition and living options for international students studying in India.',
     canonicalPath: '/study-in-india',
     keywords: 'Study in India, Higher Education in India, Indian Universities for International Students, Engineering in India, B.Sc Computer Science India, SRSU India'
   });

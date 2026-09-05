@@ -14,8 +14,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenApplication }) => {
   const navigate = useNavigate();
 
   useSEO({
-    title: 'Myers Global Pathways | Study in India — International Admissions Advisory',
-    description: 'Myers Global Pathways assists international students with university selection, admissions guidance, documentation, student visas, and arrival in India.',
+    title: 'Myers Global Pathways | Study in India Admissions Advisory',
+    description: 'Personalized educational consultancy assisting international students with university admissions, degree selection, documentation, student visas, and arrival support in India.',
     canonicalPath: '/',
     keywords: 'Myers Global Pathways, Study in India, International Student Admissions India, African Students in India, India Student Visa Guidance, SRSU India, Menlaiday Myers Dahn'
   });

@@ -39,7 +39,8 @@ export const StudentPortalPage: React.FC = () => {
     title: 'Student Portal & Application Status Tracker | Myers Global Pathways',
     description: 'Track your university application status in real-time, view verified admission letters, and upload supplementary academic documents.',
     canonicalPath: '/student-portal',
-    keywords: 'Student Portal, Application Status Tracker, Myers Global Pathways Student Portal, Study in India Tracker'
+    keywords: 'Student Portal, Application Status Tracker, Myers Global Pathways Student Portal, Study in India Tracker',
+    noIndex: true
   });
 
   const [searchInput, setSearchInput] = useState(initialParamId);

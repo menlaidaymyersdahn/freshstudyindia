@@ -13,8 +13,8 @@ export const FAQPage: React.FC<FAQPageProps> = ({ onOpenApplication }) => {
   const navigate = useNavigate();
 
   useSEO({
-    title: 'Frequently Asked Questions (FAQ) | Myers Global Pathways',
-    description: 'Clear answers on Indian university entry qualifications, English medium exemptions (no IELTS required), fee schedules, and Indian student visas.',
+    title: 'Study in India FAQs & Visa Information | Myers Global Pathways',
+    description: 'Find verified answers regarding admission entry requirements, English medium certificates (no IELTS required), tuition costs, hostels, and student visa processes.',
     canonicalPath: '/faq',
     keywords: 'Study in India FAQ, Indian Student Visa Requirements, Do I need IELTS for India, Tuition Fees in India, Cost of Living India'
   });

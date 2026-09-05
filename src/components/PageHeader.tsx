@@ -30,8 +30,12 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       <div className="absolute inset-0 z-0">
         <img
           src={bgImage}
-          alt={title}
+          alt=""
+          aria-hidden="true"
           className="w-full h-full object-cover object-center opacity-15 filter scale-105"
+          loading="lazy"
+          width={1920}
+          height={400}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#CDE2F8]/95 via-[#E0EEFC]/90 to-[#EBF3FC]/85" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#CDE2F8] via-transparent to-[#EBF3FC]" />

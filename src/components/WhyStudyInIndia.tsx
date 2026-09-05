@@ -72,9 +72,11 @@ export const WhyStudyInIndia: React.FC<WhyStudyInIndiaProps> = ({ onOpenApplicat
           <ScrollReveal delay={0.15} className="lg:col-span-4 relative rounded-3xl overflow-hidden border-2 border-white shadow-xl min-h-[380px] flex flex-col justify-end bg-white group">
             <img 
               src="/DSC_9531.jpeg" 
-              alt="Myers Global Pathways international students celebrating academic success"
+              alt="International students celebrating academic graduation and education opportunities in India"
               className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-700 ease-out"
               loading="lazy"
+              width={800}
+              height={600}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent" />
 

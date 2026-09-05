@@ -72,8 +72,11 @@ export const AboutSection: React.FC = () => {
                 <div className="relative rounded-2xl overflow-hidden border border-sky-200 bg-slate-100 shadow-md group">
                   <img
                     src={selectedPhoto}
-                    alt="Menlaiday Myers Dahn - Founder & CEO"
+                    alt="Menlaiday Myers Dahn, Founder and Managing Director of Myers Global Pathways"
                     className="w-full h-80 sm:h-96 object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                    width={600}
+                    height={800}
                     onError={() => setSelectedPhoto('/DSC_9531.jpeg')}
                   />
                   

@@ -49,9 +49,16 @@ export function useSEO({
     }
 
     // 4. Open Graph Meta Tags
-    const cleanPath = canonicalPath.startsWith('/') ? canonicalPath : (canonicalPath ? `/${canonicalPath}` : '/');
-    const fullUrl = `https://myersglobalpathways.com${cleanPath === '/' ? '/' : cleanPath}`;
-    const fullOgImage = ogImage.startsWith('http') ? ogImage : `https://myersglobalpathways.com${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
+    const normalizedPath = canonicalPath 
+      ? (canonicalPath.startsWith('/') ? canonicalPath : `/${canonicalPath}`)
+      : '/';
+    const fullUrl = normalizedPath === '/' 
+      ? 'https://myersglobalpathways.com/' 
+      : `https://myersglobalpathways.com${normalizedPath.replace(/\/$/, '')}`;
+    
+    const fullOgImage = ogImage.startsWith('http') 
+      ? ogImage 
+      : `https://myersglobalpathways.com${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
 
     updateMetaTag('meta[property="og:site_name"]', 'property', 'og:site_name', 'Myers Global Pathways');
     updateMetaTag('meta[property="og:title"]', 'property', 'og:title', title);
@@ -60,6 +67,7 @@ export function useSEO({
     updateMetaTag('meta[property="og:type"]', 'property', 'og:type', ogType);
     updateMetaTag('meta[property="og:image"]', 'property', 'og:image', fullOgImage);
     updateMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', fullOgImage);
+    updateMetaTag('meta[property="og:image:alt"]', 'property', 'og:image:alt', 'Myers Global Pathways — Study in India Advisory');
     updateMetaTag('meta[property="og:locale"]', 'property', 'og:locale', 'en_US');
 
     // 5. Twitter Meta Tags
@@ -67,6 +75,7 @@ export function useSEO({
     updateMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', title);
     updateMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', description);
     updateMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', fullOgImage);
+    updateMetaTag('meta[name="twitter:image:alt"]', 'name', 'twitter:image:alt', 'Myers Global Pathways — Study in India Advisory');
 
     // 6. Canonical Link
     let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;

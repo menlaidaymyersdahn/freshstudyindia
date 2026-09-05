@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { COMPANY, OFFICIAL_EMAIL_DIRECTORY, getWhatsAppConfig } from '../config/company';
 import { Compass, MessageCircle, ArrowUpRight, ShieldCheck, UserCheck } from 'lucide-react';
 
@@ -21,10 +21,6 @@ export const Footer: React.FC<FooterProps> = ({ onOpenApplication }) => {
     { label: 'Contact', path: '/contact' },
   ];
 
-  const handleNavigate = (path: string) => {
-    navigate(path);
-  };
-
   const handleApplyClick = () => {
     if (onOpenApplication) {
       onOpenApplication();
@@ -42,19 +38,19 @@ export const Footer: React.FC<FooterProps> = ({ onOpenApplication }) => {
           
           {/* Brand & Overview Column */}
           <div className="lg:col-span-4 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white shadow-md shrink-0">
+            <Link to="/" className="flex items-center gap-3 group text-left" aria-label="Myers Global Pathways — Home">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white shadow-md shrink-0" aria-hidden="true">
                 <Compass className="w-5 h-5 text-amber-300 stroke-[2.2]" />
               </div>
               <div>
-                <span className="block text-lg font-extrabold tracking-tight text-slate-950">
+                <span className="block text-lg font-extrabold tracking-tight text-slate-950 group-hover:text-blue-900 transition-colors">
                   {COMPANY.name}
                 </span>
                 <span className="block text-[10px] tracking-wider uppercase font-bold text-blue-700">
                   {COMPANY.tagline}
                 </span>
               </div>
-            </div>
+            </Link>
 
             <p className="text-xs text-slate-600 leading-relaxed max-w-sm font-normal">
               International education consultancy providing personalized guidance for students seeking university admissions, visa facilitation, and arrival support in India.
@@ -79,22 +75,22 @@ export const Footer: React.FC<FooterProps> = ({ onOpenApplication }) => {
             <ul className="space-y-2 text-xs text-slate-700 font-medium">
               {quickLinks.map((link) => (
                 <li key={link.path}>
-                  <button
-                    onClick={() => handleNavigate(link.path)}
+                  <Link
+                    to={link.path}
                     className="hover:text-blue-900 transition-colors cursor-pointer block py-0.5 text-left"
                   >
                     {link.label}
-                  </button>
+                  </Link>
                 </li>
               ))}
               <li className="pt-2 border-t border-sky-300/80">
-                <button
-                  onClick={() => handleNavigate('/student-portal')}
+                <Link
+                  to="/student-portal"
                   className="hover:text-blue-900 transition-colors cursor-pointer text-left py-0.5 font-bold text-blue-800 flex items-center gap-1"
                 >
                   <UserCheck className="w-3.5 h-3.5 text-blue-700" />
                   <span>Student Portal (Track Application)</span>
-                </button>
+                </Link>
               </li>
             </ul>
           </div>
@@ -140,13 +136,13 @@ export const Footer: React.FC<FooterProps> = ({ onOpenApplication }) => {
           <p>© 2026 {COMPANY.name}. All Rights Reserved.</p>
 
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => handleNavigate('/admin')}
+            <Link
+              to="/admin"
               className="text-slate-600 hover:text-blue-900 transition-colors text-[11px] flex items-center gap-1 cursor-pointer font-semibold"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-blue-700" />
               <span>Admissions Admin</span>
-            </button>
+            </Link>
           </div>
         </div>
 

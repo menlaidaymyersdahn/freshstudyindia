@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { COMPANY } from '../config/company';
 import { 
   Menu, 
@@ -103,11 +103,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
           <div className="flex items-center justify-between gap-4">
             
             {/* Brand Logo & Name */}
-            <button 
-              onClick={() => handleNavigate('/')}
+            <Link 
+              to="/"
               className="flex items-center gap-3 group text-left cursor-pointer focus:outline-none"
+              aria-label="Myers Global Pathways — Home"
             >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform duration-200 shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform duration-200 shrink-0" aria-hidden="true">
                 <Compass className="w-5 h-5 text-amber-300 stroke-[2.2]" />
               </div>
               <div>
@@ -118,16 +119,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
                   {COMPANY.tagline}
                 </span>
               </div>
-            </button>
+            </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 bg-white/80 p-1.5 rounded-2xl border border-sky-200 shadow-xs backdrop-blur-sm">
+            <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 bg-white/80 p-1.5 rounded-2xl border border-sky-200 shadow-xs backdrop-blur-sm" aria-label="Main Navigation">
               {navLinks.map((link) => {
                 const isActive = isCurrentPath(link.path);
                 return (
-                  <button
+                  <Link
                     key={link.path}
-                    onClick={() => handleNavigate(link.path)}
+                    to={link.path}
                     className={`px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition-all cursor-pointer flex items-center gap-1.5 ${
                       isActive
                         ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-500'
@@ -135,7 +136,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
                     }`}
                   >
                     <span>{link.label}</span>
-                  </button>
+                  </Link>
                 );
               })}
             </nav>
@@ -143,8 +144,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
             {/* Right Action Buttons */}
             <div className="hidden md:flex items-center gap-2">
               {/* Admin Portal Trigger */}
-              <button
-                onClick={() => handleNavigate('/admin')}
+              <Link
+                to="/admin"
                 className={`px-3 py-2 rounded-xl text-xs font-bold border shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer ${
                   location.pathname === '/admin'
                     ? 'bg-amber-500 text-slate-950 border-amber-600 shadow-sm'
@@ -154,11 +155,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
               >
                 <ShieldCheck className="w-4 h-4 text-amber-600" />
                 <span className="hidden xl:inline">Admin Portal</span>
-              </button>
+              </Link>
 
               {/* Student Portal Trigger */}
-              <button
-                onClick={() => handleNavigate('/student-portal')}
+              <Link
+                to="/student-portal"
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold border shadow-xs transition-all flex items-center gap-1.5 cursor-pointer ${
                   location.pathname === '/student-portal'
                     ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
@@ -168,7 +169,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
               >
                 <UserCheck className="w-4 h-4 text-blue-600" />
                 <span>Student Portal</span>
-              </button>
+              </Link>
 
               {/* Primary CTA Button */}
               <StarfieldButton
@@ -279,9 +280,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
                 const Icon = link.icon;
                 const isActive = isCurrentPath(link.path);
                 return (
-                  <button
+                  <Link
                     key={link.path}
-                    onClick={() => handleNavigate(link.path)}
+                    to={link.path}
+                    onClick={() => setMobileMenuOpen(false)}
                     className={`w-full p-3 rounded-xl flex items-center justify-between transition-all cursor-pointer ${
                       isActive 
                         ? 'bg-blue-600 text-white font-bold shadow-sm' 
@@ -303,7 +305,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
                         </span>
                       </div>
                     </div>
-                  </button>
+                  </Link>
                 );
               })}
             </div>
@@ -314,8 +316,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
                 Restricted & Authenticated Access
               </div>
 
-              <button
-                onClick={() => handleNavigate('/student-portal')}
+              <Link
+                to="/student-portal"
+                onClick={() => setMobileMenuOpen(false)}
                 className={`w-full p-3 rounded-xl border flex items-center justify-between transition-all cursor-pointer shadow-xs ${
                   location.pathname === '/student-portal'
                     ? 'bg-blue-600 text-white border-blue-600'
@@ -335,10 +338,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
                     </span>
                   </div>
                 </div>
-              </button>
+              </Link>
 
-              <button
-                onClick={() => handleNavigate('/admin')}
+              <Link
+                to="/admin"
+                onClick={() => setMobileMenuOpen(false)}
                 className={`w-full p-3 rounded-xl border flex items-center justify-between transition-all cursor-pointer shadow-xs ${
                   location.pathname === '/admin'
                     ? 'bg-amber-500 text-slate-950 border-amber-600 font-bold'
@@ -354,7 +358,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
                     <span className="block text-[11px] text-amber-800 font-medium">Manage, review & approve students</span>
                   </div>
                 </div>
-              </button>
+              </Link>
             </div>
 
             {/* Direct Contact Phone & WhatsApp */}

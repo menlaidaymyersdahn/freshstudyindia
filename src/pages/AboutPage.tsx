@@ -13,8 +13,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onOpenApplication }) => {
   const navigate = useNavigate();
 
   useSEO({
-    title: 'About Myers Global Pathways | Leadership & Mission',
-    description: 'Founded by Menlaiday Myers Dahn (B.Sc. Computer Science, SRSU India), Myers Global Pathways provides trusted, transparent guidance for international students.',
+    title: 'About Us & Advisory Leadership | Myers Global Pathways',
+    description: 'Learn about Myers Global Pathways, our mission, and founder Menlaiday Myers Dahn (B.Sc. Computer Science, SRSU India), dedicated to honest international student advisory.',
     canonicalPath: '/about',
     keywords: 'About Myers Global Pathways, Menlaiday Myers Dahn, SRSU India, Study in India Consultant, Liberia to India Education'
   });

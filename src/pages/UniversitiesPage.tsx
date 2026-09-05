@@ -13,8 +13,8 @@ export const UniversitiesPage: React.FC<UniversitiesPageProps> = ({ onOpenApplic
   const navigate = useNavigate();
 
   useSEO({
-    title: 'Recognized Universities & Degree Programs in India | Myers Global Pathways',
-    description: 'Find accredited Indian universities and degree programs across Computer Science, Health Sciences, Business Administration, Engineering, and Law.',
+    title: 'Indian Universities & Degree Programs Directory | Myers Global Pathways',
+    description: 'Discover recognized degree programs and accredited higher education institutions in India across Engineering, Computer Science, Business, Health Sciences, and Law.',
     canonicalPath: '/universities',
     keywords: 'Universities in India, Indian Degree Programs, Top Universities in India for African Students, Study IT in India, Study Medicine in India'
   });

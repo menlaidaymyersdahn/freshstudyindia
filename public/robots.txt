@@ -5,11 +5,13 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /api/
+Disallow: /student-portal
 
 User-agent: Googlebot
 Allow: /
 Disallow: /admin
 Disallow: /api/
+Disallow: /student-portal
 
 User-agent: Googlebot-Image
 Allow: /
@@ -20,6 +22,7 @@ User-agent: Bingbot
 Allow: /
 Disallow: /admin
 Disallow: /api/
+Disallow: /student-portal
 
 # Sitemap index reference
 Sitemap: https://myersglobalpathways.com/sitemap.xml

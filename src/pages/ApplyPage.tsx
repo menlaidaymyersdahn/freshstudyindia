@@ -33,8 +33,8 @@ export const ApplyPage: React.FC = () => {
   const presetLevel = searchParams.get('level') || 'Undergraduate (Bachelor’s)';
 
   useSEO({
-    title: 'Start Your University Application | Myers Global Pathways',
-    description: 'Submit your international student admission application for top recognized universities in India. Free guidance and step-by-step document verification.',
+    title: 'Apply for University Admission in India | Myers Global Pathways',
+    description: 'Submit your international student admission profile online for evaluation. Receive personalized counseling, course matching, and credential verification.',
     canonicalPath: '/apply',
     keywords: 'Apply Study in India, India University Application Form, International Student Admissions, Myers Global Pathways Apply'
   });
