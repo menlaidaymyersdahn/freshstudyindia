@@ -51,7 +51,7 @@ export const HomeFeatureHub: React.FC<HomeFeatureHubProps> = ({
     {
       tab: 'student-life' as NavTab,
       badge: 'Campus Life & Culture',
-      title: 'Student Life in India',
+      title: 'Student Life & Campus Blog',
       description: 'Discover campus cultural festivals, culinary survival guides, metro transit tips, and inspiring international graduate success stories.',
       icon: Newspaper,
       iconColor: 'text-amber-600',

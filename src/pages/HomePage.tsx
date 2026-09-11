@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Hero } from '../components/Hero';
 import { EditorialTrustIntro } from '../components/EditorialTrustIntro';
 import { HomeFeatureHub } from '../components/HomeFeatureHub';
+import { HomeStudentLifeSection } from '../components/HomeStudentLifeSection';
 import { ApplicationCTA } from '../components/ApplicationCTA';
 import { useSEO } from '../hooks/useSEO';
 
@@ -49,6 +50,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenApplication }) => {
           if (tab === 'home') navigate('/');
           else navigate(`/${tab}`);
         }}
+        onOpenApplication={() => handleApply()}
+      />
+
+      {/* Student Life in India & Campus Blog Spotlight */}
+      <HomeStudentLifeSection
         onOpenApplication={() => handleApply()}
       />
 

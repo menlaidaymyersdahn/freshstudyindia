@@ -105,6 +105,26 @@
         "read": "public",
         "write": "public"
       }
+    },
+    "NewsletterSubscription": {
+      "description": "Email subscribers for the Student Life in India weekly updates, campus events, and cultural guides",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "email": { "type": "string" },
+          "frequency": { "type": "string" },
+          "interest": { "type": "string" },
+          "source": { "type": "string" },
+          "subscribedAt": { "type": "string" },
+          "status": { "type": "string" }
+        },
+        "required": ["email", "subscribedAt"]
+      },
+      "security": {
+        "read": "public",
+        "write": "public"
+      }
     }
   }
 }

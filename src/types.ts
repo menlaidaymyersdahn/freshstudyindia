@@ -157,5 +157,15 @@ export interface StudentStorySubmission {
   submittedAt?: string;
 }
 
+export interface NewsletterSubscription {
+  id?: string;
+  email: string;
+  frequency?: 'weekly' | 'monthly';
+  interest?: 'All' | 'Campus Events' | 'Cultural Guides' | 'Success Stories' | 'Admissions & Scholarships';
+  source?: string;
+  subscribedAt: string;
+  status: 'active' | 'unsubscribed';
+}
+
 export type NavTab = 'home' | 'study-in-india' | 'services' | 'universities' | 'student-life' | 'faq' | 'about' | 'contact';
 

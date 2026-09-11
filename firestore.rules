@@ -13,5 +13,8 @@ service cloud.firestore {
     match /blog_submissions/{submissionId} {
       allow read, write: if true;
     }
+    match /newsletter_subscriptions/{subscriptionId} {
+      allow read, write: if true;
+    }
   }
 }

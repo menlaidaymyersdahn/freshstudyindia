@@ -15,6 +15,7 @@ import {
   MessageCircle
 } from 'lucide-react';
 import { getWhatsAppConfig } from '../config/company';
+import { StudentLifeNewsletter } from './StudentLifeNewsletter';
 
 interface StudentLifeArticleModalProps {
   article: BlogPost | null;
@@ -324,6 +325,9 @@ export const StudentLifeArticleModal: React.FC<StudentLifeArticleModalProps> = (
               </a>
             </div>
           </div>
+
+          {/* Compact Newsletter Subscription */}
+          <StudentLifeNewsletter variant="compact" className="my-6" />
 
           {/* Related Articles Strip */}
           {relatedArticles.length > 0 && (

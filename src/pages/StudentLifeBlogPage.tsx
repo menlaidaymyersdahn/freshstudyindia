@@ -11,6 +11,7 @@ import {
 import { BlogPost, BlogCategory } from '../types';
 import { StudentLifeArticleModal } from '../components/StudentLifeArticleModal';
 import { StudentStorySubmissionModal } from '../components/StudentStorySubmissionModal';
+import { StudentLifeNewsletter } from '../components/StudentLifeNewsletter';
 import { 
   Search, 
   Sparkles, 
@@ -28,6 +29,7 @@ import {
   Compass, 
   GraduationCap, 
   ShieldCheck,
+  Bell,
   X
 } from 'lucide-react';
 import { fetchBlogPostsFromFirestore } from '../lib/firebase';
@@ -52,25 +54,27 @@ export const StudentLifeBlogPage: React.FC<StudentLifeBlogPageProps> = ({ onOpen
   const [activeCategory, setActiveCategory] = useState<BlogCategory>('All');
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Articles state (combines seed data + any Firestore dynamic updates)
-  const [articles, setArticles] = useState<BlogPost[]>(STUDENT_LIFE_BLOG_POSTS);
+  // Articles state (only genuine published articles from Firestore)
+  const [articles, setArticles] = useState<BlogPost[]>([]);
   const [selectedArticle, setSelectedArticle] = useState<BlogPost | null>(null);
   const [isSubmissionModalOpen, setIsSubmissionModalOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  const [loadingPosts, setLoadingPosts] = useState(true);
 
-  // Load custom blog posts from Firestore if available
+  // Load genuine blog posts from Firestore
   useEffect(() => {
     let isMounted = true;
     async function loadDynamicPosts() {
       try {
         const dynamicPosts = await fetchBlogPostsFromFirestore();
-        if (isMounted && dynamicPosts && dynamicPosts.length > 0) {
-          // Merge dynamic posts on top of curated seed posts avoiding duplicates
-          const dynamicIds = new Set(dynamicPosts.map(p => p.slug || p.id));
-          const filteredSeed = STUDENT_LIFE_BLOG_POSTS.filter(p => !dynamicIds.has(p.slug) && !dynamicIds.has(p.id));
-          setArticles([...dynamicPosts, ...filteredSeed]);
+        if (isMounted) {
+          setArticles(dynamicPosts || []);
         }
-      } catch (_) {}
+      } catch (_) {
+        if (isMounted) setArticles([]);
+      } finally {
+        if (isMounted) setLoadingPosts(false);
+      }
     }
     loadDynamicPosts();
     return () => { isMounted = false; };
@@ -252,6 +256,18 @@ export const StudentLifeBlogPage: React.FC<StudentLifeBlogPageProps> = ({ onOpen
             </div>
 
             <button
+              onClick={() => {
+                const el = document.getElementById('student-life-newsletter');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }}
+              className="px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 font-bold text-xs uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0"
+              title="Subscribe to weekly Student Life newsletter"
+            >
+              <Bell className="w-3.5 h-3.5 text-amber-500" />
+              <span className="hidden sm:inline">Subscribe</span>
+            </button>
+
+            <button
               onClick={() => setIsSubmissionModalOpen(true)}
               className="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0"
               title="Share your student story or campus event"
@@ -347,8 +363,39 @@ export const StudentLifeBlogPage: React.FC<StudentLifeBlogPageProps> = ({ onOpen
           </div>
         )}
 
-        {/* 5. Articles Grid */}
-        {gridArticles.length > 0 ? (
+        {/* 5. Articles Grid & Authentic Empty States */}
+        {articles.length === 0 ? (
+          <div className="py-16 text-center bg-white rounded-2xl border border-sky-200 p-8 sm:p-12 space-y-4 max-w-2xl mx-auto shadow-xs">
+            <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center mx-auto border border-blue-200 shadow-2xs">
+              <BookOpen className="w-7 h-7" />
+            </div>
+            <h3 className="text-xl sm:text-2xl font-extrabold text-slate-950 tracking-tight">
+              No Published Articles Yet
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
+              Our admissions advisory team and international scholars are currently preparing authentic weekly dispatches on university admissions, campus events, and cultural survival guides.
+            </p>
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={() => setIsSubmissionModalOpen(true)}
+                className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <MessageSquarePlus className="w-4 h-4" />
+                <span>Share Your Student Story</span>
+              </button>
+              <button
+                onClick={() => {
+                  const el = document.getElementById('student-life-newsletter');
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }}
+                className="px-4 py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 font-bold text-xs uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+              >
+                <Bell className="w-4 h-4 text-amber-500" />
+                <span>Subscribe for Updates</span>
+              </button>
+            </div>
+          </div>
+        ) : gridArticles.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {gridArticles.map((post) => (
               <article
@@ -439,8 +486,13 @@ export const StudentLifeBlogPage: React.FC<StudentLifeBlogPageProps> = ({ onOpen
           </div>
         )}
 
-        {/* 6. Community Invitation Banner: Share your campus experiences */}
-        <div className="mt-16 bg-gradient-to-r from-blue-900 via-blue-950 to-slate-900 rounded-2xl text-white p-6 sm:p-10 shadow-lg relative overflow-hidden text-left">
+        {/* 6. Subscribe to Student Life Newsletter (Weekly updates on Indian university events) */}
+        <div className="mt-14">
+          <StudentLifeNewsletter />
+        </div>
+
+        {/* 7. Community Invitation Banner: Share your campus experiences */}
+        <div className="mt-14 bg-gradient-to-r from-blue-900 via-blue-950 to-slate-900 rounded-2xl text-white p-6 sm:p-10 shadow-lg relative overflow-hidden text-left">
           <div className="absolute right-0 top-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
           
           <div className="max-w-2xl space-y-4 relative z-10">

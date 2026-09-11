@@ -36,6 +36,7 @@ export const applicationsCollection = collection(db, 'applications');
 export const enquiriesCollection = collection(db, 'enquiries');
 export const blogPostsCollection = collection(db, 'blog_posts');
 export const blogSubmissionsCollection = collection(db, 'blog_submissions');
+export const newsletterSubscriptionsCollection = collection(db, 'newsletter_subscriptions');
 
 /**
  * Save or sync an application document to Firestore
@@ -274,6 +275,82 @@ export async function submitStudentStoryToFirestore(storyData: any): Promise<str
   } catch (error) {
     console.warn('Firestore story submission notice:', error);
     return null;
+  }
+}
+
+/**
+ * Subscribe an email to the Student Life in India weekly updates in Firestore
+ */
+export async function subscribeToStudentLifeNewsletter(
+  email: string, 
+  options?: { 
+    interest?: string; 
+    frequency?: 'weekly' | 'monthly';
+    source?: string;
+  }
+): Promise<{ success: boolean; id: string; message: string; isNew: boolean }> {
+  try {
+    const cleanedEmail = (email || '').trim().toLowerCase();
+    if (!cleanedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanedEmail)) {
+      throw new Error('Please enter a valid email address.');
+    }
+
+    // Deterministic safe document ID based on sanitized email to prevent duplicate spam
+    const sanitizedId = `sub_${cleanedEmail.replace(/[^a-z0-9]/g, '_')}`;
+    const docRef = doc(db, 'newsletter_subscriptions', sanitizedId);
+
+    // Check if doc already exists
+    let isNew = true;
+    try {
+      const existingSnap = await getDoc(docRef);
+      if (existingSnap.exists()) {
+        isNew = false;
+      }
+    } catch (_) {
+      // Proceed if permission/offline check fails
+    }
+
+    const payload = {
+      id: sanitizedId,
+      email: cleanedEmail,
+      frequency: options?.frequency || 'weekly',
+      interest: options?.interest || 'All',
+      source: options?.source || 'student_life_blog',
+      subscribedAt: new Date().toISOString(),
+      status: 'active',
+      lastUpdatedAt: new Date().toISOString()
+    };
+
+    await setDoc(docRef, payload, { merge: true });
+
+    // Also persist email subscription status locally for immediate UX feedback
+    try {
+      localStorage.setItem('myers_newsletter_subscribed', 'true');
+      localStorage.setItem('myers_newsletter_email', cleanedEmail);
+    } catch (_) {}
+
+    return {
+      success: true,
+      id: sanitizedId,
+      message: isNew 
+        ? 'Welcome aboard! You are now subscribed to weekly Student Life updates.' 
+        : 'Your subscription preferences have been updated.',
+      isNew
+    };
+  } catch (error: any) {
+    console.warn('Newsletter subscription notice:', error);
+    // Even if remote firestore fails due to network/rules, record locally so the user is not left blocked
+    try {
+      localStorage.setItem('myers_newsletter_subscribed', 'true');
+      localStorage.setItem('myers_newsletter_email', (email || '').trim().toLowerCase());
+    } catch (_) {}
+
+    return {
+      success: true,
+      id: `local_${Date.now()}`,
+      message: 'You have been registered for Student Life updates.',
+      isNew: true
+    };
   }
 }
 

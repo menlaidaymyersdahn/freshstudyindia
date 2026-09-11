@@ -34,7 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
     { path: '/study-in-india', label: 'Study in India', icon: Globe, description: 'Academic landscape & benefits' },
     { path: '/services', label: 'Services', icon: Sparkles, description: 'Our 8 end-to-end services' },
     { path: '/universities', label: 'Universities', icon: GraduationCap, description: 'Program directory & finder' },
-    { path: '/student-life', label: 'Student Life', icon: Newspaper, description: 'Events, culture & success stories' },
+    { path: '/student-life', label: 'Blog & Student Life', icon: Newspaper, description: 'Campus events, cultural guides & stories' },
     { path: '/faq', label: 'FAQ', icon: HelpCircle, description: 'Frequently asked questions' },
     { path: '/about', label: 'About', icon: BookOpen, description: 'Our mission & core principles' },
     { path: '/contact', label: 'Contact', icon: Mail, description: 'Admissions desk & directory' },
@@ -124,14 +124,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 bg-white/80 p-1.5 rounded-2xl border border-sky-200 shadow-xs backdrop-blur-sm" aria-label="Main Navigation">
+            <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1.5 bg-white/80 p-1.5 rounded-2xl border border-sky-200 shadow-xs backdrop-blur-sm" aria-label="Main Navigation">
               {navLinks.map((link) => {
                 const isActive = isCurrentPath(link.path);
                 return (
                   <Link
                     key={link.path}
                     to={link.path}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition-all cursor-pointer flex items-center gap-1.5 ${
+                    className={`px-2.5 xl:px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                       isActive
                         ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-500'
                         : 'text-slate-700 hover:text-blue-900 hover:bg-sky-100/80'
