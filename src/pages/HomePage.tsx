@@ -48,8 +48,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenApplication }) => {
           referrerPolicy="no-referrer"
           loading="eager"
         />
-        {/* Luminous overlay ensures WCAG AA contrast for text while showing the genuine photograph */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#DCEAFC]/75 via-white/80 to-[#E1EFFC]/85 backdrop-blur-[1px]" />
+        {/* Subtle, crystal-clear overlay: preserves the image's original vibrancy and clarity while maintaining contrast */}
+        <div className="absolute inset-0 bg-slate-950/15" />
+        <div className="absolute inset-0 bg-gradient-to-b from-sky-900/10 via-transparent to-slate-950/25" />
       </div>
 
       {/* Main Page Content Layer */}

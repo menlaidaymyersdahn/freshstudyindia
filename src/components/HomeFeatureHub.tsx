@@ -73,7 +73,7 @@ export const HomeFeatureHub: React.FC<HomeFeatureHubProps> = ({
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-b from-[#E5F1FC]/80 via-[#EBF3FD]/75 to-[#E2EEFA]/80 backdrop-blur-xs text-slate-900 border-t border-sky-200">
+    <section className="py-20 bg-white/80 backdrop-blur-md text-slate-900 border-t border-sky-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}

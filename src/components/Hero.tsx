@@ -21,29 +21,29 @@ export const Hero: React.FC<HeroProps> = ({
   return (
     <section 
       id="home" 
-      className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 text-slate-900 overflow-hidden bg-white/35 sm:bg-white/25 backdrop-blur-[1px] border-b border-sky-300/50"
+      className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 text-slate-900 overflow-hidden bg-transparent border-b border-white/20"
     >
-      {/* Interactive Cursor Ring Field Hero Canvas Background (balanced opacity to highlight photo background) */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+      {/* Interactive Cursor Ring Field Hero Canvas Background (subtle opacity to keep photo clear) */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
         <CursorRingField
           background="transparent"
           colors={["#0284c7", "#2563eb", "#1d4ed8", "#38bdf8", "#1e3a8a"]}
-          density={300}
-          dotSize={125}
+          density={200}
+          dotSize={100}
           speed={6.5}
           ring={{ push: 60, width: 11, radius: 14, turbulence: 75 }}
         />
       </div>
 
       {/* Subtle background ambient lighting */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-sky-400/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-sky-400/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           
-          {/* Left Column: Editorial Headline & Actions */}
-          <div className="lg:col-span-7 space-y-6 text-left">
+          {/* Left Column: Editorial Headline & Actions in High-Contrast Frosted Panel */}
+          <div className="lg:col-span-7 space-y-6 text-left bg-white/95 backdrop-blur-md p-6 sm:p-8 lg:p-9 rounded-3xl border-2 border-white/90 shadow-2xl">
             {/* Editorial Badge */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
