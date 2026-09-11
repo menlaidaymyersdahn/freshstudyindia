@@ -54,6 +54,57 @@
         "read": "public",
         "write": "public"
       }
+    },
+    "BlogPost": {
+      "description": "Student Life in India blog articles, campus event updates, cultural guides, and international student success stories",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "slug": { "type": "string" },
+          "title": { "type": "string" },
+          "excerpt": { "type": "string" },
+          "category": { "type": "string" },
+          "author": { "type": "object" },
+          "publishedAt": { "type": "string" },
+          "readTime": { "type": "string" },
+          "coverImage": { "type": "string" },
+          "coverImageAlt": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "sections": { "type": "array", "items": { "type": "object" } },
+          "featured": { "type": "boolean" },
+          "likes": { "type": "number" }
+        },
+        "required": ["title", "excerpt", "category"]
+      },
+      "security": {
+        "read": "public",
+        "write": "public"
+      }
+    },
+    "StudentStorySubmission": {
+      "description": "Submissions from current international students and alumni sharing experiences, events, and advice",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "studentName": { "type": "string" },
+          "email": { "type": "string" },
+          "whatsapp": { "type": "string" },
+          "country": { "type": "string" },
+          "university": { "type": "string" },
+          "program": { "type": "string" },
+          "category": { "type": "string" },
+          "storyTitle": { "type": "string" },
+          "storyContent": { "type": "string" },
+          "submittedAt": { "type": "string" }
+        },
+        "required": ["studentName", "email", "storyTitle", "storyContent"]
+      },
+      "security": {
+        "read": "public",
+        "write": "public"
+      }
     }
   }
 }

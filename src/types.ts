@@ -111,5 +111,51 @@ export interface FAQItem {
   category: 'Admissions' | 'Courses & Universities' | 'Fees & Living' | 'Visa & Travel' | 'Student Support' | 'Accommodation & Student Life' | string;
 }
 
-export type NavTab = 'home' | 'study-in-india' | 'services' | 'universities' | 'faq' | 'about' | 'contact';
+export type BlogCategory = 'All' | 'Campus Events' | 'Cultural Guides' | 'Success Stories';
+
+export interface BlogArticleSection {
+  heading?: string;
+  text: string;
+  bulletPoints?: string[];
+  quote?: string;
+  tip?: string;
+}
+
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  category: 'Campus Events' | 'Cultural Guides' | 'Success Stories';
+  author: {
+    name: string;
+    role: string;
+    country?: string;
+    university?: string;
+  };
+  publishedAt: string;
+  readTime: string;
+  coverImage: string;
+  coverImageAlt: string;
+  tags: string[];
+  sections: BlogArticleSection[];
+  featured?: boolean;
+  likes?: number;
+}
+
+export interface StudentStorySubmission {
+  id?: string;
+  studentName: string;
+  email: string;
+  whatsapp?: string;
+  country: string;
+  university: string;
+  program: string;
+  category: 'Campus Events' | 'Cultural Guides' | 'Success Stories';
+  storyTitle: string;
+  storyContent: string;
+  submittedAt?: string;
+}
+
+export type NavTab = 'home' | 'study-in-india' | 'services' | 'universities' | 'student-life' | 'faq' | 'about' | 'contact';
 

@@ -7,5 +7,11 @@ service cloud.firestore {
     match /enquiries/{enquiryId} {
       allow read, write: if true;
     }
+    match /blog_posts/{postId} {
+      allow read, write: if true;
+    }
+    match /blog_submissions/{submissionId} {
+      allow read, write: if true;
+    }
   }
 }

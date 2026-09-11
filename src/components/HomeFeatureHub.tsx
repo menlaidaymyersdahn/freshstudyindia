@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavTab } from '../types';
-import { Globe, Sparkles, GraduationCap, HelpCircle, ArrowUpRight, CheckCircle2, BookOpen, Mail } from 'lucide-react';
+import { Globe, Sparkles, GraduationCap, HelpCircle, ArrowUpRight, CheckCircle2, BookOpen, Mail, Newspaper } from 'lucide-react';
 import { motion } from 'motion/react';
 import { ScrollReveal, ScrollStaggerContainer, ScrollStaggerItem, TextScrollReveal } from './ScrollReveal';
 import { StarfieldButton } from './StarfieldButton';
@@ -47,6 +47,17 @@ export const HomeFeatureHub: React.FC<HomeFeatureHubProps> = ({
       iconBg: 'bg-emerald-100',
       actionText: 'Browse Program Directory',
       highlights: ['Undergraduate & Master\'s', 'Top Academic Hubs', 'Prerequisite Check']
+    },
+    {
+      tab: 'student-life' as NavTab,
+      badge: 'Campus Life & Culture',
+      title: 'Student Life in India',
+      description: 'Discover campus cultural festivals, culinary survival guides, metro transit tips, and inspiring international graduate success stories.',
+      icon: Newspaper,
+      iconColor: 'text-amber-600',
+      iconBg: 'bg-amber-100',
+      actionText: 'Explore Student Life Blog',
+      highlights: ['Campus Cultural Fests', 'Hostel & Food Guides', 'Graduate Success Stories']
     },
     {
       tab: 'faq' as NavTab,

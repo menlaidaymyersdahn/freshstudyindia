@@ -17,6 +17,7 @@ import { UniversitiesPage } from './pages/UniversitiesPage';
 import { FAQPage } from './pages/FAQPage';
 import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
+import { StudentLifeBlogPage } from './pages/StudentLifeBlogPage';
 import { ApplyPage } from './pages/ApplyPage';
 import { StudentPortalPage } from './pages/StudentPortalPage';
 import { AdminPage } from './pages/AdminPage';
@@ -142,6 +143,32 @@ export function App() {
           <Route 
             path="/universities/*" 
             element={<UniversitiesPage onOpenApplication={handleOpenApplication} />} 
+          />
+
+          {/* Student Life in India Blog */}
+          <Route 
+            path="/student-life" 
+            element={<StudentLifeBlogPage onOpenApplication={handleOpenApplication} />} 
+          />
+          <Route 
+            path="/student-life/*" 
+            element={<StudentLifeBlogPage onOpenApplication={handleOpenApplication} />} 
+          />
+          <Route 
+            path="/student-life-in-india" 
+            element={<StudentLifeBlogPage onOpenApplication={handleOpenApplication} />} 
+          />
+          <Route 
+            path="/student-life-in-india/*" 
+            element={<StudentLifeBlogPage onOpenApplication={handleOpenApplication} />} 
+          />
+          <Route 
+            path="/blog" 
+            element={<StudentLifeBlogPage onOpenApplication={handleOpenApplication} />} 
+          />
+          <Route 
+            path="/blog/*" 
+            element={<StudentLifeBlogPage onOpenApplication={handleOpenApplication} />} 
           />
 
           {/* FAQ */}

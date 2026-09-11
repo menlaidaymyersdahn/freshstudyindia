@@ -16,6 +16,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenApplication }) => {
     { label: 'Study in India', path: '/study-in-india' },
     { label: 'Services', path: '/services' },
     { label: 'Universities', path: '/universities' },
+    { label: 'Student Life in India', path: '/student-life' },
     { label: 'FAQ', path: '/faq' },
     { label: 'About', path: '/about' },
     { label: 'Contact', path: '/contact' },

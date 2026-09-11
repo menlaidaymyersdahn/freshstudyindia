@@ -34,6 +34,8 @@ export const db = firestoreDb;
 // Collection References
 export const applicationsCollection = collection(db, 'applications');
 export const enquiriesCollection = collection(db, 'enquiries');
+export const blogPostsCollection = collection(db, 'blog_posts');
+export const blogSubmissionsCollection = collection(db, 'blog_submissions');
 
 /**
  * Save or sync an application document to Firestore
@@ -238,6 +240,40 @@ export async function deleteEnquiryFromFirestore(id: string): Promise<boolean> {
   } catch (error) {
     console.warn('Firestore enquiry delete notice:', error);
     return false;
+  }
+}
+
+/**
+ * Fetch dynamic blog posts from Firestore
+ */
+export async function fetchBlogPostsFromFirestore(): Promise<any[]> {
+  try {
+    const snapshot = await getDocs(blogPostsCollection);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.warn('Could not fetch blog posts from Firestore:', error);
+    return [];
+  }
+}
+
+/**
+ * Submit a student story, event, or guide submission to Firestore
+ */
+export async function submitStudentStoryToFirestore(storyData: any): Promise<string | null> {
+  try {
+    if (!storyData) return null;
+    const docId = `story_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+    const docRef = doc(db, 'blog_submissions', docId);
+    const payload = {
+      ...storyData,
+      id: docId,
+      submittedAt: new Date().toISOString()
+    };
+    await setDoc(docRef, payload);
+    return docId;
+  } catch (error) {
+    console.warn('Firestore story submission notice:', error);
+    return null;
   }
 }
 

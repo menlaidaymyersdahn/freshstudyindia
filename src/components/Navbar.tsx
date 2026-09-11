@@ -14,7 +14,8 @@ import {
   HelpCircle,
   Mail,
   Phone,
-  ShieldCheck
+  ShieldCheck,
+  Newspaper
 } from 'lucide-react';
 import { StarfieldButton } from './StarfieldButton';
 
@@ -33,6 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
     { path: '/study-in-india', label: 'Study in India', icon: Globe, description: 'Academic landscape & benefits' },
     { path: '/services', label: 'Services', icon: Sparkles, description: 'Our 8 end-to-end services' },
     { path: '/universities', label: 'Universities', icon: GraduationCap, description: 'Program directory & finder' },
+    { path: '/student-life', label: 'Student Life', icon: Newspaper, description: 'Events, culture & success stories' },
     { path: '/faq', label: 'FAQ', icon: HelpCircle, description: 'Frequently asked questions' },
     { path: '/about', label: 'About', icon: BookOpen, description: 'Our mission & core principles' },
     { path: '/contact', label: 'Contact', icon: Mail, description: 'Admissions desk & directory' },
