@@ -21,10 +21,10 @@ export const Hero: React.FC<HeroProps> = ({
   return (
     <section 
       id="home" 
-      className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 text-slate-900 overflow-hidden bg-gradient-to-b from-[#CDE2F8]/70 via-[#E2EFFC]/60 to-[#EBF3FC]/80 border-b border-sky-300/60"
+      className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 text-slate-900 overflow-hidden bg-white/35 sm:bg-white/25 backdrop-blur-[1px] border-b border-sky-300/50"
     >
-      {/* Interactive Cursor Ring Field Hero Canvas Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-80">
+      {/* Interactive Cursor Ring Field Hero Canvas Background (balanced opacity to highlight photo background) */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
         <CursorRingField
           background="transparent"
           colors={["#0284c7", "#2563eb", "#1d4ed8", "#38bdf8", "#1e3a8a"]}

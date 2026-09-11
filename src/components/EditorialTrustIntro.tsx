@@ -13,7 +13,7 @@ export const EditorialTrustIntro: React.FC<EditorialTrustIntroProps> = ({
   onExploreServices
 }) => {
   return (
-    <section id="overview" className="py-20 lg:py-28 bg-[#EBF3FC] text-slate-900 border-b border-sky-200 scroll-mt-24">
+    <section id="overview" className="py-20 lg:py-28 bg-[#EBF3FC]/75 backdrop-blur-xs text-slate-900 border-b border-sky-200/80 scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}

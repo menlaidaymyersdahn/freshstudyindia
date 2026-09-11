@@ -30,39 +30,63 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenApplication }) => {
   };
 
   return (
-    <div className="animate-fadeIn">
-      {/* Hero Section */}
-      <Hero
-        onOpenApplication={() => handleApply()}
-        onExploreStudyInIndia={() => navigate('/study-in-india')}
-        onExploreServices={() => navigate('/services')}
-      />
+    <div className="relative min-h-screen animate-fadeIn">
+      {/* Full-bleed Fixed Background Image (Requested by user: https://i.ibb.co/zVbQCGqW/DSC-9531.jpg) */}
+      <div 
+        className="fixed inset-0 z-0 overflow-hidden pointer-events-none select-none" 
+        aria-hidden="true"
+      >
+        <img
+          src="/images/home-background-web.jpg"
+          srcSet="/images/home-background-web.jpg 1x, /images/home-background.jpg 2x"
+          onError={(e) => {
+            // Direct ImgBB online fallback
+            (e.currentTarget as HTMLImageElement).src = 'https://i.ibb.co/zVbQCGqW/DSC-9531.jpg';
+          }}
+          alt="Myers Global Pathways - Indian University Campus Atmosphere"
+          className="w-full h-full object-cover object-center"
+          referrerPolicy="no-referrer"
+          loading="eager"
+        />
+        {/* Luminous overlay ensures WCAG AA contrast for text while showing the genuine photograph */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#DCEAFC]/75 via-white/80 to-[#E1EFFC]/85 backdrop-blur-[1px]" />
+      </div>
 
-      {/* Editorial Trust Intro */}
-      <EditorialTrustIntro
-        onOpenApplication={() => handleApply()}
-        onExploreServices={() => navigate('/services')}
-      />
+      {/* Main Page Content Layer */}
+      <div className="relative z-10">
+        {/* Hero Section */}
+        <Hero
+          onOpenApplication={() => handleApply()}
+          onExploreStudyInIndia={() => navigate('/study-in-india')}
+          onExploreServices={() => navigate('/services')}
+        />
 
-      {/* Home Dedicated Navigation Hub Cards */}
-      <HomeFeatureHub
-        onSelectTab={(tab) => {
-          if (tab === 'home') navigate('/');
-          else navigate(`/${tab}`);
-        }}
-        onOpenApplication={() => handleApply()}
-      />
+        {/* Editorial Trust Intro */}
+        <EditorialTrustIntro
+          onOpenApplication={() => handleApply()}
+          onExploreServices={() => navigate('/services')}
+        />
 
-      {/* Student Life in India & Campus Blog Spotlight */}
-      <HomeStudentLifeSection
-        onOpenApplication={() => handleApply()}
-      />
+        {/* Home Dedicated Navigation Hub Cards */}
+        <HomeFeatureHub
+          onSelectTab={(tab) => {
+            if (tab === 'home') navigate('/');
+            else navigate(`/${tab}`);
+          }}
+          onOpenApplication={() => handleApply()}
+        />
 
-      {/* Application CTA Banner */}
-      <ApplicationCTA
-        onOpenApplication={() => handleApply()}
-        onContactClick={() => navigate('/contact')}
-      />
+        {/* Student Life in India & Campus Blog Spotlight */}
+        <HomeStudentLifeSection
+          onOpenApplication={() => handleApply()}
+        />
+
+        {/* Application CTA Banner */}
+        <ApplicationCTA
+          onOpenApplication={() => handleApply()}
+          onContactClick={() => navigate('/contact')}
+        />
+      </div>
     </div>
   );
 };

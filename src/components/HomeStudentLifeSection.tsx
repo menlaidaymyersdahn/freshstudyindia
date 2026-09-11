@@ -71,7 +71,7 @@ export const HomeStudentLifeSection: React.FC<HomeStudentLifeSectionProps> = ({ 
   return (
     <section 
       id="student-life-blog-section"
-      className="py-16 sm:py-20 bg-gradient-to-b from-sky-50/50 via-white to-sky-50/30 border-y border-sky-200/80 text-left"
+      className="py-16 sm:py-20 bg-gradient-to-b from-sky-50/70 via-white/80 to-sky-50/70 backdrop-blur-xs border-y border-sky-200/80 text-left"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
