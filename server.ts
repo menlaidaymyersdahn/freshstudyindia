@@ -667,12 +667,12 @@ async function startServer() {
   app.get('/api/student/lookup', handleStudentLookup);
   app.post('/api/student/lookup', handleStudentLookup);
 
-  // 4. GET ALL APPLICATIONS (For Admissions Admin Dashboard)
+  // 4. GET ALL APPLICATIONS (For Admissions Admin Dashboard - Newest First by default)
   app.get('/api/applications', (req, res) => {
     try {
       applications = loadApplicationsFromDisk();
       
-      const { status, country, search } = req.query;
+      const { status, country, search, sortBy = 'newest' } = req.query;
       let filtered = [...applications];
 
       if (status && status !== 'ALL') {
@@ -692,6 +692,39 @@ async function startServer() {
           a.country?.toLowerCase().includes(q)
         );
       }
+
+      // Sort applicants (Newest applicant first by default)
+      filtered.sort((a: any, b: any) => {
+        const getTs = (item: any) => {
+          if (item.submittedAt) {
+            const t = new Date(item.submittedAt).getTime();
+            if (!isNaN(t) && t > 0) return t;
+          }
+          if (item.createdAt) {
+            const t = new Date(item.createdAt).getTime();
+            if (!isNaN(t) && t > 0) return t;
+          }
+          const match = (item.id || item.trackingId || '').match(/\d{10,13}/);
+          if (match) {
+            const n = parseInt(match[0], 10);
+            if (n > 1000000000) return n < 10000000000 ? n * 1000 : n;
+          }
+          return 0;
+        };
+
+        if (sortBy === 'oldest') {
+          return getTs(a) - getTs(b);
+        } else if (sortBy === 'name-asc') {
+          return (a.fullName || '').localeCompare(b.fullName || '');
+        } else if (sortBy === 'name-desc') {
+          return (b.fullName || '').localeCompare(a.fullName || '');
+        } else {
+          // 'newest' default
+          const diff = getTs(b) - getTs(a);
+          if (diff !== 0) return diff;
+          return (b.trackingId || b.id || '').localeCompare(a.trackingId || a.id || '');
+        }
+      });
 
       const summaryList = filtered.map(app => ({
         id: app.id,

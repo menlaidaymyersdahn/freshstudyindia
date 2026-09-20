@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { ApplicationStatus, ApplicationSubmission, EnquirySubmission, StudentDocument, CommunicationLog, AdmissionDetails } from '../types';
 import { COMPANY, getWhatsAppConfig } from '../config/company';
 import { 
@@ -58,7 +58,8 @@ import {
   TrendingUp,
   BarChart2,
   PieChart,
-  Cloud
+  Cloud,
+  ArrowUpDown
 } from 'lucide-react';
 import { 
   getAllApplicationsFromFirestore, 
@@ -92,12 +93,13 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   const [adminTab, setAdminTab] = useState<'applications' | 'enquiries' | 'approvals' | 'analytics'>('applications');
   const [showChartInApplicationsTab, setShowChartInApplicationsTab] = useState(true);
 
-  // Applications State
+  // Applications State & Sorting Filter (Newest Applicants First by default)
   const [applications, setApplications] = useState<ApplicationSubmission[]>([]);
   const [enquiries, setEnquiries] = useState<EnquirySubmission[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [appSortBy, setAppSortBy] = useState<'newest' | 'oldest' | 'name-asc' | 'name-desc' | 'status' | 'country'>('newest');
 
   // Bulk Selection State
   const [selectedAppIds, setSelectedAppIds] = useState<string[]>([]);
@@ -369,6 +371,11 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     });
 
     const cleanedList = Array.from(uniqueMap.values());
+    cleanedList.sort((a, b) => {
+      const timeA = a.submittedAt ? new Date(a.submittedAt).getTime() : 0;
+      const timeB = b.submittedAt ? new Date(b.submittedAt).getTime() : 0;
+      return timeB - timeA;
+    });
     try {
       localStorage.setItem('mgp_local_applications', JSON.stringify(cleanedList));
       localStorage.setItem('mgp_applications', JSON.stringify(cleanedList));
@@ -403,7 +410,13 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         uniqueMap.set(key, item);
       }
     });
-    return Array.from(uniqueMap.values());
+    const enquiriesList = Array.from(uniqueMap.values());
+    enquiriesList.sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return timeB - timeA;
+    });
+    return enquiriesList;
   };
 
   // Auto-fetch data on open or authentication & subscribe to live student submissions
@@ -1733,32 +1746,123 @@ Website: https://myersglobalpathways.com`;
     }
   };
 
-  // Filtered applications list
-  const filteredApps = applications.filter(app => {
-    const matchesStatus = statusFilter === 'ALL' || app.status === statusFilter;
-    const q = searchQuery.toLowerCase().trim();
-    const matchesSearch = !q || 
-      app.fullName?.toLowerCase().includes(q) ||
-      app.email?.toLowerCase().includes(q) ||
-      app.trackingId?.toLowerCase().includes(q) ||
-      app.country?.toLowerCase().includes(q) ||
-      app.whatsapp?.toLowerCase().includes(q) ||
-      app.preferredCourse?.toLowerCase().includes(q) ||
-      app.preferredUniversity?.toLowerCase().includes(q);
+  // Helper to extract timestamp for application sorting & recency
+  const getAppTimestamp = (app: ApplicationSubmission): number => {
+    if (app.submittedAt) {
+      const t = new Date(app.submittedAt).getTime();
+      if (!isNaN(t) && t > 0) return t;
+    }
+    if ((app as any).createdAt) {
+      const t = new Date((app as any).createdAt).getTime();
+      if (!isNaN(t) && t > 0) return t;
+    }
+    if ((app as any).updatedAt) {
+      const t = new Date((app as any).updatedAt).getTime();
+      if (!isNaN(t) && t > 0) return t;
+    }
+    const match = (app.id || app.trackingId || '').match(/\d{10,13}/);
+    if (match) {
+      const n = parseInt(match[0], 10);
+      if (n > 1000000000) return n < 10000000000 ? n * 1000 : n;
+    }
+    return 0;
+  };
 
-    return matchesStatus && matchesSearch;
-  });
+  const isRecentApplicant = (app: ApplicationSubmission): boolean => {
+    const ts = getAppTimestamp(app);
+    if (!ts) return false;
+    const hours = (Date.now() - ts) / (1000 * 60 * 60);
+    return hours >= 0 && hours <= 72; // within 3 days
+  };
 
-  // Filtered enquiries list
-  const filteredEnquiries = enquiries.filter(enq => {
+  const formatSubmissionDate = (dateStr?: string) => {
+    if (!dateStr) return null;
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return null;
+      return d.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return null;
+    }
+  };
+
+  // Filtered and sorted applications list (Newest Applicants First by default)
+  const filteredApps = useMemo(() => {
+    const list = applications.filter(app => {
+      const matchesStatus = statusFilter === 'ALL' || app.status === statusFilter;
+      const q = searchQuery.toLowerCase().trim();
+      const matchesSearch = !q || 
+        app.fullName?.toLowerCase().includes(q) ||
+        app.email?.toLowerCase().includes(q) ||
+        app.trackingId?.toLowerCase().includes(q) ||
+        app.country?.toLowerCase().includes(q) ||
+        app.whatsapp?.toLowerCase().includes(q) ||
+        app.preferredCourse?.toLowerCase().includes(q) ||
+        app.preferredUniversity?.toLowerCase().includes(q);
+
+      return matchesStatus && matchesSearch;
+    });
+
+    return [...list].sort((a, b) => {
+      if (appSortBy === 'newest') {
+        const diff = getAppTimestamp(b) - getAppTimestamp(a);
+        if (diff !== 0) return diff;
+        return (b.trackingId || b.id || '').localeCompare(a.trackingId || a.id || '');
+      }
+      if (appSortBy === 'oldest') {
+        const diff = getAppTimestamp(a) - getAppTimestamp(b);
+        if (diff !== 0) return diff;
+        return (a.trackingId || a.id || '').localeCompare(b.trackingId || b.id || '');
+      }
+      if (appSortBy === 'name-asc') {
+        return (a.fullName || '').localeCompare(b.fullName || '');
+      }
+      if (appSortBy === 'name-desc') {
+        return (b.fullName || '').localeCompare(a.fullName || '');
+      }
+      if (appSortBy === 'status') {
+        const order: Record<string, number> = {
+          'Application Submitted': 1,
+          'Documents Review': 2,
+          'University Review': 3,
+          'Admission Decision': 4
+        };
+        const orderA = order[a.status || ''] || 99;
+        const orderB = order[b.status || ''] || 99;
+        if (orderA !== orderB) return orderA - orderB;
+        return getAppTimestamp(b) - getAppTimestamp(a);
+      }
+      if (appSortBy === 'country') {
+        return (a.country || '').localeCompare(b.country || '');
+      }
+      return 0;
+    });
+  }, [applications, statusFilter, searchQuery, appSortBy]);
+
+  // Filtered and sorted enquiries list (Newest enquiries first by default)
+  const filteredEnquiries = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    return !q ||
-      enq.fullName?.toLowerCase().includes(q) ||
-      enq.email?.toLowerCase().includes(q) ||
-      enq.country?.toLowerCase().includes(q) ||
-      enq.preferredCourse?.toLowerCase().includes(q) ||
-      enq.message?.toLowerCase().includes(q);
-  });
+    const list = enquiries.filter(enq => {
+      return !q ||
+        enq.fullName?.toLowerCase().includes(q) ||
+        enq.email?.toLowerCase().includes(q) ||
+        enq.country?.toLowerCase().includes(q) ||
+        enq.preferredCourse?.toLowerCase().includes(q) ||
+        enq.message?.toLowerCase().includes(q);
+    });
+
+    return [...list].sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return timeB - timeA;
+    });
+  }, [enquiries, searchQuery]);
 
   // Export Data to CSV
   const handleExportCSV = () => {
@@ -2109,18 +2213,43 @@ Website: https://myersglobalpathways.com`;
                   />
                 </div>
 
-                <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="flex items-center flex-wrap gap-2 w-full sm:w-auto">
                   {adminTab === 'applications' && (
-                    <select
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="px-3 py-2 rounded-xl text-xs bg-white border border-slate-200 text-slate-900 focus:outline-none cursor-pointer shadow-2xs font-medium"
-                    >
-                      <option value="ALL">All Application Statuses ({applications.length})</option>
-                      {statusOptions.map(st => (
-                        <option key={st} value={st}>{st}</option>
-                      ))}
-                    </select>
+                    <>
+                      <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="px-3 py-2 rounded-xl text-xs bg-white border border-slate-200 text-slate-900 focus:outline-none cursor-pointer shadow-2xs font-medium"
+                        title="Filter by Application Status"
+                      >
+                        <option value="ALL">All Statuses ({applications.length})</option>
+                        {statusOptions.map(st => (
+                          <option key={st} value={st}>{st}</option>
+                        ))}
+                      </select>
+
+                      {/* Sort Filter Dropdown */}
+                      <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs bg-white border border-slate-200 text-slate-800 shadow-2xs">
+                        <ArrowUpDown className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                        <label htmlFor="app-sort-filter" className="text-[11px] font-bold text-slate-500 hidden md:inline shrink-0">
+                          Sort:
+                        </label>
+                        <select
+                          id="app-sort-filter"
+                          value={appSortBy}
+                          onChange={(e) => setAppSortBy(e.target.value as any)}
+                          className="text-xs bg-transparent text-slate-900 font-semibold focus:outline-none cursor-pointer pr-1"
+                          title="Sort Student Applicants"
+                        >
+                          <option value="newest">Newest Applicant First</option>
+                          <option value="oldest">Oldest Applicant First</option>
+                          <option value="name-asc">Student Name (A – Z)</option>
+                          <option value="name-desc">Student Name (Z – A)</option>
+                          <option value="status">Workflow Status</option>
+                          <option value="country">Country (A – Z)</option>
+                        </select>
+                      </div>
+                    </>
                   )}
 
                   <button
@@ -2282,6 +2411,21 @@ Website: https://myersglobalpathways.com`;
                           </span>
                         </div>
 
+                        {/* Active Sort Order Indicator */}
+                        {selectedAppIds.length === 0 && (
+                          <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-medium">
+                            <span className="hidden sm:inline">Ordered by:</span>
+                            <span className="inline-flex items-center gap-1 font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
+                              <ArrowUpDown className="w-3 h-3" />
+                              {appSortBy === 'newest' ? 'Newest First' :
+                               appSortBy === 'oldest' ? 'Oldest First' :
+                               appSortBy === 'name-asc' ? 'Name (A–Z)' :
+                               appSortBy === 'name-desc' ? 'Name (Z–A)' :
+                               appSortBy === 'status' ? 'Status' : 'Country'}
+                            </span>
+                          </div>
+                        )}
+
                         {/* Bulk Action Controls Trigger Bar */}
                         {selectedAppIds.length > 0 ? (
                           <div className="flex flex-wrap items-center gap-1.5 animate-fadeIn">
@@ -2378,10 +2522,10 @@ Website: https://myersglobalpathways.com`;
                         </div>
                         
                         <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5">
-                          {applications.length > 0 && (statusFilter !== 'ALL' || searchQuery.trim()) && (
+                          {applications.length > 0 && (statusFilter !== 'ALL' || searchQuery.trim() || appSortBy !== 'newest') && (
                             <button
                               type="button"
-                              onClick={() => { setStatusFilter('ALL'); setSearchQuery(''); }}
+                              onClick={() => { setStatusFilter('ALL'); setSearchQuery(''); setAppSortBy('newest'); }}
                               className="px-4 py-2 rounded-xl text-xs font-bold text-slate-900 bg-amber-400 hover:bg-amber-300 transition-colors inline-flex items-center gap-1.5 shadow-sm cursor-pointer"
                             >
                               <RotateCcw className="w-3.5 h-3.5" />
@@ -2447,17 +2591,29 @@ Website: https://myersglobalpathways.com`;
                                   </button>
 
                                   <div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center flex-wrap gap-2">
                                       <span className="font-mono text-[11px] font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded">
                                         {app.trackingId}
                                       </span>
                                       <span className="text-[10px] text-slate-500 font-semibold">
                                         {app.country}
                                       </span>
+                                      {isRecentApplicant(app) && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-2xs">
+                                          <Sparkles className="w-2.5 h-2.5 text-emerald-600" />
+                                          New Applicant
+                                        </span>
+                                      )}
                                     </div>
                                     <h4 className="text-base font-extrabold text-slate-950 mt-1">
                                       {app.fullName}
                                     </h4>
+                                    {app.submittedAt && (
+                                      <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium mt-0.5">
+                                        <Clock className="w-3 h-3 text-slate-400 shrink-0" />
+                                        <span>Applied: {formatSubmissionDate(app.submittedAt)}</span>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
 
@@ -3313,7 +3469,10 @@ Website: https://myersglobalpathways.com`;
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {applications.filter(a => a.status === 'Admission Decision' || a.admissionDetails?.offerLetterIssued).map((app) => (
+                    {[...applications]
+                      .filter(a => a.status === 'Admission Decision' || a.admissionDetails?.offerLetterIssued)
+                      .sort((a, b) => getAppTimestamp(b) - getAppTimestamp(a))
+                      .map((app) => (
                       <div key={app.id} className="p-4 rounded-2xl bg-white border border-emerald-300 shadow-xs space-y-3 text-left">
                         <div className="flex items-center justify-between">
                           <span className="font-mono text-xs font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
