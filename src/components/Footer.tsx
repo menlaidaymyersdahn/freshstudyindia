@@ -63,12 +63,18 @@ export const Footer: React.FC<FooterProps> = () => {
                   </Link>
                 </li>
               ))}
-              <li className="pt-2 border-t border-[#181A1F]/[0.08]">
+              <li className="pt-2 border-t border-[#181A1F]/[0.08] space-y-2">
                 <Link
                   to="/student-portal"
                   className="text-[#181A1F] hover:text-[#A63A24] font-medium transition-ui block"
                 >
                   Student portal (track application)
+                </Link>
+                <Link
+                  to="/download-app"
+                  className="text-[#A63A24] hover:text-[#8C2F1C] font-medium transition-ui block"
+                >
+                  Install app / Android APK
                 </Link>
               </li>
             </ul>

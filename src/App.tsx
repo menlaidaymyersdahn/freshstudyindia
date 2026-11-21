@@ -20,6 +20,8 @@ import { StudentLifeBlogPage } from './pages/StudentLifeBlogPage';
 import { ApplyPage } from './pages/ApplyPage';
 import { StudentPortalPage } from './pages/StudentPortalPage';
 import { AdminPage } from './pages/AdminPage';
+import { DownloadAppPage } from './pages/DownloadAppPage';
+import { OfflineIndicator } from './components/OfflineIndicator';
 import { ServiceItem } from './types';
 
 export function App() {
@@ -266,6 +268,11 @@ export function App() {
             element={<AdminPage />} 
           />
 
+          {/* Mobile App & Android APK Download */}
+          <Route path="/download-app" element={<DownloadAppPage />} />
+          <Route path="/app" element={<DownloadAppPage />} />
+          <Route path="/install" element={<DownloadAppPage />} />
+
           {/* Fallback redirect */}
           <Route 
             path="*" 
@@ -311,6 +318,9 @@ export function App() {
           onOpenApplication={() => handleOpenApplication()}
         />
       )}
+
+      {/* Offline Connectivity Indicator */}
+      <OfflineIndicator />
 
     </div>
   );

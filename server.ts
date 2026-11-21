@@ -2190,6 +2190,30 @@ COMMUNICATION STYLE:
     res.status(404).send('Sitemap not found');
   });
 
+  // Public downloadable Android APK Build Kit (.zip) — open access, no auth required
+  const handleAndroidApkKitDownload = (_req: express.Request, res: express.Response) => {
+    const candidates = [
+      path.join(process.cwd(), 'dist', 'downloads', 'myers-global-pathways-android-apk-kit.zip'),
+      path.join(process.cwd(), 'public', 'downloads', 'myers-global-pathways-android-apk-kit.zip'),
+      ...(typeof __dirname !== 'undefined'
+        ? [path.join(__dirname, 'downloads', 'myers-global-pathways-android-apk-kit.zip')]
+        : []),
+    ];
+    const kitPath = candidates.find((p) => fs.existsSync(p));
+    if (!kitPath) {
+      return res.status(404).json({ success: false, error: 'Android APK build kit not found.' });
+    }
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', 'attachment; filename="myers-global-pathways-android-apk-kit.zip"');
+    return res.sendFile(kitPath);
+  };
+
+  app.get('/api/download/android-apk-kit', handleAndroidApkKitDownload);
+  app.get('/download/android-apk-kit', handleAndroidApkKitDownload);
+  app.get('/downloads/myers-global-pathways-android-apk-kit.zip', handleAndroidApkKitDownload);
+
   // Vite middleware for development vs static build in production
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({

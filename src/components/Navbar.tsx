@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { COMPANY } from '../config/company';
 import { Menu, X } from 'lucide-react';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface NavbarProps {
   onOpenApplication?: () => void;
@@ -73,7 +74,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
             : 'bg-[#F7F5F0] border-[#181A1F]/[0.08]'
         }`}
       >
-        <div className="max-w-7xl mx-auto h-full px-6 lg:px-8 flex items-center justify-between gap-6">
+        <div className="max-w-7xl mx-auto h-full px-6 lg:px-8 flex items-center justify-between gap-2 xl:gap-4">
           {/* Single-line Brand Wordmark */}
           <Link
             to="/"
@@ -84,14 +85,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1" aria-label="Main Navigation">
+          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1" aria-label="Main Navigation">
             {navLinks.map((link) => {
               const isActive = isCurrentPath(link.path);
               return (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`px-3 py-2 rounded-lg text-sm font-normal whitespace-nowrap transition-ui ${
+                  className={`px-2 xl:px-3 py-2 rounded-lg text-sm font-normal whitespace-nowrap transition-ui ${
                     isActive
                       ? 'text-[#A63A24] bg-[#A63A24]/[0.07] font-medium'
                       : 'text-[#4F535C] hover:text-[#181A1F] hover:bg-[#181A1F]/[0.04]'
@@ -103,11 +104,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
             })}
           </nav>
 
-          {/* Quiet Utility Actions (leaves Hero button as the page's primary CTA) */}
-          <div className="hidden lg:flex items-center gap-3 shrink-0">
+          {/* Quiet Utility Actions */}
+          <div className="hidden lg:flex items-center gap-2 shrink-0">
             <Link
               to="/student-portal"
-              className={`px-3 py-2 rounded-lg text-sm whitespace-nowrap transition-ui ${
+              className={`px-2 py-2 rounded-lg text-sm whitespace-nowrap transition-ui ${
                 location.pathname.startsWith('/student-portal')
                   ? 'text-[#A63A24] font-medium'
                   : 'text-[#4F535C] hover:text-[#181A1F]'
@@ -118,7 +119,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
 
             <Link
               to="/admin"
-              className={`px-3 py-2 rounded-lg text-sm whitespace-nowrap transition-ui ${
+              className={`px-2 py-2 rounded-lg text-sm whitespace-nowrap transition-ui ${
                 location.pathname === '/admin'
                   ? 'text-[#A63A24] font-medium'
                   : 'text-[#6E727D] hover:text-[#181A1F]'
@@ -126,6 +127,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
             >
               Admin
             </Link>
+
+            <PWAInstallButton />
 
             <button
               type="button"
@@ -138,10 +141,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
 
           {/* Mobile Controls */}
           <div className="flex lg:hidden items-center gap-2">
+            <PWAInstallButton compact />
+
             <button
               type="button"
               onClick={handleApplyClick}
-              className="px-3 py-2 rounded-lg text-sm font-medium text-[#181A1F] bg-white border border-[#181A1F]/[0.14] hover:border-[#A63A24] hover:text-[#A63A24] transition-ui cursor-pointer"
+              className="px-3 py-2 rounded-lg text-xs font-medium text-[#181A1F] bg-white border border-[#181A1F]/[0.14] hover:border-[#A63A24] hover:text-[#A63A24] transition-ui cursor-pointer"
             >
               Apply
             </button>
@@ -189,13 +194,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 space-y-6 text-left">
-            <button
-              type="button"
-              onClick={handleApplyClick}
-              className="w-full py-3 px-4 rounded-lg text-sm font-medium text-white bg-[#A63A24] hover:bg-[#8C2F1C] transition-ui cursor-pointer text-center"
-            >
-              Start your application
-            </button>
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={handleApplyClick}
+                className="w-full py-3 px-4 rounded-lg text-sm font-medium text-white bg-[#A63A24] hover:bg-[#8C2F1C] transition-ui cursor-pointer text-center"
+              >
+                Start your application
+              </button>
+              <Link
+                to="/download-app"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block w-full py-2 px-4 rounded-lg text-sm font-medium text-[#181A1F] bg-white border border-[#181A1F]/[0.14] text-center transition-ui"
+              >
+                Install app / Android APK
+              </Link>
+            </div>
 
             <div className="space-y-1">
               <Link
