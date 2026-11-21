@@ -3,7 +3,6 @@ import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { ScrollToTop } from './components/ScrollToTop';
-import { CursorRingField } from './components/CursorRingField';
 import { WhatsAppFloatingButton } from './components/WhatsAppFloatingButton';
 import { AdmissionsAdvisorChat } from './components/AdmissionsAdvisorChat';
 import { ApplicationModal } from './components/ApplicationModal';
@@ -82,22 +81,10 @@ export function App() {
   const isAdminRoute = location.pathname === '/admin';
 
   return (
-    <div className="min-h-screen bg-[#EBF3FC] text-slate-900 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950 relative">
+    <div className="min-h-screen bg-[#F7F5F0] text-[#181A1F] flex flex-col selection:bg-[#A63A24]/15 selection:text-[#181A1F] relative">
       
       {/* Scroll restoration on route changes */}
       <ScrollToTop />
-
-      {/* Dynamic Cursor Ring Field Interactive Background */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden opacity-60">
-        <CursorRingField
-          background="transparent"
-          colors={["#38bdf8", "#3b82f6", "#1d4ed8", "#60a5fa", "#0369a1"]}
-          density={260}
-          dotSize={115}
-          speed={6}
-          ring={{ push: 45, width: 10, radius: 14, turbulence: 60 }}
-        />
-      </div>
 
       {/* 1. Header Navigation Bar (Hidden on full-screen Admin page) */}
       {!isAdminRoute && (

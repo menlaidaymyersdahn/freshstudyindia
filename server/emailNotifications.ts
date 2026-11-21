@@ -1,3 +1,5 @@
+import nodemailer from 'nodemailer';
+
 export interface EmailTemplateResult {
   subject: string;
   text: string;
@@ -8,14 +10,34 @@ export interface EmailTemplateResult {
 
 export interface DispatchEmailResult {
   success: boolean;
+  delivered?: boolean;
   subject: string;
   recipient: string;
-  mode: 'gmail_api' | 'dossier_logged';
+  mode: 'gmail_api' | 'smtp' | 'dossier_logged';
+  code?: 'SENT' | 'INVALID_RECIPIENT' | 'EMAIL_NOT_CONFIGURED' | 'DELIVERY_FAILED';
   messageId?: string;
   threadId?: string;
   senderEmail?: string;
   previewText: string;
   error?: string;
+  missingConfig?: string[];
+  logEntry?: any;
+}
+
+export interface EmailServiceStatus {
+  configured: boolean;
+  activeProvider: 'gmail_api' | 'smtp' | 'none';
+  gmailOAuth: {
+    connected: boolean;
+    email: string;
+    updatedAt: string | null;
+  };
+  smtp: {
+    configured: boolean;
+    host: string | null;
+    from: string;
+  };
+  missingRequirements: string[];
 }
 
 // In-memory server-side Google Workspace OAuth token storage (never exposed to client)
@@ -39,8 +61,51 @@ export function clearServerWorkspaceToken() {
 export function getServerWorkspaceTokenInfo() {
   return {
     isConnected: Boolean(serverWorkspaceToken),
+    connected: Boolean(serverWorkspaceToken),
     email: serverWorkspaceUserEmail,
     updatedAt: tokenUpdatedAt
+  };
+}
+
+export function isSmtpConfigured(): boolean {
+  return Boolean(
+    process.env.SMTP_HOST &&
+    process.env.SMTP_USER &&
+    process.env.SMTP_PASS
+  );
+}
+
+export function getEmailServiceStatus(bearerToken?: string): EmailServiceStatus {
+  const hasGmailToken = Boolean(bearerToken || serverWorkspaceToken);
+  const hasSmtp = isSmtpConfigured();
+  const activeProvider: 'gmail_api' | 'smtp' | 'none' = hasGmailToken
+    ? 'gmail_api'
+    : hasSmtp
+    ? 'smtp'
+    : 'none';
+
+  const missingRequirements: string[] = [];
+  if (!hasGmailToken && !hasSmtp) {
+    missingRequirements.push(
+      'Connect Google Workspace Gmail OAuth (admissions@myersglobalpathways.com) using the "Connect Google Workspace" button in the Admin Dashboard',
+      'OR configure server SMTP environment variables: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS (and optional SMTP_FROM)'
+    );
+  }
+
+  return {
+    configured: hasGmailToken || hasSmtp,
+    activeProvider,
+    gmailOAuth: {
+      connected: hasGmailToken,
+      email: serverWorkspaceUserEmail,
+      updatedAt: tokenUpdatedAt
+    },
+    smtp: {
+      configured: hasSmtp,
+      host: process.env.SMTP_HOST || null,
+      from: process.env.SMTP_FROM || 'Myers Global Pathways Admissions <admissions@myersglobalpathways.com>'
+    },
+    missingRequirements
   };
 }
 
@@ -129,6 +194,7 @@ export function generateStatusEmail(
   let showAdmissionBox = false;
 
   switch (newStatus) {
+    case 'Application Received':
     case 'Application Submitted':
     case 'Submission Confirmation':
     case 'New Application':
@@ -150,6 +216,43 @@ export function generateStatusEmail(
       ];
       break;
 
+    case 'Documents Requested':
+      badgeColor = '#b45309';
+      badgeBg = '#fef3c7';
+      subject = `Application Received – Submission of Supporting Documents`;
+      headline = `Supporting Documents Requested`;
+      subheadline = `Please submit your clear, complete supporting documents so our Admissions Desk can proceed with your application.`;
+      bodyParagraphs = [
+        `Dear ${applicantName},`,
+        `We have received your application (Reference: <strong>${trackingId}</strong>) for <strong>${program}</strong> in India and are ready to proceed to document review.`,
+        `Kindly submit your required supporting documents via Email at <strong>admissions@myersglobalpathways.com</strong> or WhatsApp at <strong>+231 889425645</strong>.`,
+        customNote ? `<strong>Admissions Notice:</strong> ${customNote}` : `Please ensure all submitted documents are clear, complete, and readable so our admissions team can review and forward your application to the University.`
+      ];
+      nextSteps = [
+        `Send clear copies of your passport, academic certificates, and transcripts to admissions@myersglobalpathways.com or WhatsApp +231 889425645.`,
+        `Include your Application Reference (${trackingId}) when submitting your documents.`,
+        `Once received, our team will confirm receipt and begin reviewing your file.`
+      ];
+      break;
+
+    case 'Documents Received':
+      badgeColor = '#0f766e';
+      badgeBg = '#ccfbf1';
+      subject = `✅ Supporting Documents Received [Ref: ${trackingId}] - Myers Global Pathways`;
+      headline = `Supporting Documents Received`;
+      subheadline = `Thank you! Our Admissions Desk has received your supporting documents and queued them for evaluation.`;
+      bodyParagraphs = [
+        `Dear ${applicantName},`,
+        `This is to confirm that we have received your supporting documents for your application (Reference: <strong>${trackingId}</strong>) for <strong>${program}</strong> in India.`,
+        customNote ? `<strong>Admissions Notice:</strong> ${customNote}` : `Your documents have been added to your official dossier and will shortly move to our Academic Document Review stage.`
+      ];
+      nextSteps = [
+        `Our admissions committee will inspect each document for completeness and university compliance.`,
+        `You will be notified once your documents enter formal review or if any clarification is required.`
+      ];
+      break;
+
+    case 'Documents Under Review':
     case 'Documents Review':
     case 'Document Verification':
       badgeColor = '#0369a1';
@@ -170,33 +273,35 @@ export function generateStatusEmail(
       ];
       break;
 
+    case 'Application Submitted to University':
     case 'University Review':
     case 'Under Review':
       badgeColor = '#6d28d9';
       badgeBg = '#f3e8ff';
-      subject = `🏛️ University Committee Review in Progress [Ref: ${trackingId}] - Myers Global Pathways`;
-      headline = `Application Under University Review`;
-      subheadline = `Your verified dossier has been presented to the University Admissions Directorate for formal placement & scholarship allocation.`;
+      subject = `🏛️ Application Submitted to University [Ref: ${trackingId}] - Myers Global Pathways`;
+      headline = `Application Submitted to University`;
+      subheadline = `Your verified dossier has been forwarded to the University Admissions Directorate for formal assessment & placement.`;
       bodyParagraphs = [
         `Dear ${applicantName},`,
-        `Your application dossier (Ref: <strong>${trackingId}</strong>) has been verified and officially forwarded to the Admissions Directorate for <strong>${university}</strong>.`,
+        `Your application dossier (Ref: <strong>${trackingId}</strong>) has been verified and officially submitted to the Admissions Directorate for <strong>${university}</strong>.`,
         `The academic board is now reviewing your program suitability for <strong>${program}</strong>, seat availability for the upcoming intake, and evaluating your profile for institutional scholarship waivers.`,
         customNote ? `<strong>Admissions Notice:</strong> ${customNote}` : `Myers Global Pathways maintains direct institutional ties with university leadership to expedite admissions decisions for international candidates.`
       ];
       nextSteps = [
         `The University Committee typically issues admission recommendations within 2–4 working days.`,
-        `Upon approval, your official Provisional Admission Letter with institutional scholarship details will be issued.`,
+        `Upon approval, your official Offer Letter / Provisional Admission Letter will be issued.`,
         `Track live evaluation progress in your Student Portal.`
       ];
       break;
 
+    case 'Offer Letter Received':
     case 'Admission Decision':
       badgeColor = '#047857';
       badgeBg = '#d1fae5';
       showAdmissionBox = true;
-      subject = `🎉 Congratulations! Provisional Admission Offer Granted [Ref: ${trackingId}] - Myers Global Pathways`;
-      headline = `Official Admission Offer Issued!`;
-      subheadline = `Congratulations! The Admissions Board has approved your admission into Indian higher education.`;
+      subject = `🎉 Congratulations! Official Offer Letter Received [Ref: ${trackingId}] - Myers Global Pathways`;
+      headline = `Official Offer Letter Received!`;
+      subheadline = `Congratulations! The University Admissions Board has issued your official admission offer.`;
       bodyParagraphs = [
         `Dear ${applicantName},`,
         `We are thrilled to congratulate you on your official admission to study in India through Myers Global Pathways!`,
@@ -204,7 +309,7 @@ export function generateStatusEmail(
         customNote ? `<strong>Director's Message:</strong> ${customNote}` : `Your provisional admission letter and scholarship grant details are now available for instant download in your Student Portal.`
       ];
       nextSteps = [
-        `Download your Official Provisional Admission Letter directly from the Myers Student Portal.`,
+        `Download your Official Offer Letter directly from the Myers Student Portal.`,
         `Review tuition fee schedules, merit waiver allocations, and semester registration deadlines.`,
         `Your dedicated admissions counselor will connect with you to initiate your Indian Student Visa application.`
       ];
@@ -552,6 +657,7 @@ export async function dispatchStatusNotificationEmail(
 
   return {
     success: true,
+    delivered: mode === 'gmail_api',
     subject: emailContent.subject,
     recipient,
     mode,
@@ -559,6 +665,495 @@ export async function dispatchStatusNotificationEmail(
     threadId,
     senderEmail: 'admissions@myersglobalpathways.com',
     previewText: emailContent.text.slice(0, 160) + '...',
-    error: errorMsg
+    error: errorMsg,
+    logEntry
+  };
+}
+
+// ============================================================================
+// APPLICATION RECEIVED – SUPPORTING DOCUMENTS REQUEST EMAIL FEATURE
+// ============================================================================
+
+export const SUPPORTING_DOCUMENTS_EMAIL_SUBJECT =
+  'Application Received – Submission of Supporting Documents';
+
+const OFFICIAL_ADMISSIONS_EMAIL = 'admissions@myersglobalpathways.com';
+const OFFICIAL_WHATSAPP_NUMBER = '+231 889425645';
+const OFFICIAL_WEBSITE_URL = 'https://myersglobalpathways.com';
+
+function escapeHtml(input: string): string {
+  return String(input || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+export interface SupportingDocumentsEmailPayload {
+  studentName: string;
+  applicationId: string;
+  courseName: string;
+  recipient: string;
+  subject: string;
+  text: string;
+  html: string;
+}
+
+/**
+ * Generates the official "Application Received – Supporting Documents Request"
+ * template (plain text + branded mobile-friendly HTML), supporting optional
+ * edits made by the admissions officer before sending.
+ */
+export function generateSupportingDocumentsRequestEmail(
+  app: any,
+  overrides?: {
+    subject?: string;
+    bodyText?: string;
+    recipientEmail?: string;
+  }
+): SupportingDocumentsEmailPayload {
+  const studentName = String(app?.fullName || 'Applicant').trim();
+  const applicationId = String(app?.trackingId || app?.id || 'MGP-PENDING').trim();
+  const courseName = String(
+    app?.preferredCourse || app?.preferredStudyLevel || 'your selected program'
+  ).trim();
+  const recipient = String(overrides?.recipientEmail || app?.email || '').trim().toLowerCase();
+
+  const subject = String(
+    overrides?.subject?.trim() || SUPPORTING_DOCUMENTS_EMAIL_SUBJECT
+  ).replace(/[\r\n]/g, ' ');
+
+  const defaultBodyText = `Dear ${studentName},
+
+Greetings from the Admissions Desk at Myers Global Pathways.
+
+We are pleased to inform you that we have successfully received your application (Reference: ${applicationId}) for ${courseName} in India.
+
+To proceed with the next stage of your admission process, we kindly request that you submit your required supporting documents through either of the following channels:
+
+Email: ${OFFICIAL_ADMISSIONS_EMAIL}
+
+WhatsApp: ${OFFICIAL_WHATSAPP_NUMBER}
+
+Please ensure that all submitted documents are clear, complete and readable so our admissions team can review and process your application.
+
+Once we receive your documents, our team will review them and forward your application to the University for further assessment.
+
+If you have any questions or need assistance with the document submission process, please feel free to contact us.
+
+We look forward to assisting you with your admission journey to India.
+
+Warm regards,
+
+Admissions Committee
+Myers Global Pathways
+Email: ${OFFICIAL_ADMISSIONS_EMAIL}
+Website: ${OFFICIAL_WEBSITE_URL}`;
+
+  const text = (overrides?.bodyText && overrides.bodyText.trim().length > 0)
+    ? overrides.bodyText.trim()
+    : defaultBodyText;
+
+  const safeSubject = escapeHtml(subject);
+  const safeStudentName = escapeHtml(studentName);
+  const safeAppId = escapeHtml(applicationId);
+  const safeCourseName = escapeHtml(courseName);
+
+  const rawParagraphs = text
+    .replace(/\r\n/g, '\n')
+    .split(/\n{2,}/)
+    .map(p => p.trim())
+    .filter(Boolean);
+
+  const signOffIdx = rawParagraphs.findIndex(p => /^warm regards,?$/i.test(p));
+  const mainParagraphs = signOffIdx >= 0 ? rawParagraphs.slice(0, signOffIdx) : rawParagraphs;
+  const customSignatureParagraphs = signOffIdx >= 0 ? rawParagraphs.slice(signOffIdx) : [];
+
+  const emailLineIdx = mainParagraphs.findIndex(p =>
+    /^Email:\s*admissions@myersglobalpathways\.com$/i.test(p)
+  );
+  const whatsappLineIdx = mainParagraphs.findIndex(p =>
+    /^WhatsApp:\s*\+231\s*889425645$/i.test(p)
+  );
+  const hasChannelLines = emailLineIdx !== -1 && whatsappLineIdx !== -1;
+
+  const channelCardHtml = `
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin: 18px 0 22px 0; background-color: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #0b192c; border-radius: 10px;">
+      <tr>
+        <td style="padding: 18px 20px;">
+          <p style="margin: 0 0 12px 0; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #0b192c;">
+            Official Document Submission Channels
+          </p>
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size: 14px;">
+            <tr>
+              <td style="padding: 6px 0; vertical-align: top; width: 96px; color: #64748b; font-weight: 700;">Email:</td>
+              <td style="padding: 6px 0; vertical-align: top;">
+                <a href="mailto:${OFFICIAL_ADMISSIONS_EMAIL}?subject=${encodeURIComponent(`Supporting Documents – ${applicationId} – ${studentName}`)}" style="color: #1d4ed8; font-weight: 700; text-decoration: none; word-break: break-all;">${OFFICIAL_ADMISSIONS_EMAIL}</a>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; vertical-align: top; width: 96px; color: #64748b; font-weight: 700;">WhatsApp:</td>
+              <td style="padding: 6px 0; vertical-align: top;">
+                <a href="https://wa.me/231889425645" target="_blank" style="color: #047857; font-weight: 700; text-decoration: none;">${OFFICIAL_WHATSAPP_NUMBER}</a>
+              </td>
+            </tr>
+          </table>
+          <p style="margin: 12px 0 0 0; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #475569; line-height: 1.5;">
+            <strong>Submission Tip:</strong> Include your reference number <strong style="color: #0f172a; font-family: monospace;">${safeAppId}</strong> when sending your files. Clear PDF scans or sharp, readable photos are accepted.
+          </p>
+        </td>
+      </tr>
+    </table>`;
+
+  const renderedBlocks: string[] = [];
+  let channelCardInserted = false;
+
+  mainParagraphs.forEach((para, idx) => {
+    if (hasChannelLines && (idx === emailLineIdx || idx === whatsappLineIdx)) {
+      if (!channelCardInserted) {
+        renderedBlocks.push(channelCardHtml);
+        channelCardInserted = true;
+      }
+      return;
+    }
+
+    const escapedRefRegex = new RegExp(
+      escapeHtml(applicationId).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+      'g'
+    );
+    const formattedHtml = escapeHtml(para)
+      .replace(/\n/g, '<br />')
+      .replace(
+        escapedRefRegex,
+        `<strong style="color: #0b192c; font-family: monospace;">${safeAppId}</strong>`
+      );
+
+    renderedBlocks.push(
+      `<p style="margin: 0 0 15px 0; font-size: 15px; color: #334155; line-height: 1.7;">${formattedHtml}</p>`
+    );
+  });
+
+  if (!channelCardInserted) {
+    renderedBlocks.push(channelCardHtml);
+  }
+
+  const signatureHtml =
+    customSignatureParagraphs.length > 0
+      ? customSignatureParagraphs
+          .map((p, idx) => {
+            const safe = escapeHtml(p).replace(/\n/g, '<br />');
+            if (idx === 0) {
+              return `<p style="margin: 22px 0 10px 0; font-size: 15px; color: #334155; line-height: 1.6;">${safe}</p>`;
+            }
+            return `<p style="margin: 0 0 8px 0; font-size: 14px; color: #0f172a; line-height: 1.65; font-weight: 600;">${safe
+              .replace(
+                OFFICIAL_ADMISSIONS_EMAIL,
+                `<a href="mailto:${OFFICIAL_ADMISSIONS_EMAIL}" style="color: #1d4ed8; text-decoration: none; font-weight: 600;">${OFFICIAL_ADMISSIONS_EMAIL}</a>`
+              )
+              .replace(
+                OFFICIAL_WEBSITE_URL,
+                `<a href="${OFFICIAL_WEBSITE_URL}" target="_blank" style="color: #b45309; text-decoration: underline; font-weight: 600;">${OFFICIAL_WEBSITE_URL}</a>`
+              )}</p>`;
+          })
+          .join('')
+      : `<p style="margin: 22px 0 8px 0; font-size: 15px; color: #334155;">Warm regards,</p>
+         <p style="margin: 0; font-size: 14px; color: #0f172a; line-height: 1.65;">
+           <strong>Admissions Committee</strong><br />
+           Myers Global Pathways<br />
+           Email: <a href="mailto:${OFFICIAL_ADMISSIONS_EMAIL}" style="color: #1d4ed8; text-decoration: none;">${OFFICIAL_ADMISSIONS_EMAIL}</a><br />
+           Website: <a href="${OFFICIAL_WEBSITE_URL}" target="_blank" style="color: #b45309; text-decoration: underline;">${OFFICIAL_WEBSITE_URL}</a>
+         </p>`;
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>${safeSubject}</title>
+  <style>
+    @media only screen and (max-width: 600px) {
+      .email-outer { padding: 12px 6px !important; }
+      .email-card { border-radius: 12px !important; }
+      .email-pad { padding-left: 18px !important; padding-right: 18px !important; }
+      .ref-cell { display: block !important; width: 100% !important; padding-bottom: 10px !important; }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" class="email-outer" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f1f5f9; padding: 28px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" class="email-card" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 620px; width: 100%; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);">
+          <tr>
+            <td class="email-pad" style="background-color: #0b192c; padding: 30px 32px; text-align: center; border-bottom: 4px solid #f59e0b;">
+              <div style="display: inline-block; background-color: #f59e0b; color: #0b192c; font-weight: 900; font-size: 16px; padding: 5px 13px; border-radius: 7px; letter-spacing: 1.5px; margin-bottom: 10px;">
+                MGP
+              </div>
+              <h1 style="margin: 0; color: #ffffff; font-size: 22px; font-weight: 800; letter-spacing: -0.3px;">
+                Myers Global Pathways
+              </h1>
+              <p style="margin: 5px 0 0 0; color: #cbd5e1; font-size: 11px; text-transform: uppercase; letter-spacing: 1.6px; font-weight: 600;">
+                Admissions Desk &bull; Study in India Advisory
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td class="email-pad" style="padding: 26px 32px 14px 32px;">
+              <div style="display: inline-block; background-color: #fef3c7; color: #92400e; border: 1px solid #fcd34d; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; padding: 5px 12px; border-radius: 999px;">
+                Action Required &bull; Supporting Documents
+              </div>
+              <h2 style="margin: 14px 0 4px 0; color: #0f172a; font-size: 20px; font-weight: 800; line-height: 1.3;">
+                ${safeSubject}
+              </h2>
+            </td>
+          </tr>
+          <tr>
+            <td class="email-pad" style="padding: 6px 32px 18px 32px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;">
+                <tr>
+                  <td style="padding: 14px 18px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td class="ref-cell" width="50%" style="vertical-align: top; padding-right: 10px;">
+                          <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; font-weight: 700;">Applicant Name</div>
+                          <div style="font-size: 14px; color: #0f172a; font-weight: 700; margin-top: 2px;">${safeStudentName}</div>
+                        </td>
+                        <td class="ref-cell" width="50%" style="vertical-align: top;">
+                          <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; font-weight: 700;">Application Reference</div>
+                          <div style="font-size: 14px; color: #1d4ed8; font-weight: 800; font-family: monospace; margin-top: 2px;">${safeAppId}</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2" style="padding-top: 10px; border-top: 1px solid #e2e8f0;">
+                          <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; font-weight: 700;">Selected Course &amp; Destination</div>
+                          <div style="font-size: 14px; color: #0f172a; font-weight: 600; margin-top: 2px;">${safeCourseName} &mdash; India</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="email-pad" style="padding: 4px 32px 26px 32px;">
+              ${renderedBlocks.join('\n')}
+              <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+                ${signatureHtml}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="email-pad" style="background-color: #0b192c; padding: 20px 32px; text-align: center; color: #94a3b8; font-size: 12px; line-height: 1.6;">
+              <p style="margin: 0 0 4px 0; color: #ffffff; font-weight: 700; font-size: 13px;">
+                Myers Global Pathways &bull; Admissions Committee
+              </p>
+              <p style="margin: 0 0 8px 0; color: #cbd5e1; font-size: 11px;">
+                Your Pathway to Global Education
+              </p>
+              <p style="margin: 0; font-size: 12px;">
+                Email: <a href="mailto:${OFFICIAL_ADMISSIONS_EMAIL}" style="color: #fbbf24; text-decoration: none;">${OFFICIAL_ADMISSIONS_EMAIL}</a>
+                &nbsp;&bull;&nbsp;
+                WhatsApp: <a href="https://wa.me/231889425645" target="_blank" style="color: #fbbf24; text-decoration: none;">${OFFICIAL_WHATSAPP_NUMBER}</a><br />
+                Website: <a href="${OFFICIAL_WEBSITE_URL}" target="_blank" style="color: #fbbf24; text-decoration: underline;">${OFFICIAL_WEBSITE_URL}</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  return {
+    studentName,
+    applicationId,
+    courseName,
+    recipient,
+    subject,
+    text,
+    html
+  };
+}
+
+/**
+ * Dispatches the official "Application Received – Supporting Documents Request" email
+ * via the active email service (Google Workspace Gmail API OAuth or configured SMTP).
+ * Always records the delivery attempt (sent or failed) in the student's communicationLogs.
+ */
+export async function dispatchSupportingDocumentsRequestEmail(
+  app: any,
+  options: {
+    recipientEmail?: string;
+    subject?: string;
+    bodyText?: string;
+    author?: string;
+    bearerToken?: string;
+  } = {}
+): Promise<DispatchEmailResult> {
+  const payload = generateSupportingDocumentsRequestEmail(app, {
+    recipientEmail: options.recipientEmail,
+    subject: options.subject,
+    bodyText: options.bodyText
+  });
+
+  const author = (options.author || 'Admissions Officer').trim();
+  const recipient = payload.recipient;
+
+  // Basic RFC-style email format check
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!recipient || !emailRegex.test(recipient)) {
+    return {
+      success: false,
+      delivered: false,
+      code: 'INVALID_RECIPIENT',
+      subject: payload.subject,
+      recipient: recipient || 'Missing email',
+      mode: 'dossier_logged',
+      previewText: 'Invalid or missing student email address.',
+      error: 'The student application does not have a valid registered email address.'
+    };
+  }
+
+  const activeToken = options.bearerToken || serverWorkspaceToken;
+  const smtpReady = isSmtpConfigured();
+
+  let delivered = false;
+  let mode: 'gmail_api' | 'smtp' | 'dossier_logged' = 'dossier_logged';
+  let code: DispatchEmailResult['code'] = 'EMAIL_NOT_CONFIGURED';
+  let messageId: string | undefined;
+  let threadId: string | undefined;
+  let errorMsg: string | undefined;
+  let missingConfig: string[] | undefined;
+
+  if (activeToken) {
+    try {
+      const fromHeader = `Myers Global Pathways Admissions <${serverWorkspaceUserEmail || OFFICIAL_ADMISSIONS_EMAIL}>`;
+      const rawMessage = createRawMimeMessage({
+        to: recipient,
+        subject: payload.subject,
+        html: payload.html,
+        text: payload.text,
+        from: fromHeader,
+        replyTo: OFFICIAL_ADMISSIONS_EMAIL
+      });
+
+      const gmailResponse = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${activeToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ raw: rawMessage })
+      });
+
+      const gmailData: any = await gmailResponse.json().catch(() => ({}));
+
+      if (gmailResponse.ok && gmailData.id) {
+        delivered = true;
+        mode = 'gmail_api';
+        code = 'SENT';
+        messageId = gmailData.id;
+        threadId = gmailData.threadId;
+        console.log(`[Supporting Docs Email] Sent via Gmail API to ${recipient} (Ref: ${payload.applicationId}, ID: ${gmailData.id})`);
+      } else {
+        const detail = gmailData?.error?.message || `Gmail API returned HTTP ${gmailResponse.status}`;
+        errorMsg = gmailResponse.status === 401
+          ? `Google Workspace session expired (${detail}). Please reconnect Google Workspace in the Admin Dashboard.`
+          : `Gmail API delivery failed: ${detail}`;
+        code = 'DELIVERY_FAILED';
+        console.warn(`[Supporting Docs Email] Gmail API error:`, errorMsg);
+      }
+    } catch (err: any) {
+      errorMsg = `Network error while contacting Gmail API: ${err?.message || 'Unknown error'}`;
+      code = 'DELIVERY_FAILED';
+      console.warn(`[Supporting Docs Email] Gmail API exception:`, errorMsg);
+    }
+  } else if (smtpReady) {
+    try {
+      const port = Number(process.env.SMTP_PORT || 587);
+      const secure = process.env.SMTP_SECURE === 'true' || port === 465;
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port,
+        secure,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS
+        }
+      });
+
+      const fromAddress =
+        process.env.SMTP_FROM || `Myers Global Pathways Admissions <${OFFICIAL_ADMISSIONS_EMAIL}>`;
+
+      const info = await transporter.sendMail({
+        from: fromAddress,
+        replyTo: OFFICIAL_ADMISSIONS_EMAIL,
+        to: recipient,
+        subject: payload.subject,
+        text: payload.text,
+        html: payload.html
+      });
+
+      delivered = true;
+      mode = 'smtp';
+      code = 'SENT';
+      messageId = info.messageId;
+      console.log(`[Supporting Docs Email] Sent via SMTP to ${recipient} (Ref: ${payload.applicationId}, ID: ${info.messageId})`);
+    } catch (smtpErr: any) {
+      errorMsg = `SMTP delivery failed: ${smtpErr?.message || 'Unable to connect to mail server'}`;
+      code = 'DELIVERY_FAILED';
+      console.warn(`[Supporting Docs Email] SMTP exception:`, errorMsg);
+    }
+  } else {
+    const status = getEmailServiceStatus();
+    missingConfig = status.missingRequirements;
+    code = 'EMAIL_NOT_CONFIGURED';
+    errorMsg =
+      'No active email service is connected. Please connect Google Workspace (admissions@myersglobalpathways.com) using the button above, or configure SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASS on the server.';
+    console.warn(`[Supporting Docs Email] Attempt blocked — no active Gmail OAuth token or SMTP configuration.`);
+  }
+
+  // Always record the email delivery attempt in the student's application activity history
+  if (!Array.isArray(app.communicationLogs)) {
+    app.communicationLogs = [];
+  }
+
+  const logEntry = {
+    id: `comm-docs-req-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    type: 'email' as const,
+    templateType: 'supporting_documents_request' as const,
+    deliveryStatus: delivered ? ('sent' as const) : ('failed' as const),
+    deliveryMode: mode,
+    messageId,
+    error: errorMsg,
+    recipient,
+    subject: payload.subject,
+    message: payload.text,
+    sentBy: delivered
+      ? `${author} (${mode === 'gmail_api' ? 'Gmail API – Google Workspace' : 'SMTP Mail Server'})`
+      : `${author} (Delivery Failed)`,
+    timestamp: new Date().toISOString()
+  };
+
+  app.communicationLogs.unshift(logEntry);
+
+  return {
+    success: delivered,
+    delivered,
+    code,
+    subject: payload.subject,
+    recipient,
+    mode,
+    messageId,
+    threadId,
+    senderEmail: OFFICIAL_ADMISSIONS_EMAIL,
+    previewText: payload.text.slice(0, 180) + (payload.text.length > 180 ? '...' : ''),
+    error: errorMsg,
+    missingConfig,
+    logEntry
   };
 }

@@ -72,6 +72,7 @@ import {
 } from '../lib/firebase';
 import { ApplicationsAnalyticsChart } from './ApplicationsAnalyticsChart';
 import { WhatsAppAdmissionsMessageModal } from './WhatsAppAdmissionsMessageModal';
+import { RequestSupportingDocumentsModal } from './RequestSupportingDocumentsModal';
 
 interface AdminDashboardModalProps {
   isOpen: boolean;
@@ -200,6 +201,9 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   const [viewLogDetailModal, setViewLogDetailModal] = useState<CommunicationLog | null>(null);
   const [commTabFilter, setCommTabFilter] = useState<'all' | 'emails' | 'notes' | 'whatsapp'>('all');
 
+  // 7. Supporting Documents Request Email Modal State
+  const [supportingDocsModalApp, setSupportingDocsModalApp] = useState<ApplicationSubmission | null>(null);
+
   // Google Workspace OAuth 2.0 State (admissions@myersglobalpathways.com)
   const [isWorkspaceConnected, setIsWorkspaceConnected] = useState<boolean>(false);
   const [workspaceEmail, setWorkspaceEmail] = useState<string>('admissions@myersglobalpathways.com');
@@ -279,11 +283,52 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   }, []);
 
   const statusOptions: ApplicationStatus[] = [
-    'Application Submitted',
-    'Documents Review',
-    'University Review',
-    'Admission Decision'
+    'Application Received',
+    'Documents Requested',
+    'Documents Received',
+    'Documents Under Review',
+    'Application Submitted to University',
+    'Offer Letter Received'
   ];
+
+  // Open the Supporting Documents Request modal with freshest student dossier
+  const handleOpenSupportingDocsModal = async (app: ApplicationSubmission) => {
+    setSupportingDocsModalApp(app);
+    const targetId = app.id || app.trackingId;
+    if (!targetId) return;
+    try {
+      const result = await safeFetchJson(`/api/applications/${encodeURIComponent(targetId)}`);
+      if (result.ok && result.data?.success && result.data?.application) {
+        setSupportingDocsModalApp(result.data.application);
+      }
+    } catch (_) {}
+  };
+
+  // Persist application updates after a Supporting Documents Request email attempt (sent or failed)
+  const syncSupportingDocsAppUpdate = (updatedApp: ApplicationSubmission, toastMessage?: string) => {
+    const matchId = updatedApp.id || updatedApp.trackingId;
+    setApplications(prev => {
+      const next = prev.map(a =>
+        (matchId && (a.id === matchId || a.trackingId === matchId)) ? { ...a, ...updatedApp } : a
+      );
+      try {
+        localStorage.setItem('mgp_local_applications', JSON.stringify(next));
+        localStorage.setItem('mgp_applications', JSON.stringify(next));
+      } catch (_) {}
+      return next;
+    });
+
+    setSelectedAppDossier(prev =>
+      prev && matchId && (prev.id === matchId || prev.trackingId === matchId)
+        ? { ...prev, ...updatedApp }
+        : prev
+    );
+
+    syncApplicationToFirestore(updatedApp).catch(() => {});
+    if (toastMessage) {
+      showNotification(toastMessage);
+    }
+  };
 
   const universitySuggestions = [
     'SRM Institute of Science & Technology, Chennai / Delhi NCR',
@@ -1792,10 +1837,22 @@ Website: https://myersglobalpathways.com`;
     }
   };
 
+  // Helper to match status filter including backward-compatible legacy status labels
+  const matchesStatusFilter = (appStatus: string | undefined, filterValue: string): boolean => {
+    if (filterValue === 'ALL') return true;
+    const st = appStatus || 'Application Received';
+    if (st === filterValue) return true;
+    if (filterValue === 'Application Received' && st === 'Application Submitted') return true;
+    if (filterValue === 'Documents Under Review' && st === 'Documents Review') return true;
+    if (filterValue === 'Application Submitted to University' && st === 'University Review') return true;
+    if (filterValue === 'Offer Letter Received' && st === 'Admission Decision') return true;
+    return false;
+  };
+
   // Filtered and sorted applications list (Newest Applicants First by default)
   const filteredApps = useMemo(() => {
     const list = applications.filter(app => {
-      const matchesStatus = statusFilter === 'ALL' || app.status === statusFilter;
+      const matchesStatus = matchesStatusFilter(app.status, statusFilter);
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch = !q || 
         app.fullName?.toLowerCase().includes(q) ||
@@ -1828,10 +1885,16 @@ Website: https://myersglobalpathways.com`;
       }
       if (appSortBy === 'status') {
         const order: Record<string, number> = {
+          'Application Received': 1,
           'Application Submitted': 1,
-          'Documents Review': 2,
-          'University Review': 3,
-          'Admission Decision': 4
+          'Documents Requested': 2,
+          'Documents Received': 3,
+          'Documents Under Review': 4,
+          'Documents Review': 4,
+          'Application Submitted to University': 5,
+          'University Review': 5,
+          'Offer Letter Received': 6,
+          'Admission Decision': 6
         };
         const orderA = order[a.status || ''] || 99;
         const orderB = order[b.status || ''] || 99;
@@ -2151,7 +2214,7 @@ Website: https://myersglobalpathways.com`;
                     <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
                       adminTab === 'approvals' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-800'
                     }`}>
-                      {applications.filter(a => a.status === 'Admission Decision' || a.admissionDetails?.offerLetterIssued).length}
+                      {applications.filter(a => a.status === 'Offer Letter Received' || a.status === 'Admission Decision' || a.admissionDetails?.offerLetterIssued).length}
                     </span>
                   </button>
 
@@ -2180,21 +2243,28 @@ Website: https://myersglobalpathways.com`;
                     <span className="text-base font-extrabold text-slate-950 font-mono">{applications.length}</span>
                   </div>
                   <div className="px-3 py-2 rounded-xl bg-blue-50/80 border border-blue-200 shadow-2xs">
-                    <span className="text-[9px] font-bold uppercase text-blue-800 block">Submitted</span>
+                    <span className="text-[9px] font-bold uppercase text-blue-800 block">Received</span>
                     <span className="text-base font-extrabold text-blue-900 font-mono">
-                      {applications.filter(a => a.status === 'Application Submitted').length}
+                      {applications.filter(a => a.status === 'Application Received' || a.status === 'Application Submitted').length}
                     </span>
                   </div>
                   <div className="px-3 py-2 rounded-xl bg-amber-50/80 border border-amber-200 shadow-2xs">
-                    <span className="text-[9px] font-bold uppercase text-amber-800 block">Under Review</span>
+                    <span className="text-[9px] font-bold uppercase text-amber-800 block">Docs &amp; Review</span>
                     <span className="text-base font-extrabold text-amber-900 font-mono">
-                      {applications.filter(a => a.status === 'Documents Review' || a.status === 'University Review').length}
+                      {applications.filter(a =>
+                        a.status === 'Documents Requested' ||
+                        a.status === 'Documents Received' ||
+                        a.status === 'Documents Under Review' ||
+                        a.status === 'Documents Review' ||
+                        a.status === 'Application Submitted to University' ||
+                        a.status === 'University Review'
+                      ).length}
                     </span>
                   </div>
                   <div className="px-3 py-2 rounded-xl bg-emerald-50/80 border border-emerald-200 shadow-2xs">
-                    <span className="text-[9px] font-bold uppercase text-emerald-800 block">Approved</span>
+                    <span className="text-[9px] font-bold uppercase text-emerald-800 block">Offer Issued</span>
                     <span className="text-base font-extrabold text-emerald-900 font-mono">
-                      {applications.filter(a => a.status === 'Admission Decision' || a.admissionDetails?.offerLetterIssued).length}
+                      {applications.filter(a => a.status === 'Offer Letter Received' || a.status === 'Admission Decision' || a.admissionDetails?.offerLetterIssued).length}
                     </span>
                   </div>
                 </div>
@@ -2560,7 +2630,14 @@ Website: https://myersglobalpathways.com`;
                           const isSelected = selectedAppId === app.id;
                           const isChecked = selectedAppIds.includes(app.id!);
                           const docsCount = app.documents?.length || app.documentsCount || 0;
-                          const isApproved = app.status === 'Admission Decision' || app.admissionDetails?.offerLetterIssued;
+                          const isApproved = app.status === 'Offer Letter Received' || app.status === 'Admission Decision' || app.admissionDetails?.offerLetterIssued;
+                          const hasDocsRequestSent = Boolean(
+                            app.status === 'Documents Requested' ||
+                            app.documentsRequestedAt ||
+                            app.communicationLogs?.some(
+                              c => c.type === 'email' && c.templateType === 'supporting_documents_request' && c.deliveryStatus === 'sent'
+                            )
+                          );
 
                           return (
                             <div
@@ -2621,13 +2698,17 @@ Website: https://myersglobalpathways.com`;
                                   <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider inline-block ${
                                     isApproved 
                                       ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                                      : app.status === 'Documents Review'
-                                      ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                                      : app.status === 'University Review'
+                                      : app.status === 'Documents Requested'
+                                      ? 'bg-amber-100 text-amber-950 border border-amber-300'
+                                      : app.status === 'Documents Received'
+                                      ? 'bg-teal-100 text-teal-900 border border-teal-300'
+                                      : app.status === 'Documents Under Review' || app.status === 'Documents Review'
+                                      ? 'bg-sky-100 text-sky-900 border border-sky-300'
+                                      : app.status === 'Application Submitted to University' || app.status === 'University Review'
                                       ? 'bg-indigo-100 text-indigo-900 border border-indigo-300'
                                       : 'bg-slate-100 text-slate-800 border border-slate-200'
                                   }`}>
-                                    {app.status}
+                                    {app.status || 'Application Received'}
                                   </span>
                                 </div>
                               </div>
@@ -2664,7 +2745,22 @@ Website: https://myersglobalpathways.com`;
                                 </div>
 
                                 {/* Direct Action Buttons */}
-                                <div className="flex items-center gap-1.5">
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  {/* Request Supporting Documents Automated Email Button */}
+                                  <button
+                                    type="button"
+                                    onClick={(e) => { e.stopPropagation(); handleOpenSupportingDocsModal(app); }}
+                                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs border ${
+                                      hasDocsRequestSent
+                                        ? 'text-amber-900 bg-amber-50 hover:bg-amber-100 border-amber-300'
+                                        : 'text-white bg-[#0b192c] hover:bg-slate-800 border-slate-900'
+                                    }`}
+                                    title="Send official Application Received – Supporting Documents Request email"
+                                  >
+                                    <MailCheck className={`w-3.5 h-3.5 ${hasDocsRequestSent ? 'text-amber-700' : 'text-amber-400'}`} />
+                                    <span>Request Supporting Documents</span>
+                                  </button>
+
                                   {/* Direct WhatsApp Contact Button */}
                                   <button
                                     onClick={(e) => { e.stopPropagation(); handleOpenWhatsApp(app); }}
@@ -2838,6 +2934,17 @@ Website: https://myersglobalpathways.com`;
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2">
+                          {/* Request Supporting Documents Automated Email Button */}
+                          <button
+                            type="button"
+                            onClick={() => handleOpenSupportingDocsModal(selectedAppDossier)}
+                            className="px-3 py-1.5 rounded-xl text-xs font-extrabold text-white bg-[#0b192c] hover:bg-slate-800 border border-slate-900 shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                            title="Preview, edit, and send official Supporting Documents Request email"
+                          >
+                            <MailCheck className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Request Supporting Documents</span>
+                          </button>
+
                           {/* Automated Notify Trigger Button (Always available in dossier) */}
                           <button
                             onClick={() => handleOpenInstantNotificationTrigger(selectedAppDossier)}
@@ -2867,7 +2974,7 @@ Website: https://myersglobalpathways.com`;
                           </button>
 
                           {/* Approve */}
-                          {selectedAppDossier.status !== 'Admission Decision' && (
+                          {selectedAppDossier.status !== 'Admission Decision' && selectedAppDossier.status !== 'Offer Letter Received' && (
                             <button
                               onClick={() => handleOpenApproveModal(selectedAppDossier)}
                               className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 shadow-xs transition-colors flex items-center gap-1 cursor-pointer"
@@ -2982,11 +3089,12 @@ Website: https://myersglobalpathways.com`;
                           </button>
                         </div>
 
-                        {/* Quick Status Stage Transition Buttons */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                        {/* Quick Status Stage Transition Buttons (6 Official Admissions Stages) */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
                           {statusOptions.map((st) => {
                             const isCurrent = selectedAppDossier.status === st;
-                            const isDecision = st === 'Admission Decision';
+                            const isOffer = st === 'Offer Letter Received';
+                            const isDocsReq = st === 'Documents Requested';
                             
                             return (
                               <button
@@ -2996,13 +3104,15 @@ Website: https://myersglobalpathways.com`;
                                 onClick={() => handleStatusChange(st)}
                                 className={`px-2.5 py-2 rounded-xl text-[11px] font-bold text-left transition-all flex items-center justify-between border cursor-pointer ${
                                   isCurrent
-                                    ? isDecision
+                                    ? isOffer
                                       ? 'bg-emerald-600 border-emerald-600 text-white font-extrabold shadow-xs'
+                                      : isDocsReq
+                                      ? 'bg-amber-600 border-amber-600 text-white font-extrabold shadow-xs'
                                       : 'bg-blue-700 border-blue-700 text-white shadow-xs'
                                     : 'bg-white border-slate-200 text-slate-700 hover:border-blue-300 hover:bg-blue-50/50'
                                 }`}
                               >
-                                <span className="truncate">{st}</span>
+                                <span className="truncate" title={st}>{st}</span>
                                 {isCurrent && (
                                   <CheckCircle className="w-3.5 h-3.5 shrink-0 ml-1" />
                                 )}
@@ -3014,11 +3124,14 @@ Website: https://myersglobalpathways.com`;
                         {/* Status Selector Dropdown */}
                         <div className="flex items-center gap-2 pt-1">
                           <select
-                            value={selectedAppDossier.status}
+                            value={selectedAppDossier.status || 'Application Received'}
                             disabled={isUpdatingStatus}
                             onChange={(e) => handleStatusChange(e.target.value)}
                             className="flex-1 px-3 py-2 rounded-xl text-xs bg-white border border-slate-300 font-bold text-slate-900 cursor-pointer shadow-xs focus:ring-2 focus:ring-blue-500/20"
                           >
+                            {selectedAppDossier.status && !statusOptions.includes(selectedAppDossier.status) && (
+                              <option value={selectedAppDossier.status}>{selectedAppDossier.status} (Legacy)</option>
+                            )}
                             {statusOptions.map(st => (
                               <option key={st} value={st}>{st}</option>
                             ))}
@@ -3191,30 +3304,48 @@ Website: https://myersglobalpathways.com`;
 
                               const isEmail = log.type === 'email';
                               const isWhatsApp = log.type === 'whatsapp';
+                              const isFailed = log.deliveryStatus === 'failed';
+                              const isDocsReq = log.templateType === 'supporting_documents_request';
 
                               return (
                                 <div 
                                   key={log.id} 
                                   className={`p-3 rounded-xl border text-xs transition-all ${
-                                    isEmail 
+                                    isFailed
+                                      ? 'bg-rose-50/80 border-rose-200'
+                                      : isEmail 
                                       ? 'bg-blue-50/80 border-blue-200' 
                                       : isWhatsApp 
                                       ? 'bg-emerald-50/80 border-emerald-200' 
                                       : 'bg-slate-50 border-slate-200'
                                   }`}
                                 >
-                                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                                    <div className="flex items-center gap-1.5">
+                                  <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
+                                    <div className="flex items-center gap-1.5 flex-wrap">
                                       <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1 ${
-                                        isEmail 
+                                        isFailed
+                                          ? 'bg-rose-200 text-rose-950'
+                                          : isEmail 
                                           ? 'bg-blue-200 text-blue-900' 
                                           : isWhatsApp 
                                           ? 'bg-emerald-200 text-emerald-950' 
                                           : 'bg-slate-200 text-slate-800'
                                       }`}>
-                                        {isEmail && <Mail className="w-3 h-3 text-blue-800" />}
+                                        {isEmail && <Mail className="w-3 h-3" />}
                                         {isWhatsApp && <Phone className="w-3 h-3 text-emerald-800" />}
-                                        <span>{isEmail ? 'Automated Email Dispatched' : isWhatsApp ? 'WhatsApp Dispatched' : 'Communication Log'}</span>
+                                        <span>
+                                          {isDocsReq
+                                            ? isFailed
+                                              ? 'Docs Request Email Failed'
+                                              : 'Docs Request Email Sent'
+                                            : isEmail
+                                            ? isFailed
+                                              ? 'Email Delivery Failed'
+                                              : 'Automated Email Dispatched'
+                                            : isWhatsApp
+                                            ? 'WhatsApp Dispatched'
+                                            : 'Communication Log'}
+                                        </span>
                                       </span>
 
                                       <span className="text-[10px] text-slate-500 font-medium truncate max-w-[180px]">
@@ -3230,6 +3361,12 @@ Website: https://myersglobalpathways.com`;
                                   {log.subject && (
                                     <p className="font-bold text-slate-900 text-xs mb-1">
                                       Subject: {log.subject}
+                                    </p>
+                                  )}
+
+                                  {isFailed && log.error && (
+                                    <p className="text-[11px] text-rose-800 bg-white/90 p-2 rounded-lg border border-rose-200 mb-1.5 font-medium">
+                                      <strong>Delivery Error:</strong> {log.error}
                                     </p>
                                   )}
 
@@ -3470,7 +3607,7 @@ Website: https://myersglobalpathways.com`;
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {[...applications]
-                      .filter(a => a.status === 'Admission Decision' || a.admissionDetails?.offerLetterIssued)
+                      .filter(a => a.status === 'Offer Letter Received' || a.status === 'Admission Decision' || a.admissionDetails?.offerLetterIssued)
                       .sort((a, b) => getAppTimestamp(b) - getAppTimestamp(a))
                       .map((app) => (
                       <div key={app.id} className="p-4 rounded-2xl bg-white border border-emerald-300 shadow-xs space-y-3 text-left">
@@ -4835,6 +4972,28 @@ Website: https://myersglobalpathways.com`;
           </div>
         </div>
       )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 8: APPLICATION RECEIVED – SUPPORTING DOCUMENTS REQUEST EMAIL MODAL */}
+      {/* ========================================================================= */}
+      <RequestSupportingDocumentsModal
+        isOpen={Boolean(supportingDocsModalApp)}
+        app={supportingDocsModalApp}
+        onClose={() => setSupportingDocsModalApp(null)}
+        isWorkspaceConnected={isWorkspaceConnected}
+        isConnectingWorkspace={isConnectingWorkspace}
+        workspaceEmail={workspaceEmail}
+        onConnectWorkspace={handleGoogleWorkspaceConnect}
+        onSuccess={(updatedApp, message) => {
+          syncSupportingDocsAppUpdate(updatedApp, `✉️ ${message}`);
+        }}
+        onAttemptLogged={(updatedApp) => {
+          syncSupportingDocsAppUpdate(updatedApp);
+        }}
+        onErrorNotification={(errMsg) => {
+          showNotification(`⚠️ ${errMsg}`);
+        }}
+      />
 
     </div>
   );

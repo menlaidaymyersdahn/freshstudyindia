@@ -9,6 +9,9 @@ import dotenv from 'dotenv';
 import { 
   generateStatusEmail, 
   dispatchStatusNotificationEmail,
+  generateSupportingDocumentsRequestEmail,
+  dispatchSupportingDocumentsRequestEmail,
+  getEmailServiceStatus,
   setServerWorkspaceToken,
   clearServerWorkspaceToken,
   getServerWorkspaceTokenInfo
@@ -178,6 +181,9 @@ async function startServer() {
   let applications: any[] = loadApplicationsFromDisk();
   let enquiries: any[] = loadEnquiriesFromDisk();
 
+  // In-flight lock map to prevent concurrent duplicate Supporting Documents Request sends
+  const inFlightDocRequestLocks = new Map<string, number>();
+
   // API Health Endpoint
   app.get('/api/health', (req, res) => {
     res.json({ 
@@ -187,7 +193,18 @@ async function startServer() {
       totalEnquiries: enquiries.length,
       geminiConfigured: Boolean(process.env.GEMINI_API_KEY),
       googleWorkspaceOAuth: getServerWorkspaceTokenInfo(),
+      emailService: getEmailServiceStatus(),
       storageType: 'Secure Private Document Vault'
+    });
+  });
+
+  // EMAIL DELIVERY SERVICE STATUS ENDPOINT (Gmail OAuth + Optional SMTP)
+  app.get('/api/email/status', (req, res) => {
+    const authHeader = req.headers.authorization;
+    const bearer = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
+    res.json({
+      success: true,
+      ...getEmailServiceStatus(bearer)
     });
   });
 
@@ -413,7 +430,7 @@ async function startServer() {
         preferredCourse: preferredCourse ? String(preferredCourse).trim() : '',
         preferredUniversity: preferredUniversity ? String(preferredUniversity).trim() : '',
         message: message ? String(message).trim() : '',
-        status: 'Application Submitted',
+        status: 'Application Received',
         documentsCount: savedDocs.length,
         documents: savedDocs,
         notes: [
@@ -443,7 +460,7 @@ async function startServer() {
 
         confirmationEmailResult = await dispatchStatusNotificationEmail(
           newApplication,
-          'Application Submitted',
+          'Application Received',
           {
             author: 'Admissions Automated Notification Hub',
             baseUrl,
@@ -737,7 +754,7 @@ async function startServer() {
         preferredCourse: app.preferredCourse,
         preferredUniversity: app.preferredUniversity,
         currentQualification: app.currentQualification,
-        status: app.status || 'Application Submitted',
+        status: app.status || 'Application Received',
         documentsCount: app.documents?.length || 0,
         documentsSummary: (app.documents || []).map((d: any) => ({
           id: d.id,
@@ -746,6 +763,9 @@ async function startServer() {
           verified: Boolean(d.verified)
         })),
         notesCount: app.notes?.length || 0,
+        communicationLogs: Array.isArray(app.communicationLogs) ? app.communicationLogs : [],
+        documentsRequestedAt: app.documentsRequestedAt || undefined,
+        admissionDetails: app.admissionDetails || undefined,
         submittedAt: app.submittedAt,
         updatedAt: app.updatedAt
       }));
@@ -926,6 +946,227 @@ async function startServer() {
       });
     } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // 6d. PREVIEW "APPLICATION RECEIVED – SUPPORTING DOCUMENTS REQUEST" EMAIL
+  app.post('/api/applications/:id/request-documents-preview', (req, res) => {
+    try {
+      const { application: providedApp, subject, bodyText, recipientEmail } = req.body || {};
+      applications = loadApplicationsFromDisk();
+      const index = findAppIndex(applications, req.params.id);
+      const appItem = index !== -1 ? applications[index] : providedApp;
+
+      if (!appItem) {
+        return res.status(404).json({ success: false, error: 'Application not found' });
+      }
+
+      const authHeader = req.headers.authorization;
+      const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
+      const preview = generateSupportingDocumentsRequestEmail(appItem, {
+        subject,
+        bodyText,
+        recipientEmail
+      });
+
+      const previousRequests = (appItem.communicationLogs || []).filter(
+        (log: any) =>
+          log.type === 'email' &&
+          (log.templateType === 'supporting_documents_request' ||
+            String(log.subject || '').toLowerCase().includes('submission of supporting documents'))
+      );
+
+      res.json({
+        success: true,
+        preview,
+        previousRequests,
+        emailService: getEmailServiceStatus(bearerToken)
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message || 'Failed to generate document request preview' });
+    }
+  });
+
+  // 6e. SEND "APPLICATION RECEIVED – SUPPORTING DOCUMENTS REQUEST" EMAIL
+  // Updates application status to "Documents Requested" ONLY on successful delivery.
+  // Records every delivery attempt (sent or failed) in the student's activity history.
+  app.post('/api/applications/:id/request-documents-email', async (req, res) => {
+    const lockKey = String(req.params.id || '').trim().toLowerCase();
+
+    // Prevent concurrent double-click duplicate submissions
+    if (inFlightDocRequestLocks.has(lockKey)) {
+      const startedAt = inFlightDocRequestLocks.get(lockKey)!;
+      if (Date.now() - startedAt < 30000) {
+        return res.status(409).json({
+          success: false,
+          delivered: false,
+          code: 'IN_FLIGHT_DUPLICATE',
+          error: 'A supporting documents request email is already being sent for this application. Please wait a moment.'
+        });
+      }
+    }
+
+    inFlightDocRequestLocks.set(lockKey, Date.now());
+
+    try {
+      const {
+        application: providedApp,
+        recipientEmail,
+        subject,
+        bodyText,
+        author = 'Admissions Officer',
+        allowResend = false
+      } = req.body || {};
+
+      applications = loadApplicationsFromDisk();
+      let index = findAppIndex(applications, req.params.id);
+
+      if (index === -1 && providedApp && providedApp.fullName) {
+        const targetId = providedApp.id || req.params.id || `MGP-${Date.now()}`;
+        const hydratedRecord = {
+          ...providedApp,
+          id: targetId,
+          trackingId: providedApp.trackingId || targetId,
+          status: providedApp.status || 'Application Received',
+          notes: Array.isArray(providedApp.notes) ? providedApp.notes : [],
+          communicationLogs: Array.isArray(providedApp.communicationLogs) ? providedApp.communicationLogs : [],
+          submittedAt: providedApp.submittedAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        applications.unshift(hydratedRecord);
+        index = 0;
+      }
+
+      if (index === -1) {
+        return res.status(404).json({
+          success: false,
+          delivered: false,
+          code: 'NOT_FOUND',
+          error: 'Application record not found.'
+        });
+      }
+
+      const appItem = applications[index];
+
+      // Prevent accidental duplicate email submissions
+      const previousSentLogs = (appItem.communicationLogs || []).filter(
+        (log: any) =>
+          log.type === 'email' &&
+          log.deliveryStatus === 'sent' &&
+          (log.templateType === 'supporting_documents_request' ||
+            String(log.subject || '').toLowerCase().includes('submission of supporting documents'))
+      );
+
+      if (previousSentLogs.length > 0) {
+        const lastSentAt = previousSentLogs[0].timestamp;
+        const elapsedMs = Date.now() - new Date(lastSentAt).getTime();
+
+        // Hard 30-second anti-double-click cooldown even if allowResend is checked
+        if (!isNaN(elapsedMs) && elapsedMs >= 0 && elapsedMs < 30000) {
+          return res.status(409).json({
+            success: false,
+            delivered: false,
+            code: 'COOLDOWN_ACTIVE',
+            lastSentAt,
+            error: 'This supporting documents request email was just sent seconds ago. Please wait 30 seconds before sending again.'
+          });
+        }
+
+        if (!allowResend) {
+          return res.status(409).json({
+            success: false,
+            delivered: false,
+            code: 'DUPLICATE_REQUEST',
+            lastSentAt,
+            error: `A Supporting Documents Request email was already sent to ${appItem.email} on ${new Date(lastSentAt).toLocaleString()}. Confirm re-send if you intentionally want to send another copy.`
+          });
+        }
+      }
+
+      const authHeader = req.headers.authorization;
+      const bearerToken = authHeader?.startsWith('Bearer ')
+        ? authHeader.slice(7)
+        : (req.body?.bearerToken || req.body?.oauthToken || undefined);
+
+      const emailResult = await dispatchSupportingDocumentsRequestEmail(appItem, {
+        recipientEmail,
+        subject,
+        bodyText,
+        author,
+        bearerToken
+      });
+
+      if (!Array.isArray(appItem.notes)) {
+        appItem.notes = [];
+      }
+
+      const nowIso = new Date().toISOString();
+
+      if (emailResult.delivered) {
+        const previousStatus = appItem.status || 'Application Received';
+        // Strictly update application status to "Documents Requested" on successful delivery.
+        // Never mark documents as received or submitted to the University automatically.
+        appItem.status = 'Documents Requested';
+        appItem.documentsRequestedAt = nowIso;
+        appItem.updatedAt = nowIso;
+
+        appItem.notes.unshift({
+          id: `note-docs-req-${Date.now()}`,
+          author,
+          text: `Supporting Documents Request email sent to ${emailResult.recipient} (${emailResult.mode === 'gmail_api' ? 'Google Workspace Gmail API' : 'SMTP'}). Application status updated from "${previousStatus}" to "Documents Requested".`,
+          createdAt: nowIso
+        });
+
+        saveApplicationsToDisk(applications);
+
+        return res.json({
+          success: true,
+          delivered: true,
+          code: 'SENT',
+          statusUpdatedTo: 'Documents Requested',
+          message: `Supporting documents request email successfully sent to ${emailResult.recipient}. Application status updated to "Documents Requested".`,
+          emailResult,
+          application: appItem
+        });
+      }
+
+      // Delivery failed or email service not configured: log the failed attempt, do NOT alter status
+      appItem.updatedAt = nowIso;
+      appItem.notes.unshift({
+        id: `note-docs-req-fail-${Date.now()}`,
+        author,
+        text: `Supporting Documents Request email attempt to ${emailResult.recipient} failed: ${emailResult.error || 'Email service unavailable'}. Status unchanged ("${appItem.status || 'Application Received'}").`,
+        createdAt: nowIso
+      });
+
+      saveApplicationsToDisk(applications);
+
+      const httpStatus =
+        emailResult.code === 'INVALID_RECIPIENT'
+          ? 400
+          : emailResult.code === 'EMAIL_NOT_CONFIGURED'
+          ? 412
+          : 502;
+
+      return res.status(httpStatus).json({
+        success: false,
+        delivered: false,
+        code: emailResult.code || 'DELIVERY_FAILED',
+        error: emailResult.error || 'Failed to deliver supporting documents request email.',
+        missingConfig: emailResult.missingConfig,
+        emailResult,
+        application: appItem
+      });
+    } catch (err: any) {
+      console.error('[Supporting Docs Email Endpoint] Unexpected error:', err);
+      return res.status(500).json({
+        success: false,
+        delivered: false,
+        code: 'SERVER_ERROR',
+        error: err?.message || 'Unexpected error while sending supporting documents request email.'
+      });
+    } finally {
+      inFlightDocRequestLocks.delete(lockKey);
     }
   });
 

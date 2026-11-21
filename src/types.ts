@@ -1,4 +1,11 @@
-export type ApplicationStatus = 
+export type ApplicationStatus =
+  | 'Application Received'
+  | 'Documents Requested'
+  | 'Documents Received'
+  | 'Documents Under Review'
+  | 'Application Submitted to University'
+  | 'Offer Letter Received'
+  // Legacy statuses preserved for backward compatibility with existing records
   | 'Application Submitted'
   | 'Documents Review'
   | 'University Review'
@@ -25,6 +32,11 @@ export interface CommunicationLog {
   message: string;
   sentBy: string;
   timestamp: string;
+  templateType?: 'supporting_documents_request' | 'status_notification' | 'manual_email' | 'admission_offer';
+  deliveryStatus?: 'sent' | 'failed' | 'logged';
+  deliveryMode?: 'gmail_api' | 'smtp' | 'dossier_logged' | 'mailto';
+  messageId?: string;
+  error?: string;
 }
 
 export interface AdmissionDetails {
@@ -59,6 +71,7 @@ export interface ApplicationSubmission {
   notes?: { id: string; author: string; text: string; createdAt: string }[];
   admissionDetails?: AdmissionDetails;
   communicationLogs?: CommunicationLog[];
+  documentsRequestedAt?: string;
   submittedAt?: string;
   updatedAt?: string;
 }

@@ -57,10 +57,12 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
   const [uploadErrorNotice, setUploadErrorNotice] = useState<string | null>(null);
 
   const statusSteps: ApplicationStatus[] = [
-    'Application Submitted',
-    'Documents Review',
-    'University Review',
-    'Admission Decision'
+    'Application Received',
+    'Documents Requested',
+    'Documents Received',
+    'Documents Under Review',
+    'Application Submitted to University',
+    'Offer Letter Received'
   ];
 
   // On open: check for existing submissions and auto-load if available
@@ -240,8 +242,16 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
 
   const getCurrentStepIndex = (currentStatus?: ApplicationStatus) => {
     if (!currentStatus) return 0;
-    const idx = statusSteps.indexOf(currentStatus);
-    return idx === -1 ? 0 : idx;
+    const directIdx = statusSteps.indexOf(currentStatus);
+    if (directIdx !== -1) return directIdx;
+    // Backward-compatible mapping for legacy application statuses
+    const legacyMap: Record<string, number> = {
+      'Application Submitted': 0,
+      'Documents Review': 3,
+      'University Review': 4,
+      'Admission Decision': 5
+    };
+    return legacyMap[currentStatus] ?? 0;
   };
 
   // Document Upload Handlers
@@ -594,7 +604,7 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
               </div>
 
               {/* Official Admission Offer Letter Banner (If Approved) */}
-              {(studentRecord.admissionDetails || studentRecord.status === 'Admission Decision') && (
+              {(studentRecord.admissionDetails || studentRecord.status === 'Offer Letter Received' || studentRecord.status === 'Admission Decision') && (
                 <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-300 text-slate-900 space-y-3 shadow-xs">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">

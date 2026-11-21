@@ -141,7 +141,7 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
       preferredCourse: formData.preferredCourse.trim(),
       preferredUniversity: formData.preferredUniversity.trim(),
       message: formData.message.trim(),
-      status: 'Application Submitted',
+      status: 'Application Received' as const,
       documentsCount: documents.length,
       documents: documents.map(d => ({
         id: d.id,

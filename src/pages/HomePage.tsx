@@ -29,22 +29,32 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenApplication }) => {
     }
   };
 
+  const handleTrackApplication = (trackingId?: string) => {
+    const cleaned = trackingId?.trim();
+    if (cleaned) {
+      navigate(`/student-portal?trackingId=${encodeURIComponent(cleaned)}`);
+    } else {
+      navigate('/student-portal');
+    }
+  };
+
   return (
-    <div className="min-h-screen animate-fadeIn">
-      {/* Hero Section */}
+    <div className="min-h-screen bg-[#F7F5F0] text-[#181A1F]">
+      {/* 1. Hero Section */}
       <Hero
         onOpenApplication={() => handleApply()}
         onExploreStudyInIndia={() => navigate('/study-in-india')}
         onExploreServices={() => navigate('/services')}
       />
 
-      {/* Editorial Trust Intro */}
+      {/* 2. Advisory Overview & Live Admissions Workflow */}
       <EditorialTrustIntro
         onOpenApplication={() => handleApply()}
         onExploreServices={() => navigate('/services')}
+        onTrackApplication={handleTrackApplication}
       />
 
-      {/* Home Dedicated Navigation Hub Cards */}
+      {/* 3. Dedicated Portals & Programs Index */}
       <HomeFeatureHub
         onSelectTab={(tab) => {
           if (tab === 'home') navigate('/');
@@ -53,12 +63,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenApplication }) => {
         onOpenApplication={() => handleApply()}
       />
 
-      {/* Student Life in India & Campus Blog Spotlight */}
+      {/* 4. Student Life in India & Campus Blog */}
       <HomeStudentLifeSection
         onOpenApplication={() => handleApply()}
       />
 
-      {/* Application CTA Banner */}
+      {/* 5. Closing Application CTA */}
       <ApplicationCTA
         onOpenApplication={() => handleApply()}
         onContactClick={() => navigate('/contact')}

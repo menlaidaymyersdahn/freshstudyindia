@@ -14,15 +14,28 @@
           "intendedDegree": { "type": "string" },
           "desiredMajor": { "type": "string" },
           "budget": { "type": "string" },
-          "status": { "type": "string" },
+          "status": {
+            "type": "string",
+            "description": "Application workflow status: Application Received, Documents Requested, Documents Received, Documents Under Review, Application Submitted to University, Offer Letter Received"
+          },
           "stageIndex": { "type": "number" },
           "priority": { "type": "string" },
           "adminNotes": { "type": "string" },
           "universityMatch": { "type": "string" },
+          "documentsRequestedAt": { "type": "string" },
           "submittedAt": { "type": "string" },
           "updatedAt": { "type": "string" },
           "documents": {
             "type": "array",
+            "items": { "type": "object" }
+          },
+          "notes": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
+          "communicationLogs": {
+            "type": "array",
+            "description": "Email and WhatsApp communication activity history including Supporting Documents Request delivery attempts",
             "items": { "type": "object" }
           }
         },
