@@ -413,13 +413,14 @@ Website: ${baseUrl}`;
           
           <!-- Top Header Banner -->
           <tr>
-            <td style="background-color: #0b192c; padding: 32px 28px; text-align: center; border-bottom: 3px solid #f59e0b;">
+            <td style="background-color: #0b1f3a; padding: 28px 28px; text-align: center; border-bottom: 3px solid #c5922e;">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                   <td align="center">
-                    <div style="display: inline-block; background-color: #f59e0b; color: #0b192c; font-weight: 900; font-size: 18px; padding: 6px 14px; border-radius: 8px; letter-spacing: 1px; margin-bottom: 10px;">MGP</div>
-                    <h1 style="margin: 0; color: #ffffff; font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">Myers Global Pathways</h1>
-                    <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;">Admissions Directorate & Student Mobility Hub</p>
+                    <div style="display: inline-block; background-color: #ffffff; padding: 10px 16px; border-radius: 10px; margin-bottom: 12px;">
+                      <img src="https://myersglobalpathways.com/mgp-logo-full.png" alt="Myers Global Pathways" width="136" style="display: block; height: auto; max-width: 136px; border: 0;" />
+                    </div>
+                    <p style="margin: 0; color: #cbd5e1; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;">Admissions Directorate &amp; Student Mobility Hub</p>
                   </td>
                 </tr>
               </table>

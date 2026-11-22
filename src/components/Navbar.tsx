@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { COMPANY, getWhatsAppConfig } from '../config/company';
 import { Menu, X, ArrowRight, MessageCircle, MessageSquare } from 'lucide-react';
+import { OfficialLogo } from './OfficialLogo';
 
 interface NavbarProps {
   onOpenApplication?: () => void;
@@ -76,19 +77,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication, onOpenAdvisor
         }`}
       >
         <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 lg:gap-6">
-          {/* Zone 1: Single-line Brand Wordmark */}
+          {/* Zone 1: Official Myers Global Pathways Logo */}
           <Link
             to="/"
-            className="font-display text-base sm:text-[17px] font-bold tracking-[-0.02em] text-[#0B1F3A] hover:text-[#132E54] transition-ui whitespace-nowrap shrink-0 flex items-center gap-2.5"
+            className="hover:opacity-90 transition-ui shrink-0 flex items-center"
             aria-label="Myers Global Pathways — Home"
           >
-            <span
-              className="w-7 h-7 rounded-md bg-[#0B1F3A] text-[#E5B95C] font-display text-xs font-bold inline-flex items-center justify-center shrink-0"
-              aria-hidden="true"
-            >
-              M
-            </span>
-            <span>{COMPANY.shortName}</span>
+            <OfficialLogo variant="header" />
           </Link>
 
           {/* Zone 2: Clean Desktop Navigation Links */}
@@ -174,10 +169,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication, onOpenAdvisor
           }`}
         >
           {/* Drawer Header */}
-          <div className="h-16 px-5 border-b border-slate-200 flex items-center justify-between bg-[#0B1F3A] text-white shrink-0">
-            <span className="font-display text-base font-bold tracking-[-0.015em]">
-              {COMPANY.shortName}
-            </span>
+          <div className="min-h-[68px] py-2.5 px-5 border-b border-slate-200 flex items-center justify-between bg-[#0B1F3A] text-white shrink-0">
+            <Link
+              to="/"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-label="Myers Global Pathways — Home"
+              className="inline-flex items-center"
+            >
+              <OfficialLogo variant="badge" size="sm" />
+            </Link>
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}

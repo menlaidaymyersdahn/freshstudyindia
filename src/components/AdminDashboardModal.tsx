@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ApplicationStatus, ApplicationSubmission, EnquirySubmission, StudentDocument, CommunicationLog, AdmissionDetails } from '../types';
 import { COMPANY, getWhatsAppConfig } from '../config/company';
+import { OfficialLogo } from './OfficialLogo';
 import { 
   initAuth, 
   googleSignIn, 
@@ -1958,11 +1959,9 @@ Website: https://myersglobalpathways.com`;
       <div className="bg-[#F8FAFC] rounded-3xl max-w-6xl w-full max-h-[94vh] flex flex-col shadow-2xl border border-slate-300 overflow-hidden my-auto text-left">
         
         {/* Top Header Bar */}
-        <div className="p-4 sm:p-5 bg-[#07132B] text-white flex items-center justify-between border-b border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-black shadow-md shrink-0">
-              <ShieldCheck className="w-5 h-5 stroke-[2.2]" />
-            </div>
+        <div className="p-4 sm:p-5 bg-[#0B1F3A] text-white flex items-center justify-between border-b border-slate-800">
+          <div className="flex items-center gap-3.5">
+            <OfficialLogo variant="badge" size="sm" />
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-base sm:text-lg font-extrabold text-white tracking-tight">
@@ -2096,8 +2095,8 @@ Website: https://myersglobalpathways.com`;
             /* 1. PASSKEY AUTHENTICATION GATE */
             /* ========================================================================= */
             <div className="max-w-md mx-auto py-10 text-center space-y-6">
-              <div className="w-16 h-16 rounded-2xl bg-amber-100 border-2 border-amber-300 text-amber-800 flex items-center justify-center mx-auto shadow-sm">
-                <Lock className="w-8 h-8" />
+              <div className="flex justify-center">
+                <OfficialLogo variant="full" size="md" />
               </div>
 
               <div>

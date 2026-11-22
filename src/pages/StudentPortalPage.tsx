@@ -29,6 +29,7 @@ import {
 import { lookupApplicationInFirestore, syncApplicationToFirestore } from '../lib/firebase';
 import { useSEO } from '../hooks/useSEO';
 import { getWhatsAppConfig, COMPANY } from '../config/company';
+import { OfficialLogo } from '../components/OfficialLogo';
 
 export const StudentPortalPage: React.FC = () => {
   const navigate = useNavigate();
@@ -270,17 +271,21 @@ export const StudentPortalPage: React.FC = () => {
         {/* Portal Search & Welcome Card */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-sky-300 shadow-md mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-sky-200">
-            <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-900 border border-blue-300 text-xs font-bold">
-                <UserCheck className="w-3.5 h-3.5 text-blue-700" />
-                <span>Student Application Status Desk</span>
+            <div className="flex items-start gap-4">
+              <div className="hidden sm:block shrink-0 pt-0.5">
+                <OfficialLogo variant="full" size="sm" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">
-                Student Portal & Application Tracker
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-600">
-                Enter your Tracking ID (e.g. <strong className="text-slate-900 font-mono">MGP-2026-XXXX</strong>) or registered email address to view live admission updates.
-              </p>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#C5922E]">
+                  Student Application Status Desk
+                </p>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0B1F3A] tracking-tight">
+                  Student Portal & Application Tracker
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-600">
+                  Enter your Tracking ID (e.g. <strong className="text-slate-900 font-mono">MGP-IND-XXXXXX</strong>) or registered email address to view live admission updates.
+                </p>
+              </div>
             </div>
 
             <button

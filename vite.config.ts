@@ -11,15 +11,22 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.svg', 'icon.svg', 'apple-touch-icon.png'],
+        includeAssets: [
+          'favicon.ico',
+          'favicon-16x16.png',
+          'favicon-32x32.png',
+          'apple-touch-icon.png',
+          'mgp-logo-emblem.png',
+          'mgp-logo-full.png',
+        ],
         manifest: {
           id: '/',
           name: 'Myers Global Pathways',
           short_name: 'Myers Path',
           description:
             'International student admissions advisory, university directory, and application tracking portal for studying in India.',
-          theme_color: '#F7F5F0',
-          background_color: '#F7F5F0',
+          theme_color: '#0B1F3A',
+          background_color: '#FFFFFF',
           display: 'standalone',
           orientation: 'portrait',
           start_url: '/',

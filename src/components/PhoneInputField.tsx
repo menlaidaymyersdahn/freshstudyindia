@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronDown, Check, Phone, Globe2 } from 'lucide-react';
-import { COUNTRY_CODES, CountryCodeItem, DEFAULT_COUNTRY_CODE, parsePhoneNumber } from '../config/countryCodes';
+import { ChevronDown, Check, Globe2, Search, AlertCircle } from 'lucide-react';
+import {
+  COUNTRY_CODES,
+  CountryCodeItem,
+  DEFAULT_COUNTRY_CODE,
+  parsePhoneNumber,
+} from '../config/countryCodes';
 
 interface PhoneInputFieldProps {
   value: string;
@@ -25,43 +30,74 @@ export const PhoneInputField: React.FC<PhoneInputFieldProps> = ({
   placeholder,
   className = '',
   helperText,
-  error
+  error,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Parse current value
-  const parsed = parsePhoneNumber(value);
-  const [selectedDialCode, setSelectedDialCode] = useState<string>(parsed.dialCode || DEFAULT_COUNTRY_CODE.dialCode);
-  const [localNumber, setLocalNumber] = useState<string>(parsed.localNumber || '');
+  const initialParsed = parsePhoneNumber(value);
+  const [selectedCountry, setSelectedCountry] = useState<CountryCodeItem>(
+    initialParsed.countryItem || DEFAULT_COUNTRY_CODE
+  );
+  const [localNumber, setLocalNumber] = useState<string>(initialParsed.localNumber || '');
 
-  // Keep internal state synced if parent value changes externally
+  // Keep internal state synchronized when parent value changes externally
   useEffect(() => {
+    if (!value) {
+      setLocalNumber('');
+      return;
+    }
     const updated = parsePhoneNumber(value);
-    setSelectedDialCode(updated.dialCode || DEFAULT_COUNTRY_CODE.dialCode);
     setLocalNumber(updated.localNumber || '');
-  }, [value]);
+    if (updated.dialCode && updated.dialCode !== selectedCountry.dialCode) {
+      const matched =
+        updated.countryItem ||
+        COUNTRY_CODES.find((c) => c.dialCode === updated.dialCode) ||
+        DEFAULT_COUNTRY_CODE;
+      setSelectedCountry(matched);
+    }
+  }, [value, selectedCountry.dialCode]);
 
-  // Close dropdown on click outside
+  // Focus search input when opening dropdown
   useEffect(() => {
+    if (isOpen) {
+      requestAnimationFrame(() => {
+        searchInputRef.current?.focus();
+      });
+    }
+  }, [isOpen]);
+
+  // Close dropdown on click outside or Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
 
-  const currentCountry = COUNTRY_CODES.find(c => c.dialCode === selectedDialCode) || DEFAULT_COUNTRY_CODE;
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
 
   const handleDialCodeSelect = (country: CountryCodeItem) => {
-    setSelectedDialCode(country.dialCode);
+    setSelectedCountry(country);
     setIsOpen(false);
     setSearchQuery('');
-    
-    const combined = country.dialCode + (localNumber ? ` ${localNumber}` : '');
+
+    const combined = localNumber ? `${country.dialCode} ${localNumber}` : country.dialCode;
     onChange(combined);
 
     if (onCountrySelect) {
@@ -70,97 +106,131 @@ export const PhoneInputField: React.FC<PhoneInputFieldProps> = ({
   };
 
   const handleLocalNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let raw = e.target.value;
+    const raw = e.target.value;
 
-    // If user pasted a full number with a plus sign (e.g. +233 24 123 4567)
+    // Support pasting a full international number (e.g. +233 24 123 4567)
     if (raw.startsWith('+')) {
       const parsedPasted = parsePhoneNumber(raw);
-      setSelectedDialCode(parsedPasted.dialCode);
-      setLocalNumber(parsedPasted.localNumber);
-      onChange(raw);
-      if (parsedPasted.countryItem && onCountrySelect) {
-        onCountrySelect(parsedPasted.countryItem.name);
+      if (parsedPasted.countryItem) {
+        setSelectedCountry(parsedPasted.countryItem);
+        if (onCountrySelect) {
+          onCountrySelect(parsedPasted.countryItem.name);
+        }
       }
+      setLocalNumber(parsedPasted.localNumber);
+      onChange(raw.trim());
       return;
     }
 
-    // Clean up unwanted characters except numbers and spaces/dashes
-    const cleaned = raw.replace(/[^\d\s\-]/g, '');
+    const cleaned = raw.replace(/[^\d\s-]/g, '');
     setLocalNumber(cleaned);
-    const combined = `${selectedDialCode} ${cleaned}`.trim();
+    const combined = cleaned.trim() ? `${selectedCountry.dialCode} ${cleaned.trim()}` : '';
     onChange(combined);
   };
 
-  // Filter countries for search
-  const filteredCountries = COUNTRY_CODES.filter(c => 
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.dialCode.includes(searchQuery) ||
-    c.code.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredCountries = COUNTRY_CODES.filter((c) => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      c.name.toLowerCase().includes(q) ||
+      c.dialCode.includes(q) ||
+      c.code.toLowerCase().includes(q)
+    );
+  });
+
+  const hasError = Boolean(error);
 
   return (
-    <div className={`space-y-1 ${className}`}>
+    <div className={`space-y-1.5 ${className}`}>
       {label && (
-        <div className="flex items-center justify-between">
-          <label htmlFor={id} className="block text-xs font-bold text-slate-800">
-            {label} {required && <span className="text-red-500 font-bold">*</span>}
-          </label>
-          <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
-            Country Code Required
-          </span>
-        </div>
+        <label
+          htmlFor={id}
+          className="block text-[13px] font-semibold text-[#0B1F3A] tracking-[-0.01em]"
+        >
+          {label}
+          {required && <span className="text-red-600 ml-1" aria-hidden="true">*</span>}
+        </label>
       )}
 
-      <div className="relative flex items-stretch rounded-xl bg-slate-50 border border-sky-200 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all shadow-sm">
-        {/* Country Code Dropdown Trigger */}
-        <div className="relative" ref={dropdownRef}>
+      <div
+        className={`relative flex items-stretch min-h-[46px] rounded-lg bg-[#F4F6F9] border transition-all duration-150 ${
+          hasError
+            ? 'border-red-400 bg-red-50/30 focus-within:bg-white focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-500/15'
+            : 'border-slate-200 hover:border-slate-300 focus-within:bg-white focus-within:border-[#0B1F3A] focus-within:ring-2 focus-within:ring-[#0B1F3A]/10'
+        }`}
+      >
+        {/* Country Code Selector */}
+        <div className="relative shrink-0" ref={dropdownRef}>
           <button
             type="button"
-            onClick={() => setIsOpen(!isOpen)}
-            className="h-full flex items-center gap-1.5 px-3 py-2.5 bg-slate-100/90 hover:bg-slate-200/80 border-r border-sky-200 rounded-l-xl text-slate-900 font-bold text-xs sm:text-sm transition-colors select-none focus:outline-none"
-            title="Select Country Calling Code"
+            onClick={() => setIsOpen((prev) => !prev)}
+            aria-expanded={isOpen}
+            aria-haspopup="listbox"
+            aria-label={`Selected country code: ${selectedCountry.name} ${selectedCountry.dialCode}`}
+            className="h-full min-h-[44px] flex items-center gap-1.5 px-3 bg-slate-100/80 hover:bg-slate-200/70 border-r border-slate-200 rounded-l-lg text-[#0B1F3A] text-sm font-semibold transition-colors select-none focus:outline-none cursor-pointer"
           >
-            <span className="text-base leading-none">{currentCountry.flag}</span>
-            <span className="font-mono text-slate-950 font-bold tracking-tight">{currentCountry.dialCode}</span>
-            <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-150 ${isOpen ? 'rotate-180' : ''}`} />
+            <span className="text-base leading-none" aria-hidden="true">
+              {selectedCountry.flag}
+            </span>
+            <span className="font-mono text-[13px] font-semibold tabular-nums text-[#0B1F3A]">
+              {selectedCountry.dialCode}
+            </span>
+            <ChevronDown
+              className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-150 ${
+                isOpen ? 'rotate-180' : ''
+              }`}
+            />
           </button>
 
-          {/* Dropdown Menu */}
+          {/* Searchable Dropdown Popover */}
           {isOpen && (
-            <div className="absolute left-0 top-full mt-1.5 w-72 sm:w-80 max-h-72 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
-              {/* Search Bar */}
-              <div className="p-2 border-b border-slate-100 bg-slate-50">
-                <input
-                  type="text"
-                  autoFocus
-                  placeholder="Search country or code (e.g. +231, Liberia)..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 text-slate-900 placeholder:text-slate-400"
-                />
+            <div
+              role="listbox"
+              aria-label="Select country calling code"
+              className="absolute left-0 top-full mt-1.5 w-[min(19.5rem,calc(100vw-2.5rem))] max-h-72 bg-white rounded-xl shadow-[0_16px_40px_rgba(11,31,58,0.16)] border border-slate-200 z-50 overflow-hidden flex flex-col"
+            >
+              <div className="p-2.5 border-b border-slate-100 bg-[#F8FAFC]">
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="Search country or code (+231, Liberia)..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-8 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-[#0B1F3A] text-slate-900 placeholder:text-slate-400"
+                  />
+                </div>
               </div>
 
-              {/* Country List */}
-              <div className="overflow-y-auto flex-1 divide-y divide-slate-50 p-1">
+              <div className="overflow-y-auto flex-1 divide-y divide-slate-100/80 p-1">
                 {filteredCountries.length > 0 ? (
                   filteredCountries.map((country) => {
-                    const isSelected = country.dialCode === selectedDialCode;
+                    const isSelected = country.code === selectedCountry.code;
                     return (
                       <button
                         key={`${country.code}-${country.dialCode}`}
                         type="button"
+                        role="option"
+                        aria-selected={isSelected}
                         onClick={() => handleDialCodeSelect(country)}
-                        className={`w-full flex items-center justify-between px-3 py-2 text-left text-xs rounded-lg transition-colors ${
-                          isSelected ? 'bg-blue-50 text-blue-900 font-bold' : 'hover:bg-slate-100 text-slate-700'
+                        className={`w-full min-h-[40px] flex items-center justify-between px-2.5 py-2 text-left text-xs rounded-lg transition-colors cursor-pointer ${
+                          isSelected
+                            ? 'bg-[#0B1F3A]/6 text-[#0B1F3A] font-semibold'
+                            : 'hover:bg-slate-50 text-slate-700'
                         }`}
                       >
-                        <div className="flex items-center gap-2 truncate pr-2">
-                          <span className="text-base">{country.flag}</span>
+                        <div className="flex items-center gap-2 min-w-0 pr-2">
+                          <span className="text-base leading-none shrink-0" aria-hidden="true">
+                            {country.flag}
+                          </span>
                           <span className="truncate">{country.name}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                          <span className="font-mono font-bold text-slate-900">{country.dialCode}</span>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-blue-600" />}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="font-mono font-semibold tabular-nums text-[#0B1F3A]">
+                            {country.dialCode}
+                          </span>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-[#C5922E]" />}
                         </div>
                       </button>
                     );
@@ -175,27 +245,33 @@ export const PhoneInputField: React.FC<PhoneInputFieldProps> = ({
           )}
         </div>
 
-        {/* Local Number Input */}
+        {/* Local Phone Number Input */}
         <input
           id={id}
           type="tel"
+          inputMode="tel"
+          autoComplete="tel-national"
           required={required}
           value={localNumber}
           onChange={handleLocalNumberChange}
-          placeholder={placeholder || `e.g. ${currentCountry.example}`}
-          className="flex-1 px-3 py-2.5 bg-transparent rounded-r-xl text-slate-900 font-semibold text-xs sm:text-sm placeholder:text-slate-400 focus:outline-none"
+          placeholder={placeholder || `e.g. ${selectedCountry.example}`}
+          aria-invalid={hasError}
+          className="flex-1 min-w-0 px-3.5 py-2.5 bg-transparent rounded-r-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none tabular-nums"
         />
       </div>
 
-      {/* Helper & Requirement Guidance */}
       {error ? (
-        <p className="text-[11px] text-red-600 font-semibold flex items-center gap-1 mt-1">
-          <span>⚠️</span> {error}
+        <p className="text-xs text-red-600 font-medium flex items-center gap-1.5 pt-0.5" role="alert">
+          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+          <span>{error}</span>
         </p>
       ) : (
-        <p className="text-[11px] text-slate-500 flex items-center gap-1">
-          <Globe2 className="w-3 h-3 text-slate-400 inline" />
-          <span>{helperText || `Selected code: ${currentCountry.flag} ${currentCountry.name} (${currentCountry.dialCode}). Our admissions office in Monrovia & India will contact you via WhatsApp.`}</span>
+        <p className="text-[11px] text-slate-500 flex items-center gap-1.5 pt-0.5">
+          <Globe2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <span>
+            {helperText ||
+              `${selectedCountry.flag} ${selectedCountry.name} (${selectedCountry.dialCode}) — include your active WhatsApp number for admissions updates.`}
+          </span>
         </p>
       )}
     </div>

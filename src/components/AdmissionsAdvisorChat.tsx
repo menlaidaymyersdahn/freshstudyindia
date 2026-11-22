@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { OFFICIAL_EMAIL_DIRECTORY, getWhatsAppConfig } from '../config/company';
 import { X, Send, MessageSquare, MessageCircle, Loader2, Headphones } from 'lucide-react';
+import { OfficialLogo } from './OfficialLogo';
 
 interface AdmissionsAdvisorChatProps {
   onOpenApplication: () => void;
@@ -219,10 +220,13 @@ export const AdmissionsAdvisorChat: React.FC<AdmissionsAdvisorChatProps> = ({
       {isChatOpen && (
         <div className="fixed bottom-4 md:bottom-20 right-4 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-[400px] rounded-xl bg-white border border-slate-200 shadow-[0_16px_40px_rgba(11,31,58,0.18)] overflow-hidden flex flex-col max-h-[82vh] md:max-h-[560px] text-left">
           {/* Header */}
-          <div className="p-4 bg-[#0B1F3A] text-white flex items-center justify-between">
-            <div>
-              <h4 className="font-display text-sm font-bold text-white">Admissions Advisor</h4>
-              <p className="text-xs text-slate-300">Myers Global Pathways</p>
+          <div className="p-4 bg-[#0B1F3A] text-white flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <OfficialLogo variant="badge" size="sm" />
+              <div className="min-w-0">
+                <h4 className="font-display text-sm font-bold text-white truncate">Admissions Advisor</h4>
+                <p className="text-xs text-slate-300 truncate">Myers Global Pathways</p>
+              </div>
             </div>
 
             <button

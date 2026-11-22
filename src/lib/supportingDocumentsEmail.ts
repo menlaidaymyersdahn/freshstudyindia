@@ -233,14 +233,11 @@ export function renderSupportingDocumentsHtml(params: {
           
           <!-- Branded Header -->
           <tr>
-            <td class="email-pad" style="background-color: #0b192c; padding: 30px 32px; text-align: center; border-bottom: 4px solid #f59e0b;">
-              <div style="display: inline-block; background-color: #f59e0b; color: #0b192c; font-weight: 900; font-size: 16px; padding: 5px 13px; border-radius: 7px; letter-spacing: 1.5px; margin-bottom: 10px;">
-                MGP
+            <td class="email-pad" style="background-color: #0b1f3a; padding: 28px 32px; text-align: center; border-bottom: 4px solid #c5922e;">
+              <div style="display: inline-block; background-color: #ffffff; padding: 10px 16px; border-radius: 10px; margin-bottom: 12px;">
+                <img src="https://myersglobalpathways.com/mgp-logo-full.png" alt="Myers Global Pathways" width="132" style="display: block; height: auto; max-width: 132px; border: 0;" />
               </div>
-              <h1 style="margin: 0; color: #ffffff; font-size: 22px; font-weight: 800; letter-spacing: -0.3px;">
-                Myers Global Pathways
-              </h1>
-              <p style="margin: 5px 0 0 0; color: #cbd5e1; font-size: 11px; text-transform: uppercase; letter-spacing: 1.6px; font-weight: 600;">
+              <p style="margin: 0; color: #cbd5e1; font-size: 11px; text-transform: uppercase; letter-spacing: 1.6px; font-weight: 600;">
                 Admissions Desk &bull; Study in India Advisory
               </p>
             </td>

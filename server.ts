@@ -1912,9 +1912,12 @@ async function startServer() {
 </head>
 <body>
   <div class="header">
-    <div>
-      <div class="logo-title">MYERS GLOBAL PATHWAYS</div>
-      <div class="tagline">Your Pathway to Global Education • Monrovia & India Desks</div>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <img src="/mgp-logo-full.png" alt="Myers Global Pathways Official Logo" style="height: 60px; width: auto; display: block;" />
+      <div>
+        <div class="logo-title">MYERS GLOBAL PATHWAYS</div>
+        <div class="tagline">Your Pathway to Global Education • Monrovia & India Desks</div>
+      </div>
     </div>
     <div class="ref-badge">
       <div>REF: ${app.trackingId}</div>

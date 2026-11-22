@@ -15,7 +15,7 @@ export function useSEO({
   description,
   canonicalPath = '',
   ogType = 'website',
-  ogImage = '/og-image.svg',
+  ogImage = '/og-image.png',
   keywords,
   noIndex = false
 }: SEOProps) {

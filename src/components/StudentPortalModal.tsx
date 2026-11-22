@@ -27,6 +27,7 @@ import {
   Check
 } from 'lucide-react';
 import { lookupApplicationInFirestore, syncApplicationToFirestore } from '../lib/firebase';
+import { OfficialLogo } from './OfficialLogo';
 
 interface StudentPortalModalProps {
   isOpen: boolean;
@@ -389,13 +390,11 @@ export const StudentPortalModal: React.FC<StudentPortalModalProps> = ({
       <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden my-auto text-left">
         
         {/* Modal Header */}
-        <div className="p-5 sm:p-6 bg-[#0A1128] text-white flex items-center justify-between border-b border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
-              <UserCheck className="w-5 h-5" />
-            </div>
+        <div className="p-5 sm:p-6 bg-[#0B1F3A] text-white flex items-center justify-between border-b border-slate-800">
+          <div className="flex items-center gap-3.5">
+            <OfficialLogo variant="badge" size="sm" />
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#E5B95C]">
                 Student Self-Service Desk
               </span>
               <h3 className="text-lg sm:text-xl font-extrabold text-white">

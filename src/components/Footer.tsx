@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { COMPANY, OFFICIAL_EMAIL_DIRECTORY, getWhatsAppConfig } from '../config/company';
 import { MapPin, Phone, MessageCircle, Globe, Mail, MessageSquare } from 'lucide-react';
+import { OfficialLogo } from './OfficialLogo';
 
 interface FooterProps {
   onOpenApplication?: () => void;
@@ -37,16 +38,10 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdvisor }) => {
           <div className="lg:col-span-4 space-y-5">
             <Link
               to="/"
-              className="inline-flex items-center gap-2.5 font-display text-lg font-bold tracking-[-0.015em] text-white hover:text-[#F0C86E] transition-ui"
+              className="inline-flex items-center hover:opacity-95 transition-ui"
               aria-label="Myers Global Pathways — Home"
             >
-              <span
-                className="w-8 h-8 rounded-md bg-[#C5922E] text-[#081528] font-display text-sm font-extrabold inline-flex items-center justify-center shrink-0"
-                aria-hidden="true"
-              >
-                M
-              </span>
-              <span>{COMPANY.shortName}</span>
+              <OfficialLogo variant="badge" size="lg" />
             </Link>
 
             <p className="text-sm text-slate-300 leading-relaxed max-w-sm">
