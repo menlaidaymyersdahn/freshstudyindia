@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { OFFICIAL_EMAIL_DIRECTORY } from '../config/company';
-import { X, Send, MessageSquare, Loader2 } from 'lucide-react';
+import { OFFICIAL_EMAIL_DIRECTORY, getWhatsAppConfig } from '../config/company';
+import { X, Send, MessageSquare, MessageCircle, Loader2, Headphones } from 'lucide-react';
 
 interface AdmissionsAdvisorChatProps {
   onOpenApplication: () => void;
+  externalOpen?: boolean;
+  onExternalOpenChange?: (open: boolean) => void;
 }
 
 function generateSmartAdmissionsResponse(query: string): string {
@@ -23,7 +25,7 @@ function generateSmartAdmissionsResponse(query: string): string {
   }
 
   if (q.includes('course') || q.includes('degree') || q.includes('bachelor') || q.includes('master') || q.includes('engineering') || q.includes('medicine') || q.includes('nursing') || q.includes('pharmacy') || q.includes('computer') || q.includes('mba') || q.includes('bba')) {
-    return `Indian universities offer undergraduate and postgraduate degrees across several fields:\n\n- Technology: B.Tech / M.Tech in Computer Science, AI, Cyber Security, Civil, and Mechanical\n- Health Sciences: MBBS, B.Sc Nursing, B.Pharmacy, Medical Lab Tech\n- Business: BBA, MBA, Finance, Business Analytics\n- Computing: BCA, MCA, Data Science\n- Agriculture, Biotechnology, and Law\n\nSelect Start your application if you would like an eligibility review.`;
+    return `Indian universities offer undergraduate and postgraduate degrees across several fields:\n\n- Technology: B.Tech / M.Tech in Computer Science, AI, Cyber Security, Civil, and Mechanical\n- Health Sciences: MBBS, B.Sc Nursing, B.Pharmacy, Medical Lab Tech\n- Business: BBA, MBA, Finance, Business Analytics\n- Computing: BCA, MCA, Data Science\n- Agriculture, Biotechnology, and Law\n\nSelect Start Your Application if you would like an eligibility review.`;
   }
 
   if (q.includes('fee') || q.includes('cost') || q.includes('price') || q.includes('expensive') || q.includes('living') || q.includes('tuition') || q.includes('budget') || q.includes('afford')) {
@@ -45,8 +47,26 @@ function generateSmartAdmissionsResponse(query: string): string {
   return `Myers Global Pathways guides international students with university admissions, documentation, Indian student visas, and campus arrival. Reach us at admissions@myersglobalpathways.com or WhatsApp +231 889425645.`;
 }
 
-export const AdmissionsAdvisorChat: React.FC<AdmissionsAdvisorChatProps> = ({ onOpenApplication }) => {
-  const [isOpen, setIsOpen] = useState(false);
+export const AdmissionsAdvisorChat: React.FC<AdmissionsAdvisorChatProps> = ({
+  onOpenApplication,
+  externalOpen,
+  onExternalOpenChange
+}) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [deskMenuOpen, setDeskMenuOpen] = useState(false);
+  const whatsappConfig = getWhatsAppConfig();
+
+  const isChatOpen = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setChatOpen = (next: boolean) => {
+    setInternalOpen(next);
+    if (onExternalOpenChange) {
+      onExternalOpenChange(next);
+    }
+    if (next) {
+      setDeskMenuOpen(false);
+    }
+  };
+
   const [messages, setMessages] = useState<Array<{ sender: 'user' | 'model'; text: string }>>([
     {
       sender: 'model',
@@ -67,10 +87,10 @@ export const AdmissionsAdvisorChat: React.FC<AdmissionsAdvisorChatProps> = ({ on
   ];
 
   useEffect(() => {
-    if (isOpen) {
+    if (isChatOpen) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isOpen]);
+  }, [messages, isChatOpen]);
 
   const sendQuery = async (queryText: string) => {
     if (!queryText.trim() || isLoading) return;
@@ -117,47 +137,112 @@ export const AdmissionsAdvisorChat: React.FC<AdmissionsAdvisorChatProps> = ({ on
 
   return (
     <>
-      {/* Quiet Desk Trigger (docked bottom-right so left reading margin stays clear) */}
-      <div className="fixed bottom-6 right-36 z-40">
+      {/* Single Compact Desktop-Only Quick-Assist Trigger (Hidden on mobile so no floating button covers content) */}
+      <div className="hidden md:flex fixed bottom-6 right-6 z-40 flex-col items-end gap-3">
+        {deskMenuOpen && !isChatOpen && (
+          <div className="p-4 rounded-xl bg-white text-[#0F172A] text-xs border border-slate-200 w-72 text-left space-y-3 shadow-[0_12px_32px_rgba(11,31,58,0.14)]">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <div>
+                <p className="font-display font-bold text-sm text-[#0B1F3A]">Admissions Desk</p>
+                <p className="text-[11px] text-slate-500">Direct WhatsApp &amp; instant Q&amp;A</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDeskMenuOpen(false)}
+                className="text-slate-400 hover:text-[#0B1F3A] p-1 transition-ui cursor-pointer"
+                aria-label="Close admissions desk menu"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => setChatOpen(true)}
+                className="w-full p-3 rounded-lg bg-[#0B1F3A] hover:bg-[#132E54] text-white text-left flex items-center justify-between transition-ui cursor-pointer"
+              >
+                <span className="inline-flex items-center gap-2 font-semibold">
+                  <MessageSquare className="w-4 h-4 text-[#F0C86E]" />
+                  <span>Ask Admissions Advisor</span>
+                </span>
+              </button>
+
+              <a
+                href={whatsappConfig.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block p-3 rounded-lg bg-[#F4F6F9] hover:bg-slate-200/70 border border-slate-200 transition-ui"
+              >
+                <p className="font-semibold text-xs text-[#0B1F3A] inline-flex items-center gap-1.5">
+                  <MessageCircle className="w-3.5 h-3.5 text-[#9A6D17]" />
+                  <span>WhatsApp — Liberia Desk</span>
+                </p>
+                <p className="text-xs font-mono text-slate-600 mt-0.5 tabular-nums">+231 889425645</p>
+              </a>
+
+              <a
+                href={whatsappConfig.altUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block p-3 rounded-lg bg-[#F4F6F9] hover:bg-slate-200/70 border border-slate-200 transition-ui"
+              >
+                <p className="font-semibold text-xs text-[#0B1F3A] inline-flex items-center gap-1.5">
+                  <MessageCircle className="w-3.5 h-3.5 text-[#9A6D17]" />
+                  <span>WhatsApp — India Desk</span>
+                </p>
+                <p className="text-xs font-mono text-slate-600 mt-0.5 tabular-nums">+91 93478 69324</p>
+              </a>
+            </div>
+          </div>
+        )}
+
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="px-4 py-3 rounded-[10px] bg-white hover:bg-[#EFECE4] text-[#181A1F] border border-[#181A1F]/[0.14] transition-ui flex items-center gap-2 text-xs font-medium cursor-pointer shadow-[0_2px_8px_rgba(24,26,31,0.06)]"
-          title="Admissions desk chat"
+          onClick={() => {
+            if (isChatOpen) {
+              setChatOpen(false);
+            } else {
+              setDeskMenuOpen((prev) => !prev);
+            }
+          }}
+          className="px-4 py-3 rounded-lg bg-[#0B1F3A] hover:bg-[#132E54] text-white border border-white/15 transition-ui flex items-center gap-2 text-xs font-semibold cursor-pointer shadow-[0_6px_20px_rgba(11,31,58,0.22)]"
+          aria-label="Open admissions desk support"
+          title="Admissions Desk & WhatsApp Support"
         >
-          <MessageSquare className="w-4 h-4 text-[#A63A24]" />
-          <span>Ask admissions desk</span>
+          <Headphones className="w-4 h-4 text-[#F0C86E]" />
+          <span>Admissions Desk</span>
         </button>
       </div>
 
-      {/* Chat Panel */}
-      {isOpen && (
-        <div className="fixed bottom-24 right-4 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-[400px] rounded-2xl bg-white border border-[#181A1F]/[0.12] shadow-[0_12px_32px_rgba(24,26,31,0.10)] overflow-hidden flex flex-col max-h-[560px] text-left">
+      {/* Chat Drawer (Accessible from Desktop Quick-Assist AND Inline Mobile Buttons) */}
+      {isChatOpen && (
+        <div className="fixed bottom-4 md:bottom-20 right-4 sm:right-6 z-50 w-[calc(100vw-32px)] sm:w-[400px] rounded-xl bg-white border border-slate-200 shadow-[0_16px_40px_rgba(11,31,58,0.18)] overflow-hidden flex flex-col max-h-[82vh] md:max-h-[560px] text-left">
           {/* Header */}
-          <div className="p-4 bg-[#EFECE4] text-[#181A1F] flex items-center justify-between border-b border-[#181A1F]/[0.08]">
+          <div className="p-4 bg-[#0B1F3A] text-white flex items-center justify-between">
             <div>
-              <h4 className="text-sm font-medium text-[#181A1F]">Admissions desk</h4>
-              <p className="text-xs text-[#4F535C]">Myers Global Pathways</p>
+              <h4 className="font-display text-sm font-bold text-white">Admissions Advisor</h4>
+              <p className="text-xs text-slate-300">Myers Global Pathways</p>
             </div>
 
             <button
               type="button"
-              onClick={() => setIsOpen(false)}
-              className="p-2 rounded-lg text-[#4F535C] hover:text-[#181A1F] bg-white border border-[#181A1F]/[0.10] transition-ui cursor-pointer"
-              aria-label="Close admissions desk chat"
+              onClick={() => setChatOpen(false)}
+              className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-ui cursor-pointer"
+              aria-label="Close admissions advisor chat"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
           {/* Direct Channels Bar */}
-          <div className="px-4 py-2 bg-[#F7F5F0] border-b border-[#181A1F]/[0.08] flex items-center justify-between text-xs text-[#4F535C]">
-            <span>Liberia: <span className="font-mono text-[#181A1F]">+231 889425645</span></span>
-            <span>India: <span className="font-mono text-[#181A1F]">+91 93478 69324</span></span>
+          <div className="px-4 py-2 bg-[#F4F6F9] border-b border-slate-200 flex items-center justify-between text-[11px] text-slate-600">
+            <span>Liberia: <span className="font-mono text-[#0B1F3A] font-medium tabular-nums">+231 889425645</span></span>
+            <span>India: <span className="font-mono text-[#0B1F3A] font-medium tabular-nums">+91 93478 69324</span></span>
           </div>
 
           {/* Message History */}
-          <div className="p-4 overflow-y-auto flex-1 space-y-3 text-sm bg-[#F7F5F0] min-h-[220px]">
+          <div className="p-4 overflow-y-auto flex-1 space-y-3 text-sm bg-[#F4F6F9] min-h-[220px]">
             {messages.map((msg, i) => (
               <div
                 key={i}
@@ -166,8 +251,8 @@ export const AdmissionsAdvisorChat: React.FC<AdmissionsAdvisorChatProps> = ({ on
                 <div
                   className={`p-3 rounded-xl max-w-[85%] leading-relaxed whitespace-pre-line text-xs sm:text-sm ${
                     msg.sender === 'user'
-                      ? 'bg-[#181A1F] text-white'
-                      : 'bg-white text-[#181A1F] border border-[#181A1F]/[0.08]'
+                      ? 'bg-[#0B1F3A] text-white'
+                      : 'bg-white text-[#0F172A] border border-slate-200'
                   }`}
                 >
                   {msg.text}
@@ -176,8 +261,8 @@ export const AdmissionsAdvisorChat: React.FC<AdmissionsAdvisorChatProps> = ({ on
             ))}
 
             {isLoading && (
-              <div className="flex items-center gap-2 text-[#6E727D] text-xs py-1">
-                <Loader2 className="w-4 h-4 animate-spin text-[#A63A24]" />
+              <div className="flex items-center gap-2 text-slate-500 text-xs py-1">
+                <Loader2 className="w-4 h-4 animate-spin text-[#C5922E]" />
                 <span>Checking admissions information...</span>
               </div>
             )}
@@ -186,13 +271,13 @@ export const AdmissionsAdvisorChat: React.FC<AdmissionsAdvisorChatProps> = ({ on
           </div>
 
           {/* Quick Prompt Row */}
-          <div className="p-3 bg-white border-t border-[#181A1F]/[0.08] overflow-x-auto flex gap-2">
+          <div className="p-3 bg-white border-t border-slate-200 overflow-x-auto flex gap-2">
             {quickQuestions.map((q, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => sendQuery(q)}
-                className="px-3 py-1 rounded-lg bg-[#F7F5F0] hover:bg-[#EFECE4] border border-[#181A1F]/[0.08] text-xs text-[#4F535C] hover:text-[#181A1F] whitespace-nowrap transition-ui cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-[#F4F6F9] hover:bg-slate-200/70 border border-slate-200 text-xs text-slate-700 hover:text-[#0B1F3A] whitespace-nowrap transition-ui cursor-pointer"
               >
                 {q}
               </button>
@@ -200,36 +285,36 @@ export const AdmissionsAdvisorChat: React.FC<AdmissionsAdvisorChatProps> = ({ on
           </div>
 
           {/* Direct Application Link */}
-          <div className="px-4 py-2 bg-[#EFECE4] border-t border-[#181A1F]/[0.08] flex items-center justify-between text-xs">
-            <span className="text-[#4F535C]">Ready to apply?</span>
+          <div className="px-4 py-2.5 bg-[#F4F6F9] border-t border-slate-200 flex items-center justify-between text-xs">
+            <span className="text-slate-600">Ready to apply?</span>
             <button
               type="button"
               onClick={() => {
-                setIsOpen(false);
+                setChatOpen(false);
                 onOpenApplication();
               }}
-              className="text-[#A63A24] font-medium hover:underline cursor-pointer"
+              className="text-[#0B1F3A] font-semibold hover:text-[#9A6D17] hover:underline cursor-pointer"
             >
-              Start your application
+              Start Your Application
             </button>
           </div>
 
           {/* Input Form */}
-          <form onSubmit={handleSendMessage} className="p-3 bg-white border-t border-[#181A1F]/[0.08] flex gap-2">
+          <form onSubmit={handleSendMessage} className="p-3 bg-white border-t border-slate-200 flex gap-2">
             <input
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Ask about admissions, courses, or visas"
-              className="flex-1 px-3 py-2 rounded-lg text-sm bg-[#F7F5F0] border border-[#181A1F]/[0.12] focus:outline-none focus:border-[#A63A24] focus:bg-white text-[#181A1F] transition-ui"
+              className="flex-1 px-3 py-2 rounded-lg text-sm bg-[#F4F6F9] border border-slate-200 focus:outline-none focus:border-[#0B1F3A] focus:bg-white text-[#0F172A] transition-ui"
             />
             <button
               type="submit"
               disabled={isLoading || !inputText.trim()}
-              className="px-3 py-2 rounded-lg bg-[#A63A24] hover:bg-[#8C2F1C] text-white disabled:opacity-50 transition-ui flex items-center justify-center cursor-pointer"
+              className="px-3.5 py-2 rounded-lg bg-[#0B1F3A] hover:bg-[#132E54] text-white disabled:opacity-50 transition-ui flex items-center justify-center cursor-pointer"
               aria-label="Send message"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-4 h-4 text-[#F0C86E]" />
             </button>
           </form>
         </div>

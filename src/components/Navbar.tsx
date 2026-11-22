@@ -1,26 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { COMPANY } from '../config/company';
-import { Menu, X } from 'lucide-react';
-import { PWAInstallButton } from './PWAInstallButton';
+import { COMPANY, getWhatsAppConfig } from '../config/company';
+import { Menu, X, ArrowRight, MessageCircle, MessageSquare } from 'lucide-react';
 
 interface NavbarProps {
   onOpenApplication?: () => void;
+  onOpenAdvisor?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication, onOpenAdvisor }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const whatsappConfig = getWhatsAppConfig();
 
   const navLinks: Array<{ path: string; label: string }> = [
+    { path: '/', label: 'Home' },
     { path: '/study-in-india', label: 'Study in India' },
-    { path: '/services', label: 'Services' },
     { path: '/universities', label: 'Universities' },
-    { path: '/student-life', label: 'Student life' },
-    { path: '/faq', label: 'FAQ' },
-    { path: '/about', label: 'About' },
+    { path: '/services', label: 'Our Services' },
+    { path: '/student-life', label: 'Student Life' },
+    { path: '/about', label: 'About Us' },
     { path: '/contact', label: 'Contact' },
   ];
 
@@ -68,93 +69,83 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 h-16 transition-ui border-b ${
+        className={`fixed top-0 left-0 right-0 z-50 h-16 font-body transition-ui border-b ${
           isScrolled
-            ? 'bg-[#F7F5F0]/95 backdrop-blur-sm border-[#181A1F]/[0.10]'
-            : 'bg-[#F7F5F0] border-[#181A1F]/[0.08]'
+            ? 'bg-white/95 backdrop-blur-md border-slate-200/90 shadow-[0_4px_20px_rgba(11,31,58,0.06)]'
+            : 'bg-white border-slate-200/80'
         }`}
       >
-        <div className="max-w-7xl mx-auto h-full px-6 lg:px-8 flex items-center justify-between gap-2 xl:gap-4">
-          {/* Single-line Brand Wordmark */}
+        <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 lg:gap-6">
+          {/* Zone 1: Single-line Brand Wordmark */}
           <Link
             to="/"
-            className="text-base font-medium tracking-[-0.015em] text-[#181A1F] hover:text-[#A63A24] transition-ui whitespace-nowrap shrink-0"
+            className="font-display text-base sm:text-[17px] font-bold tracking-[-0.02em] text-[#0B1F3A] hover:text-[#132E54] transition-ui whitespace-nowrap shrink-0 flex items-center gap-2.5"
             aria-label="Myers Global Pathways — Home"
           >
-            {COMPANY.shortName}
+            <span
+              className="w-7 h-7 rounded-md bg-[#0B1F3A] text-[#E5B95C] font-display text-xs font-bold inline-flex items-center justify-center shrink-0"
+              aria-hidden="true"
+            >
+              M
+            </span>
+            <span>{COMPANY.shortName}</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1" aria-label="Main Navigation">
+          {/* Zone 2: Clean Desktop Navigation Links */}
+          <nav
+            className="hidden lg:flex items-center gap-1 xl:gap-2"
+            aria-label="Main Navigation"
+          >
             {navLinks.map((link) => {
               const isActive = isCurrentPath(link.path);
               return (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`px-2 xl:px-3 py-2 rounded-lg text-sm font-normal whitespace-nowrap transition-ui ${
+                  className={`relative px-2.5 xl:px-3 py-2 text-[13.5px] xl:text-sm whitespace-nowrap shrink-0 transition-ui ${
                     isActive
-                      ? 'text-[#A63A24] bg-[#A63A24]/[0.07] font-medium'
-                      : 'text-[#4F535C] hover:text-[#181A1F] hover:bg-[#181A1F]/[0.04]'
+                      ? 'text-[#0B1F3A] font-semibold'
+                      : 'text-slate-600 font-medium hover:text-[#0B1F3A]'
                   }`}
                 >
-                  {link.label}
+                  <span>{link.label}</span>
+                  {isActive && (
+                    <span
+                      className="absolute left-2.5 right-2.5 bottom-0.5 h-[2px] bg-[#C5922E] rounded-full"
+                      aria-hidden="true"
+                    />
+                  )}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Quiet Utility Actions */}
-          <div className="hidden lg:flex items-center gap-2 shrink-0">
-            <Link
-              to="/student-portal"
-              className={`px-2 py-2 rounded-lg text-sm whitespace-nowrap transition-ui ${
-                location.pathname.startsWith('/student-portal')
-                  ? 'text-[#A63A24] font-medium'
-                  : 'text-[#4F535C] hover:text-[#181A1F]'
-              }`}
-            >
-              Student portal
-            </Link>
-
-            <Link
-              to="/admin"
-              className={`px-2 py-2 rounded-lg text-sm whitespace-nowrap transition-ui ${
-                location.pathname === '/admin'
-                  ? 'text-[#A63A24] font-medium'
-                  : 'text-[#6E727D] hover:text-[#181A1F]'
-              }`}
-            >
-              Admin
-            </Link>
-
-            <PWAInstallButton />
-
+          {/* Zone 3: Prominent Primary Action */}
+          <div className="hidden lg:flex items-center shrink-0">
             <button
               type="button"
               onClick={handleApplyClick}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-[#181A1F] bg-white border border-[#181A1F]/[0.14] hover:border-[#A63A24] hover:text-[#A63A24] transition-ui cursor-pointer whitespace-nowrap"
+              className="px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#0B1F3A] hover:bg-[#132E54] transition-ui cursor-pointer whitespace-nowrap shrink-0 inline-flex items-center gap-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5922E]"
             >
-              Apply
+              <span>Apply Now</span>
+              <ArrowRight className="w-4 h-4 text-[#E5B95C]" />
             </button>
           </div>
 
           {/* Mobile Controls */}
-          <div className="flex lg:hidden items-center gap-2">
-            <PWAInstallButton compact />
-
+          <div className="flex lg:hidden items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={handleApplyClick}
-              className="px-3 py-2 rounded-lg text-xs font-medium text-[#181A1F] bg-white border border-[#181A1F]/[0.14] hover:border-[#A63A24] hover:text-[#A63A24] transition-ui cursor-pointer"
+              className="px-3.5 py-2 rounded-lg text-xs font-semibold text-white bg-[#0B1F3A] hover:bg-[#132E54] transition-ui cursor-pointer whitespace-nowrap min-h-[40px]"
             >
-              Apply
+              Apply Now
             </button>
 
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="p-2 rounded-lg text-[#181A1F] bg-white border border-[#181A1F]/[0.10] hover:border-[#181A1F]/[0.20] transition-ui cursor-pointer"
+              className="p-2.5 rounded-lg text-[#0B1F3A] bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-ui cursor-pointer min-h-[40px] min-w-[40px] inline-flex items-center justify-center"
               aria-label="Open navigation menu"
             >
               <Menu className="w-5 h-5" />
@@ -163,66 +154,52 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
         </div>
       </header>
 
-      {/* Mobile Navigation Drawer */}
+      {/* Mobile Slide-Out Navigation Drawer */}
       <div
         className={`fixed inset-0 z-50 lg:hidden transition-ui ${
           mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         aria-modal="true"
         role="dialog"
+        aria-label="Mobile Navigation"
       >
         <div
           onClick={() => setMobileMenuOpen(false)}
-          className="fixed inset-0 bg-[#181A1F]/30"
+          className="fixed inset-0 bg-[#071426]/55 backdrop-blur-[2px]"
         />
 
         <div
-          className={`fixed inset-y-0 right-0 max-w-sm w-full bg-[#F7F5F0] border-l border-[#181A1F]/[0.10] flex flex-col justify-between transition-ui z-10 ${
+          className={`fixed inset-y-0 right-0 max-w-sm w-[88vw] bg-white border-l border-slate-200 flex flex-col justify-between transition-ui z-10 shadow-2xl ${
             mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
-          <div className="h-16 px-6 border-b border-[#181A1F]/[0.08] flex items-center justify-between bg-white">
-            <span className="text-base font-medium text-[#181A1F]">{COMPANY.shortName}</span>
+          {/* Drawer Header */}
+          <div className="h-16 px-5 border-b border-slate-200 flex items-center justify-between bg-[#0B1F3A] text-white shrink-0">
+            <span className="font-display text-base font-bold tracking-[-0.015em]">
+              {COMPANY.shortName}
+            </span>
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2 rounded-lg text-[#4F535C] hover:text-[#181A1F] border border-[#181A1F]/[0.10] transition-ui cursor-pointer"
+              className="p-2 rounded-lg text-slate-200 hover:text-white hover:bg-white/10 transition-ui cursor-pointer min-h-[40px] min-w-[40px] inline-flex items-center justify-center"
               aria-label="Close navigation menu"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 text-left">
-            <div className="space-y-2">
-              <button
-                type="button"
-                onClick={handleApplyClick}
-                className="w-full py-3 px-4 rounded-lg text-sm font-medium text-white bg-[#A63A24] hover:bg-[#8C2F1C] transition-ui cursor-pointer text-center"
-              >
-                Start your application
-              </button>
-              <Link
-                to="/download-app"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block w-full py-2 px-4 rounded-lg text-sm font-medium text-[#181A1F] bg-white border border-[#181A1F]/[0.14] text-center transition-ui"
-              >
-                Install app / Android APK
-              </Link>
-            </div>
+          {/* Drawer Body */}
+          <div className="flex-1 overflow-y-auto p-5 space-y-6 text-left">
+            <button
+              type="button"
+              onClick={handleApplyClick}
+              className="w-full py-3.5 px-4 rounded-lg text-sm font-semibold text-[#081528] bg-[#C5922E] hover:bg-[#D4A13B] transition-ui cursor-pointer flex items-center justify-center gap-2 min-h-[46px]"
+            >
+              <span>Start Your Application</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
 
-            <div className="space-y-1">
-              <Link
-                to="/"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`block px-3 py-2 rounded-lg text-sm transition-ui ${
-                  location.pathname === '/'
-                    ? 'bg-white text-[#A63A24] font-medium border border-[#181A1F]/[0.08]'
-                    : 'text-[#4F535C] hover:bg-white hover:text-[#181A1F]'
-                }`}
-              >
-                Home
-              </Link>
+            <nav className="space-y-1" aria-label="Mobile Links">
               {navLinks.map((link) => {
                 const isActive = isCurrentPath(link.path);
                 return (
@@ -230,48 +207,88 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApplication }) => {
                     key={link.path}
                     to={link.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`block px-3 py-2 rounded-lg text-sm transition-ui ${
+                    className={`block px-3.5 py-3 rounded-lg text-sm transition-ui ${
                       isActive
-                        ? 'bg-white text-[#A63A24] font-medium border border-[#181A1F]/[0.08]'
-                        : 'text-[#4F535C] hover:bg-white hover:text-[#181A1F]'
+                        ? 'bg-[#0B1F3A]/[0.06] text-[#0B1F3A] font-semibold'
+                        : 'text-slate-700 hover:bg-slate-50 hover:text-[#0B1F3A] font-medium'
                     }`}
                   >
                     {link.label}
                   </Link>
                 );
               })}
-            </div>
+            </nav>
 
-            <div className="pt-4 border-t border-[#181A1F]/[0.08] space-y-1">
+            <div className="pt-4 border-t border-slate-200 space-y-1">
               <Link
                 to="/student-portal"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-lg text-sm text-[#181A1F] hover:bg-white transition-ui"
+                className="block px-3.5 py-2.5 rounded-lg text-sm font-semibold text-[#0B1F3A] hover:bg-slate-50 transition-ui"
               >
-                Student portal
+                Student Portal (Track Application)
+              </Link>
+              <Link
+                to="/faq"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-[#0B1F3A] transition-ui"
+              >
+                Frequently Asked Questions
               </Link>
               <Link
                 to="/admin"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-lg text-sm text-[#4F535C] hover:bg-white hover:text-[#181A1F] transition-ui"
+                className="block px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-[#0B1F3A] transition-ui"
               >
-                Admissions admin
+                Admissions Admin
               </Link>
             </div>
 
-            <div className="p-4 rounded-xl bg-white border border-[#181A1F]/[0.08] space-y-2 text-sm text-[#4F535C]">
-              <p className="font-medium text-[#181A1F]">Direct admissions desk</p>
-              <p>Monrovia, Liberia: {COMPANY.primaryPhone}</p>
-              <p>India desk: {COMPANY.alternativePhone}</p>
+            {/* Inline Mobile Contact & Advisor Actions (replaces intrusive floating buttons on mobile) */}
+            <div className="p-4 rounded-xl bg-[#F4F6F9] border border-slate-200/80 space-y-3">
+              <p className="font-display text-xs font-bold text-[#0B1F3A]">
+                Direct Admissions Support
+              </p>
+              <div className="space-y-2">
+                <a
+                  href={whatsappConfig.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-[#0B1F3A] hover:border-[#0B1F3A] flex items-center justify-between transition-ui min-h-[44px]"
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4 text-[#C5922E]" />
+                    <span>WhatsApp Desk</span>
+                  </span>
+                  <span className="font-mono text-[11px] text-slate-600 tabular-nums">{COMPANY.primaryPhone}</span>
+                </a>
+
+                {onOpenAdvisor && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onOpenAdvisor();
+                    }}
+                    className="w-full px-3.5 py-2.5 rounded-lg bg-[#0B1F3A] text-white text-xs font-semibold hover:bg-[#132E54] flex items-center justify-center gap-2 transition-ui cursor-pointer min-h-[44px]"
+                  >
+                    <MessageSquare className="w-4 h-4 text-[#E5B95C]" />
+                    <span>Ask Admissions Advisor</span>
+                  </button>
+                )}
+              </div>
+              <p className="text-[11px] text-slate-500 tabular-nums">
+                India Desk: {COMPANY.alternativePhone}
+              </p>
             </div>
           </div>
 
-          <div className="px-6 py-4 border-t border-[#181A1F]/[0.08] bg-white text-xs text-[#6E727D] flex items-center justify-between">
-            <span>© 2026 {COMPANY.shortName}</span>
+          {/* Drawer Footer */}
+          <div className="px-5 py-3.5 border-t border-slate-200 bg-slate-50 text-xs text-slate-500 flex items-center justify-between shrink-0">
+            <span>© {COMPANY.year} {COMPANY.shortName}</span>
             <Link
               to="/contact"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-[#181A1F] hover:text-[#A63A24] transition-ui"
+              className="text-[#0B1F3A] font-medium hover:text-[#9A6D17] transition-ui"
             >
               Contact
             </Link>

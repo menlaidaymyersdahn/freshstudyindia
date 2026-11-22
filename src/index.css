@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  /* Preserved inner-page surface tokens */
   --surface-canvas: #F7F5F0;
   --surface-elevated: #FFFFFF;
   --surface-recessed: #EFECE4;
@@ -9,26 +10,55 @@
   --ink-muted: #6E727D;
   --accent-primary: #A63A24;
   --accent-hover: #8C2F1C;
+
+  /* Consultancy Navy & Gold Design Tokens (Homepage, Navbar & Footer) */
+  --brand-navy: #0B1F3A;
+  --brand-navy-hover: #132E54;
+  --brand-navy-deep: #071426;
+  --brand-gold: #C5922E;
+  --brand-gold-hover: #D4A13B;
+  --brand-gold-ink: #9A6D17;
+  --consultancy-canvas: #FFFFFF;
+  --consultancy-subtle: #F4F6F9;
+  --consultancy-ink: #0F172A;
+  --consultancy-muted: #475569;
   --ease-out-ui: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @layer base {
   html {
-    font-family: 'Bricolage Grotesque', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background-color: var(--surface-canvas);
-    color: var(--ink-primary);
+    font-family: 'Plus Jakarta Sans', 'Bricolage Grotesque', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: var(--consultancy-canvas);
+    color: var(--consultancy-ink);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    background-color: var(--surface-canvas);
-    color: var(--ink-primary);
+    background-color: var(--consultancy-canvas);
+    color: var(--consultancy-ink);
   }
 }
 
+.font-display {
+  font-family: 'Manrope', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.font-body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
 .transition-ui {
-  transition-property: color, background-color, border-color, opacity, transform;
+  transition-property: color, background-color, border-color, opacity, transform, box-shadow;
   transition-duration: 200ms;
   transition-timing-function: var(--ease-out-ui);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transition-ui,
+  * {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

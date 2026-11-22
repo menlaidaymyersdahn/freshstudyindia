@@ -1,24 +1,33 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Hero } from '../components/Hero';
-import { EditorialTrustIntro } from '../components/EditorialTrustIntro';
-import { HomeFeatureHub } from '../components/HomeFeatureHub';
+import { TrustCredibilityBar } from '../components/TrustCredibilityBar';
+import { HomeUniversitiesSection } from '../components/HomeUniversitiesSection';
+import { HomeServicesSection } from '../components/HomeServicesSection';
+import { HomeProcessTimeline } from '../components/HomeProcessTimeline';
 import { HomeStudentLifeSection } from '../components/HomeStudentLifeSection';
+import { EditorialTrustIntro } from '../components/EditorialTrustIntro';
 import { ApplicationCTA } from '../components/ApplicationCTA';
 import { useSEO } from '../hooks/useSEO';
 
 interface HomePageProps {
   onOpenApplication?: (preset?: any) => void;
+  onOpenAdvisor?: () => void;
 }
 
-export const HomePage: React.FC<HomePageProps> = ({ onOpenApplication }) => {
+export const HomePage: React.FC<HomePageProps> = ({
+  onOpenApplication,
+  onOpenAdvisor
+}) => {
   const navigate = useNavigate();
 
   useSEO({
     title: 'Myers Global Pathways | Study in India Admissions Advisory',
-    description: 'Personalized educational consultancy assisting international students with university admissions, degree selection, documentation, student visas, and arrival support in India.',
+    description:
+      'Personalized educational consultancy assisting international students with university admissions, degree selection, documentation, student visas, and arrival support in India.',
     canonicalPath: '/',
-    keywords: 'Myers Global Pathways, Study in India, International Student Admissions India, African Students in India, India Student Visa Guidance, SRSU India, Menlaiday Myers Dahn'
+    keywords:
+      'Myers Global Pathways, Study in India, International Student Admissions India, African Students in India, India Student Visa Guidance, SRSU India, Menlaiday Myers Dahn'
   });
 
   const handleApply = (preset?: any) => {
@@ -39,39 +48,49 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenApplication }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F5F0] text-[#181A1F]">
-      {/* 1. Hero Section */}
+    <div className="min-h-screen bg-white text-[#0F172A] font-body">
+      {/* 1. Full-Width Editorial Hero (Real Uploaded Group Graduation Photo) */}
       <Hero
         onOpenApplication={() => handleApply()}
-        onExploreStudyInIndia={() => navigate('/study-in-india')}
+        onExploreUniversities={() => navigate('/universities')}
+      />
+
+      {/* 2. Four-Pillar Trust & Credibility Bar */}
+      <TrustCredibilityBar />
+
+      {/* 3. Featured University, Indian Study Hubs & Popular Academic Fields */}
+      <HomeUniversitiesSection
+        onExploreUniversities={() => navigate('/universities')}
+        onApplyWithPreset={(preset) => handleApply(preset)}
+      />
+
+      {/* 4. Eight Admissions Advisory Services */}
+      <HomeServicesSection
         onExploreServices={() => navigate('/services')}
       />
 
-      {/* 2. Advisory Overview & Live Admissions Workflow */}
+      {/* 5. Four-Step Visual Admissions Timeline */}
+      <HomeProcessTimeline
+        onOpenApplication={() => handleApply()}
+      />
+
+      {/* 6. Graduate & Student Success Showcase + Live Firestore Student Stories */}
+      <HomeStudentLifeSection
+        onOpenApplication={(preset) => handleApply(preset)}
+      />
+
+      {/* 7. Interactive Six-Stage Admissions Status Tracker & Live Portal Lookup */}
       <EditorialTrustIntro
         onOpenApplication={() => handleApply()}
         onExploreServices={() => navigate('/services')}
         onTrackApplication={handleTrackApplication}
       />
 
-      {/* 3. Dedicated Portals & Programs Index */}
-      <HomeFeatureHub
-        onSelectTab={(tab) => {
-          if (tab === 'home') navigate('/');
-          else navigate(`/${tab}`);
-        }}
-        onOpenApplication={() => handleApply()}
-      />
-
-      {/* 4. Student Life in India & Campus Blog */}
-      <HomeStudentLifeSection
-        onOpenApplication={() => handleApply()}
-      />
-
-      {/* 5. Closing Application CTA */}
+      {/* 8. Closing Admissions Consultation Band */}
       <ApplicationCTA
         onOpenApplication={() => handleApply()}
         onContactClick={() => navigate('/contact')}
+        onOpenAdvisor={onOpenAdvisor}
       />
     </div>
   );

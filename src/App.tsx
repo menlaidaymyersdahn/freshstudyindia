@@ -3,7 +3,6 @@ import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { ScrollToTop } from './components/ScrollToTop';
-import { WhatsAppFloatingButton } from './components/WhatsAppFloatingButton';
 import { AdmissionsAdvisorChat } from './components/AdmissionsAdvisorChat';
 import { ApplicationModal } from './components/ApplicationModal';
 import { StudentPortalModal } from './components/StudentPortalModal';
@@ -41,9 +40,10 @@ export function App() {
     } catch (_) {}
   }, [navigate, location.pathname]);
 
-  // Modal States
+  // Modal & Advisor States
   const [isApplicationOpen, setIsApplicationOpen] = useState(false);
   const [isStudentPortalOpen, setIsStudentPortalOpen] = useState(false);
+  const [isAdvisorOpen, setIsAdvisorOpen] = useState(false);
   
   // Application Modal Preset
   const [applicationPreset, setApplicationPreset] = useState<{
@@ -81,9 +81,10 @@ export function App() {
   };
 
   const isAdminRoute = location.pathname === '/admin';
+  const isHomeRoute = location.pathname === '/';
 
   return (
-    <div className="min-h-screen bg-[#F7F5F0] text-[#181A1F] flex flex-col selection:bg-[#A63A24]/15 selection:text-[#181A1F] relative">
+    <div className={`min-h-screen flex flex-col selection:bg-[#C5922E]/20 selection:text-[#0B1F3A] relative ${isHomeRoute ? 'bg-white text-[#0F172A]' : 'bg-[#F7F5F0] text-[#181A1F]'}`}>
       
       {/* Scroll restoration on route changes */}
       <ScrollToTop />
@@ -92,6 +93,7 @@ export function App() {
       {!isAdminRoute && (
         <Navbar
           onOpenApplication={() => handleOpenApplication()}
+          onOpenAdvisor={() => setIsAdvisorOpen(true)}
         />
       )}
 
@@ -101,7 +103,12 @@ export function App() {
           {/* Home */}
           <Route 
             path="/" 
-            element={<HomePage onOpenApplication={handleOpenApplication} />} 
+            element={
+              <HomePage
+                onOpenApplication={handleOpenApplication}
+                onOpenAdvisor={() => setIsAdvisorOpen(true)}
+              />
+            } 
           />
 
           {/* Study in India */}
@@ -285,6 +292,7 @@ export function App() {
       {!isAdminRoute && (
         <Footer
           onOpenApplication={() => handleOpenApplication()}
+          onOpenAdvisor={() => setIsAdvisorOpen(true)}
         />
       )}
 
@@ -309,13 +317,12 @@ export function App() {
         }}
       />
 
-      {/* Floating WhatsApp Action Trigger */}
-      {!isAdminRoute && <WhatsAppFloatingButton />}
-
-      {/* AI Admissions Counselor Drawer */}
+      {/* Unified Desktop Quick-Assist (WhatsApp + Admissions Advisor Drawer; hidden floating trigger on mobile) */}
       {!isAdminRoute && (
         <AdmissionsAdvisorChat 
           onOpenApplication={() => handleOpenApplication()}
+          externalOpen={isAdvisorOpen}
+          onExternalOpenChange={setIsAdvisorOpen}
         />
       )}
 
